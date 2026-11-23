@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
 type: article
 title: "Kintsugi: Find and Repair Quantization Damage Where Tasks Break, Not Where Averages Look"
-version: "1.0"
+version: "1.0.1"
 date-released: "2026-11-23"
 license: CC-BY-4.0
 repository-code: "https://github.com/professorpalmer/kintsugi-method"

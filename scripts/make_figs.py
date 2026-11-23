@@ -101,7 +101,7 @@ def fig2():
             ("KL-tools", [301, np.nan, 299], OK["orange"], "^", "--"),
             ("author's fits", [288, np.nan, 289], OK["green"], "v", "--"),
             ("KL-only winner", [285, np.nan, 296], OK["verm"], "D", "--")]
-    fig, ax = plt.subplots(1, 2, figsize=(7.2, 2.9))
+    fig, ax = plt.subplots(1, 2, figsize=(7.2, 3.5))
     x = np.arange(3)
     for n, v, c, m, ls in arms:
         v = np.array(v, dtype=float)
@@ -111,7 +111,7 @@ def fig2():
     ax[0].set_xticks(x); ax[0].set_xticklabels(pairs)
     ax[0].set_ylabel("AppWorld test_normal task-runs (of 336)")
     ax[0].set_title("(a) Score per seed pair")
-    ax[0].legend(frameon=False, fontsize=7, loc="lower right", ncol=1)
+    ax[0].legend(frameon=False, fontsize=7, loc="upper center", ncol=3, bbox_to_anchor=(0.5, -0.24), columnspacing=0.8, handletextpad=0.4)
     g = [(21, 8, 34, 0.0025), (1, -14, 17, 1.0), (-2, -16, 11, 0.89)]
     for i, (p, lo, hi, pv) in enumerate(g):
         ax[1].errorbar(i, p, yerr=[[p - lo], [hi - p]], fmt="o", ms=8, color=OK["black"] if i == 0 else OK["blue"],
@@ -143,7 +143,7 @@ def fig3():
                 assert [r["item"] for r in A] == [r["item"] for r in X]
                 d += [min(x["min"], CAP) - min(a["min"], CAP) for a, x in zip(A, X)]
         gc[arm] = np.array(d)
-    fig, ax = plt.subplots(1, 2, figsize=(7.2, 2.9))
+    fig, ax = plt.subplots(1, 2, figsize=(7.2, 3.4))
     for t, c, m, n in (("U1", OK["orange"], "o", "uniform baseline"), ("H1", OK["blue"], "s", "HAWQ-style baseline")):
         v = np.sort(gb[t])
         ax[0].plot(np.arange(len(v)), v, ls="-", lw=1, color=c, marker=m, ms=3.5, mfc="white" if m == "o" else c,
@@ -152,7 +152,7 @@ def fig3():
     ax[0].set_xlabel("items, sorted by difference (Qwen, 117k)")
     ax[0].set_ylabel("capped item margin vs shipped (nats)")
     ax[0].set_title("(a) Qwen baselines: the change sits in few items")
-    ax[0].legend(frameon=False, fontsize=7, loc="upper left")
+    ax[0].legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.2))
     for arm, c, m, n in (("b", OK["verm"], "^", "blanket q4_0"), ("c", OK["green"], "v", "blanket q8_0"),
                          ("d", OK["purple"], "D", "q4_0 global + f16 SWA")):
         v = np.sort(gc[arm])
@@ -160,9 +160,9 @@ def fig3():
                    label=f"{n}: mean {v.mean():+.3f}")
     ax[1].axhline(0, color=OK["grey"], lw=0.8, ls=":")
     ax[1].set_xlabel("item-depth units, sorted (Inkling, 117k + 245k)")
-    ax[1].set_ylabel("capped item margin vs release K/V (nats)")
+    ax[1].set_ylabel("capped margin vs release K/V (nats)")
     ax[1].set_title("(b) Inkling K/V settings: spread, no shift")
-    ax[1].legend(frameon=False, fontsize=7, loc="upper left")
+    ax[1].legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.2))
     fig.tight_layout(w_pad=2.5)
     save(fig, "fig4-item-margins")
 

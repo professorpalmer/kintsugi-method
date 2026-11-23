@@ -2,7 +2,7 @@
 
 Cary Palmer
 
-*Version 1.0 (2026-11-23). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one.*
+*Version 1.0.1 (2026-11-23). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one.*
 
 ---
 
@@ -81,11 +81,12 @@ a multi-step agent benchmark. Three observations shaped the method.
 is the L0xRE-V2 allocation by YourHighnessLA [L0xRE-V2], shipped unchanged. On the 27B model our method changed what did *not*
 ship and what we claimed; on Inkling 2 Mini it chose the shipped map and runtime settings.
 
-**Availability.** Kintsugi-27B: https://github.com/professorpalmer/Kintsugi-27B (weights:
-https://huggingface.co/CaryPalmer/Kintsugi-27B). Kintsugi for Inkling 2 Mini, release v1.0:
-https://github.com/professorpalmer/Kintsugi-Inkling-2-Mini/releases/tag/v1.0 (weights:
-https://huggingface.co/CaryPalmer/Kintsugi-Inkling-2-Mini). Evidence, data and the scripts that recompute every
-statistic and figure: https://github.com/professorpalmer/kintsugi-method.
+**Availability.** Kintsugi-27B: [GitHub](https://github.com/professorpalmer/Kintsugi-27B) and
+[Hugging Face](https://huggingface.co/CaryPalmer/Kintsugi-27B). Kintsugi for Inkling 2 Mini:
+[release v1.0](https://github.com/professorpalmer/Kintsugi-Inkling-2-Mini/releases/tag/v1.0) and
+[Hugging Face](https://huggingface.co/CaryPalmer/Kintsugi-Inkling-2-Mini). Evidence, data and the scripts that
+recompute every statistic and figure: the [evidence repository](https://github.com/professorpalmer/kintsugi-method)
+(DOI [10.5281/zenodo.24455576](https://doi.org/10.5281/zenodo.24455576)).
 
 ## 2. Setting
 
@@ -178,7 +179,7 @@ seeds 100 + 101; fresh = seeds 104 + 105.*
 | KL-group | measured KL per group | -9.3 % [-10.5, -8.3]; p2 -8.2 % | 23/24 + 19/20 (a needle lost) | not run | fail | [E1.3] |
 | KL-table A | KL table | -8.5 % (subset) | 24/24 + 19/20 (fragile item only) | not run | fail as written (weak) | [E1.6] |
 | KL-table B | KL table | -10.6 % (subset) | needle margin -1.94; held-out (B1): long-range margin loss | not run | fail | [E1.7, E1.34] |
-| KL-only winner | KL table | -7.0 % [-8.3, -5.6] | 24/24 + 20/20 (also at 245k) | 285 vs 302 (p = 0.019); 296 vs 292 (p = 0.68); test_challenge 610 vs 670 of 834 (p = 1.3e-5) | long-chat flag; loses on the harder split | [E1.8, E1.31, E1.36] |
+| KL-only winner | KL table | -7.0 % [-8.3, -5.6] | 24/24 + 20/20 (also at 245k) | 285 vs 302 (p = 0.019); 296 vs 292 (p = 0.68); harder split: 610 vs 670 of 834 (p = 1.3e-5) | long-chat flag; loses on the harder split | [E1.8, E1.31, E1.36] |
 | KL-tools | KL table, tools-aimed | -7.9 % [-9.1, -6.9] | 24/24 + 20/20 | 301 vs 302 (p = 1.00); 299 vs 292 (p = 0.37) | no gain; long-chat flag | [E1.9, E3.16] |
 | Uniform (baseline) | uniform rule: 3 bits on the last 30 layers | -3.8 % [-6.0, -1.6]; p2 -1.2 % [-6.6, +4.4] | 24/24 + 19/20 (fragile item only); more margin on the other 43 | not run (rule) | fail as written (weak); chat +13.6 % | [E1.28, E1.33] |
 
@@ -187,7 +188,7 @@ band up to 256k tokens in both KL and the model's own NLL of the true next token
 one code copy at 117k. The KL-only winner passed every KL, recall and code gate. On the selection seeds it lost the agent
 benchmark by 17 task-runs (difference -17 [-30, -3]); on two fresh seeds it was level (+4 [-10, +18], p = 0.68), so
 that loss did not replicate on that split [E1.8, E1.31, E3.17]. On the harder test_challenge split (417 tasks that no
-choice used; the third of the owner's three tests, with its line written before the run) it lost 60 of 834 task-runs:
+choice used; the third of the author's three tests, with its line written before the run) it lost 60 of 834 task-runs:
 610 against 670, 63 against 123 discordant, p = 1.3e-5, difference -60 [-87, -33], and on each seed (106: 304 against
 335, p = 0.0017; 107: 306 against 335, p = 0.0035) [E1.36, E3.17]. Both results stand: on the standard split the two
 files were level on fresh seeds; on the harder split the KL-only winner is clearly worse. The cost of KL-only selection
@@ -206,7 +207,7 @@ selection seeds (filled) and on fresh seeds 104 + 105 (open), with 95 % paired b
 agent loss of the KL-only winner did not replicate on this standard split; on the harder test_challenge split (not
 shown) it lost 60 of 834 task-runs [-87, -33] [E1.8, E1.31, E1.36, E3.16, E3.17].](figs/fig2-kl-vs-task.png){width=100%}
 
-**Held-out recall population (B1).** After an external review, the owner fixed three tests and their lines before
+**Held-out recall population (B1).** After an external review, the author fixed three tests and their lines before
 any of them ran, with a family alpha of 0.0167 (Bonferroni over the three); no other test is added until one of them
 passes. The first asks whether a lower-KL map loses recall on material that no choice used. It has 20 haystack
 documents built from standard-library code that no recall gate of the selection used, 240 needles and 240 distinct
@@ -237,6 +238,7 @@ twins, about 3.9k tokens) and the depth contrast C = L - S, with 99.72 % bootstr
 and the two floors of the line; the shaded maps are not counted (higher KL; the refit arm). Only KL-table B has L and
 C below their floors with S above. (b) KL-table B by depth and family: the loss is on needles at 117k and 245k;
 copies and twins are flat. Confirmed on one box with one GPU model (run floor 0.000) [E1.34, E1.35].](figs/fig3-b1-recall-population.png){width=100%}
+
 A local proxy did worse than KL: a map chosen by the sum of per-projection Hessian-weighted fit errors was 36.7 %
 *worse* in KL at the same size, because it took bits from the last MLP layers, whose own fit error is small but whose
 effect on the output is large (+46.2 % KL for that family alone) [E1.1, E1.2]. A HAWQ-V2-style map (average Hessian
@@ -266,7 +268,7 @@ against the release K/V setting; wide spread, no clear shift of the mean [E2.23]
 **A naive 2-bit file on fresh seeds.** On fresh seeds, the shipped build beats the naive 2-bit file (Unsloth
 UD-Q2_K_XL, a K-quant) in the same engine by 36 task-runs of 336: 292 against 256 on seeds 104 + 105, 51 against 15
 discordant, exact sign test p = 1.0e-5, difference +36 [+20, +52] [E1.32, E3.17]. This is the second of three tests
-that the owner fixed, with a family alpha of 0.0167, before their results existed, and it passes. It compares a
+that the author fixed, with a family alpha of 0.0167, before their results existed, and it passes. It compares a
 trellis build with a K-quant file: the codec, the fits and the bit allocation all differ, so it does not isolate the
 allocation method and is not evidence for C1. The naive file ran with its own chat template; the first prompt of every
 task-run had the same token count as the shipped file's (336 of 336). On the selection seeds the gap was 35 (302
@@ -325,8 +327,6 @@ record stays "failed"; the release states the behaviour as a known limit. A sepa
 malformed tokens in 81,646 generated tokens on the final build [E1.26]; it is reported as a passed gate, not as
 damage found.
 
-[Main track: add the full 21-row task-damage table with per-probe z-values, and the margin distributions.]
-
 ### 4.2 Local repair beats blanket precision (C2)
 
 **K/V cache, by cache class (Inkling 2 Mini).** The model has 48 K/V caches: 8 for global-attention layers, which
@@ -368,8 +368,8 @@ missed the KL line (0.005135 at 32k); on M2 it passed (0.004552 +- 0.000047 agai
 at 245k rose from 8.7 to 30.2 tokens per second (3.47x, line 13.05) and at 117k by 1.34x, with no change at 32k
 (0.97x, inside the run-to-run band) [E2.17]. A KL pass is not enough to ship it: the setting also needs full recall at
 117k and 245k, and it got 24/24 needles and 20/20 copies at both [E2.18]. The measured gain came from removing the
-host tail, not from faster 4-bit attention, as the byte model predicted [E2.17]. It is the default of the coming
-release (not yet released). On AppWorld it scored 595 of 672 against 592 for the official weights and 596 for the 8-bit
+host tail, not from faster 4-bit attention, as the byte model predicted [E2.17]. It became the default of the published release (v1.0); below, "the release setting" means the q8_0-global
+setting that the tests compared against. On AppWorld it scored 595 of 672 against 592 for the official weights and 596 for the 8-bit
 cache (p = 0.78 and 1.0) [E4.12]; its KL against the official weights is measured only on a 10-document subset. On
 graded recall margins the result is inconclusive: -0.120 nats [-0.320, +0.090] against the 8-bit global cache. The
 interval is not below 0, but its lower end is below the non-inferiority margin of -0.25 nats that we wrote before the
@@ -560,7 +560,7 @@ byte split costs far more [E2.10].
 - **Ablations.** Task probes are shown to matter on recall, long chat and the harder agent split, not on the standard
   agent split [E1.31, E1.36]; the
   selection effect is not separated from noise [E3.15]; per-class runtime repairs show no recall difference [E2.22,
-  E2.23]. Seeds 106 + 107 were reserved and went to the one harder test (AppWorld test_challenge). The owner's three
+  E2.23]. Seeds 106 + 107 were reserved and went to the one harder test (AppWorld test_challenge). The author's three
   named tests (B1, the naive file, test_challenge) all passed at the family alpha; no other test was added.
 - **Every missed line.** Table 6 lists every pre-written line that a run missed and what we did.
 
@@ -595,7 +595,7 @@ seeds, and its harness gate
 caught an engine fault that the KL gate passed. The engine fault came from our own porting, and the fix came from
 upstream work by others.
 
-## 8. Related work (short)
+## 8. Related work
 
 Mixed-precision allocation by sensitivity [HAWQ; HAWQ-V2; HAWQ-V3; SqueezeLLM], by learned or searched policies
 [HAQ; EvoPress] and outlier-aware PTQ [SpQR; GPTQ; AWQ] choose bits by a proxy, a hardware signal, a calibration
@@ -651,68 +651,106 @@ code we ported); Aldehir Rojas (the llama.cpp Inkling chat parser and the gramma
 port caused the harness failures of Section 4.1, and the lazy-grammar reasoning gating); Alexey Fateev (alesha-pro)
 and Peasant Smith and the Project Maya contributors (the per-token launch-overhead measurement on Inkling 2 Mini and
 the idea to fuse its glue launches); Killy (the voxel-pagoda prompt behind the bad-token check); the authors of HumanEval and
-AppWorld. [Inkling-side credits to be checked against the Inkling release CREDITS before submission.]
+AppWorld.
 No person or company named here endorses this work.
 
 ## References
 
 [AppWorld] H. Trivedi, T. Khot, et al. AppWorld: A Controllable World of Apps and People for Benchmarking Interactive
 Coding Agents. ACL 2024. arXiv:2407.18901.
+
 [AWQ] J. Lin et al. AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration. MLSys 2024.
 arXiv:2306.00978.
+
 [Cawley & Talbot] G. C. Cawley, N. L. C. Talbot. On Over-fitting in Model Selection and Subsequent Selection Bias in
 Performance Evaluation. JMLR 11:2079-2107, 2010.
+
 [Dutta et al.] A. Dutta, S. Krishnan, N. Kwatra, R. Ramjee. Accuracy is Not All You Need. NeurIPS 2024.
 arXiv:2407.09141.
+
 [Dwork et al.] C. Dwork, V. Feldman, M. Hardt, T. Pitassi, O. Reingold, A. Roth. The reusable holdout: Preserving
 validity in adaptive data analysis. Science, 2015.
+
 [EAC-MoE] Y. Chen, Y. Shao, P. Wang, J. Cheng. EAC-MoE: Expert-Selection Aware Compressor for Mixture-of-Experts
 Large Language Models. ACL 2025. arXiv:2508.01625.
+
 [EvoPress] O. Sieberling, D. Kuznedelev, E. Kurtic, D. Alistarh. EvoPress: Accurate Dynamic Model Compression via
 Evolutionary Search. ICML 2025. arXiv:2410.14649.
-[EXL3] turboderp. ExLlamaV3. Software, https://github.com/turboderp-org/exllamav3.
+
+[EXL3] turboderp. ExLlamaV3. Software, <https://github.com/turboderp-org/exllamav3>.
+
 [GDN] S. Yang, J. Kautz, A. Hatamizadeh. Gated Delta Networks: Improving Mamba2 with Delta Rule. ICLR 2025.
 arXiv:2412.06464.
+
 [GPTQ] E. Frantar, S. Ashkboos, T. Hoefler, D. Alistarh. GPTQ (OPTQ). ICLR 2023. arXiv:2210.17323.
+
 [HAQ] K. Wang, Z. Liu, Y. Lin, J. Lin, S. Han. HAQ: Hardware-Aware Automated Quantization with Mixed Precision.
 CVPR 2019. arXiv:1811.08886.
+
 [HAWQ] Z. Dong, Z. Yao, A. Gholami, M. W. Mahoney, K. Keutzer. HAWQ. ICCV 2019. arXiv:1905.03696.
+
 [HAWQ-V2] Z. Dong et al. HAWQ-V2. NeurIPS 2020. arXiv:1911.03852.
+
 [HAWQ-V3] Z. Yao et al. HAWQ-V3: Dyadic Neural Network Quantization. ICML 2021. arXiv:2011.10680.
+
 [HumanEval] M. Chen et al. Evaluating Large Language Models Trained on Code. arXiv:2107.03374, 2021.
+
 [Jaiswal et al.] A. Jaiswal, Z. Gan, X. Du, B. Zhang, Z. Wang, Y. Yang. Compressing LLMs: The Truth is Rarely Pure
 and Never Simple. ICLR 2024. arXiv:2310.01382.
+
 [KIVI] Z. Liu et al. KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache. ICML 2024. arXiv:2402.02750.
+
 [Koehn] P. Koehn. Statistical Significance Tests for Machine Translation Evaluation. EMNLP 2004.
+
 [KVQuant] C. Hooper et al. KVQuant. NeurIPS 2024. arXiv:2401.18079.
+
 [KVTuner] X. Li, Z. Xing, Y. Li, L. Qu, H.-L. Zhen, W. Liu, Y. Yao, S. J. Pan, M. Yuan. KVTuner: Sensitivity-Aware
 Layer-Wise Mixed-Precision KV Cache Quantization for Efficient and Nearly Lossless LLM Inference. ICML 2025.
 arXiv:2502.04420.
+
 [Liu et al. 2025] R. Liu et al. Quantization Hurts Reasoning? COLM 2025. arXiv:2504.04823.
-[LookAtMyQuant] ShinMegamiBoson. LookAtMyQuant. Software, https://github.com/ShinMegamiBoson/lookatmyquant.
+
+[LookAtMyQuant] ShinMegamiBoson. LookAtMyQuant. Software, <https://github.com/ShinMegamiBoson/lookatmyquant>.
+
 [Marchisio et al.] K. Marchisio et al. How Does Quantization Affect Multilingual LLMs? Findings of EMNLP 2024.
 arXiv:2407.03211.
+
 [Mekala et al.] A. Mekala, A. Atmakuru, Y. Song, M. Karpinska, M. Iyyer. Does quantization affect models' performance
 on long-context tasks? EMNLP 2025. arXiv:2505.20276.
+
 [MoEQuant] X. Hu, Z. Chen, D. Yang, et al. MoEQuant: Enhancing Quantization for Mixture-of-Experts Large Language
 Models via Expert-Balanced Sampling and Affinity Guidance. ICML 2025. arXiv:2505.03804.
+
 [NIAH] G. Kamradt. Needle In A Haystack. Software, 2023.
+
 [Nosek et al.] B. A. Nosek, C. R. Ebersole, A. C. DeHaven, D. T. Mellor. The preregistration revolution. PNAS
 115(11):2600-2606, 2018.
+
 [Prereg-ML] S. Albanie, J. F. Henriques, L. Bertinetto, A. Hernandez-Garcia, H. Doughty, G. Varol (eds.). NeurIPS
 2021 Workshop on Pre-registration in Machine Learning. PMLR 181, 2022.
+
 [QTIP] A. Tseng, Q. Sun, D. Hou, C. De Sa. QTIP: Quantization with Trellises and Incoherence Processing. NeurIPS 2024.
 arXiv:2406.11235.
+
 [QuIP#] A. Tseng, J. Chee, Q. Sun, V. Kuleshov, C. De Sa. QuIP#. ICML 2024. arXiv:2402.04396.
+
 [Recht et al.] B. Recht, R. Roelofs, L. Schmidt, V. Shankar. Do ImageNet Classifiers Generalize to ImageNet? ICML 2019.
+
 [RULER] C.-P. Hsieh et al. RULER. COLM 2024. arXiv:2404.06654.
+
 [SpQR] T. Dettmers et al. SpQR. ICLR 2024. arXiv:2306.03078.
+
 [SqueezeLLM] S. Kim et al. SqueezeLLM: Dense-and-Sparse Quantization. ICML 2024. arXiv:2306.07629.
+
 [Thaler] R. H. Thaler. Anomalies: The Winner's Curse. Journal of Economic Perspectives 2(1):191-202, 1988.
+
 [Unsloth] Unsloth AI. Unsloth Dynamic 2.0 GGUFs. Blog, 2025.
-[L0xRE-V2] YourHighnessLA. L0xRE-V2-27b-Low. Hugging Face, 2026. https://huggingface.co/YourHighnessLA/L0xRE-V2-27b-Low
-[Escha W2] Escha Labs. escha-mlx (Escha W2 format and reference). Software, https://github.com/EschaLabs/escha-mlx
-[llama.cpp-escha] Ajay9o9. llama.cpp-escha (the Escha op for ggml). Software, https://github.com/Ajay9o9/llama.cpp-escha
+
+[L0xRE-V2] YourHighnessLA. L0xRE-V2-27b-Low. Hugging Face, 2026. <https://huggingface.co/YourHighnessLA/L0xRE-V2-27b-Low>
+
+[Escha W2] Escha Labs. escha-mlx (Escha W2 format and reference). Software, <https://github.com/EschaLabs/escha-mlx>
+
+[llama.cpp-escha] Ajay9o9. llama.cpp-escha (the Escha op for ggml). Software, <https://github.com/Ajay9o9/llama.cpp-escha>
 
 ## Appendix A. Names in the text and in the records
 
@@ -732,13 +770,4 @@ arXiv:2406.11235.
 | sparse attention past 200k | S1v2 | rejected 27B runtime repair |
 | KL gate, recall gate, harness gate, bad-token check | G1, G2 / G3, G6, GATE P | release gates |
 | graded margin probe | P1 (Qwen), ink_margin gf (Inkling) | teacher-forced recall margins |
-| fresh-seed tests (agent ablation, selection effect, K/V ablation, graded K/V, graded baselines) | G-A1, G-A2, G-C, G-C2, G-B2 | `evidence/LINES.md` sections |
-
-## Appendix notes (for the main-track version)
-
-- A. The full sensitivity tables (KL per MiB, 20 groups; task damage, 21 rows) with intervals.
-- B. Gate lines with their timestamps, including the lines that were wrong on first use (a capped margin score; a
-  class line) and how they were changed for later maps only.
-- C. Engine checks: determinism, engine-vs-simulation lines, cross-architecture KL (Ampere, Turing).
-- D. The tiered K/V cache and batch-invariant decode (possibly a separate systems paper) [S.1, S.2].
-- E. The ablation tables (seeds 104 + 105, graded K/V margins per item) and the third model from `evidence/LINES.md`, once run.
+| fresh-seed tests (agent ablation, selection effect, K/V ablation, graded K/V, graded baselines) | G-A1, G-A2, G-C, G-C2, G-B2 | test names in `evidence/LINES.md` |
