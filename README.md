@@ -1,6 +1,6 @@
 # The Kintsugi method
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24455576.svg)](https://doi.org/10.5281/zenodo.24455576)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24455575.svg)](https://doi.org/10.5281/zenodo.24455575)
 
 **Find and repair quantization damage where tasks break, not where averages look.**
 Paper and evidence by Cary Palmer, version 1.0.1 (2026-11-23).
@@ -67,4 +67,4 @@ AppWorld scores come from the AppWorld harness (not included); `data/appworld/` 
 ## Cite
 
 Palmer, C. (2026). *Kintsugi: Find and Repair Quantization Damage Where Tasks Break, Not Where Averages Look*. Zenodo.
-https://doi.org/10.5281/zenodo.24455576 (machine-readable: `CITATION.cff`; Zenodo gives each version its own DOI).
+https://doi.org/10.5281/zenodo.24455575 (machine-readable: `CITATION.cff`; Zenodo gives each version its own DOI).
