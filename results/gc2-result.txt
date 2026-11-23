@@ -1,0 +1,75 @@
+G-C2 result (scripts/gc2_score.py; evidence/LINES.md # 4). One rented box, 8x RTX 4070, engine ad657a606 (b10935), method gf.
+Capped min margin m (cap 5.0 nats). Bootstrap: 10000 resamples of the 44 items, seed 20261122, percentile 95 %.
+
+== Per arm and depth (88 units per arm) ==
+  a 117000 needle: mean capped m 4.758; min m +3.622; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  a 117000 copy  : mean capped m 1.745; min m +0.577; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 2775/2775
+  a 245000 needle: mean capped m 4.853; min m +3.818; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  a 245000 copy  : mean capped m 2.701; min m -0.970; units m<0: 1 ['c19:__getattr__(-0.970)']; tokens<0 1; bound flags 0; wrong-in-top20 3178/3178
+  a (release v1.0: q8_0 global + f16 SWA): units with m < 0: 1 of 88
+  b 117000 needle: mean capped m 4.818; min m +3.461; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  b 117000 copy  : mean capped m 2.286; min m -0.808; units m<0: 2 ['c17:_decimal_lshift_exact(-0.808)', 'c18:_decimal_lshift_exact(-0.205)']; tokens<0 3; bound flags 0; wrong-in-top20 2775/2775
+  b 245000 needle: mean capped m 4.515; min m +2.781; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  b 245000 copy  : mean capped m 2.337; min m -0.109; units m<0: 1 ['c19:__getattr__(-0.109)']; tokens<0 1; bound flags 0; wrong-in-top20 3178/3178
+  b (blanket q4_0 (all 48 caches)): units with m < 0: 3 of 88
+  c 117000 needle: mean capped m 4.581; min m +2.546; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  c 117000 copy  : mean capped m 1.850; min m +0.960; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 2775/2775
+  c 245000 needle: mean capped m 4.651; min m +3.065; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  c 245000 copy  : mean capped m 2.680; min m -0.957; units m<0: 1 ['c19:__getattr__(-0.957)']; tokens<0 1; bound flags 0; wrong-in-top20 3178/3178
+  c (blanket q8_0 (all 48 caches)): units with m < 0: 1 of 88
+  d 117000 needle: mean capped m 4.577; min m +2.011; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  d 117000 copy  : mean capped m 1.950; min m -0.406; units m<0: 2 ['c17:_decimal_lshift_exact(-0.100)', 'c18:_decimal_lshift_exact(-0.406)']; tokens<0 2; bound flags 0; wrong-in-top20 2775/2775
+  d 245000 needle: mean capped m 4.437; min m +2.428; units m<0: 0 []; tokens<0 0; bound flags 0; wrong-in-top20 48/48
+  d 245000 copy  : mean capped m 2.683; min m -0.370; units m<0: 1 ['c19:__getattr__(-0.370)']; tokens<0 1; bound flags 0; wrong-in-top20 3178/3178
+  d (new default: q4_0 global + f16 SWA): units with m < 0: 3 of 88
+
+== Noise floor: arm (a) repeated at 117k on the same box (24 needles + copy slots 0-9, same order) ==
+  units 34; mean |repeat difference| of m = 0.000 nats; max 0.000; needles mean 0.000, copies mean 0.000; units exactly equal 34
+  copy repeat per slot (m repeat - m a): 0:aix_buildtag +0.000, 1:_type_repr +0.000, 2:_read_output +0.000, 3:_find_build_tool +0.000, 4:get_cache_token +0.000, 5:_check_tzname +0.000, 6:_divide_and_round +0.000, 7:_isoweek1monday +0.000, 8:_isoweek1monday +0.000, 9:getcontext +0.000
+  needle repeat differences not 0: none
+
+== Rig vs box cross-check of arm (a) at 117k (information only; used in no statistic) ==
+  needle: 24 items; rig - box min margin: mean |diff| 0.0000, max |diff| 0.0000; capped mean |diff| 0.0000; exactly equal 24
+    per item (rig - box): 0:vault 1 +0.0000, 1:vault 2 +0.0000, 2:vault 3 +0.0000, 3:vault 4 +0.0000, 4:vault 5 +0.0000, 5:vault 6 +0.0000, 6:vault 7 +0.0000, 7:vault 8 +0.0000, 8:vault 9 +0.0000, 9:vault 10 +0.0000, 10:vault 11 +0.0000, 11:vault 12 +0.0000, 12:vault 13 +0.0000, 13:vault 14 +0.0000, 14:vault 15 +0.0000, 15:vault 16 +0.0000, 16:vault 17 +0.0000, 17:vault 18 +0.0000, 18:vault 19 +0.0000, 19:vault 20 +0.0000, 20:vault 21 +0.0000, 21:vault 22 +0.0000, 22:vault 23 +0.0000, 23:vault 24 +0.0000
+  copy: 20 items; rig - box min margin: mean |diff| 0.0000, max |diff| 0.0000; capped mean |diff| 0.0000; exactly equal 20
+    per item (rig - box): 0:aix_buildtag +0.0000, 1:_type_repr +0.0000, 2:_read_output +0.0000, 3:_find_build_tool +0.0000, 4:get_cache_token +0.0000, 5:_check_tzname +0.0000, 6:_divide_and_round +0.0000, 7:_isoweek1monday +0.0000, 8:_isoweek1monday +0.0000, 9:getcontext +0.0000, 10:setcontext +0.0000, 11:setcontext +0.0000, 12:setcontext +0.0000, 13:_dec_from_triple +0.0000, 14:_dec_from_triple +0.0000, 15:_dec_from_triple +0.0000, 16:_dec_from_triple +0.0000, 17:_decimal_lshift_exact +0.0000, 18:_decimal_lshift_exact +0.0000, 19:_convert_other +0.0000
+
+== Paired vs arm (a): d = m(X) - m(a) over 88 units; interval over the 44 items ==
+  b (blanket q4_0 (all 48 caches)) vs a:
+    PRIMARY mean d = -0.035 nats, 95 % [-0.213, +0.146]  (SD of per-item d 0.622)
+    by family (information): needles -0.139 [-0.292, +0.001], copies +0.088 [-0.279, +0.446]; by depth: 117k +0.279, 245k -0.350
+    secondary: copy log-prob difference per copy unit -0.053 nats [-0.180, +0.039] (40 units)
+    secondary: units with m < 0: 3 vs a 1 of 88; difference +2 [+0.0, +5.0]
+    m < 0 in b but >= 0 in a: ['copy slot 17 _decimal_lshift_exact @117000 (+1.755 -> -0.808)', 'copy slot 18 _decimal_lshift_exact @117000 (+1.143 -> -0.205)']
+    m < 0 in a but >= 0 in b: none
+  c (blanket q8_0 (all 48 caches)) vs a:
+    PRIMARY mean d = -0.084 nats, 95 % [-0.224, +0.061]  (SD of per-item d 0.488)
+    by family (information): needles -0.189 [-0.335, -0.069], copies +0.042 [-0.215, +0.309]; by depth: 117k -0.049, 245k -0.120
+    secondary: copy log-prob difference per copy unit +0.015 nats [-0.024, +0.058] (40 units)
+    secondary: units with m < 0: 1 vs a 1 of 88; difference +0 [+0.0, +0.0]
+    m < 0 in c but >= 0 in a: none
+    m < 0 in a but >= 0 in c: none
+  d (new default: q4_0 global + f16 SWA) vs a:
+    PRIMARY mean d = -0.120 nats, 95 % [-0.320, +0.090]  (SD of per-item d 0.710)
+    by family (information): needles -0.299 [-0.511, -0.116], copies +0.093 [-0.279, +0.471]; by depth: 117k -0.006, 245k -0.235
+    secondary: copy log-prob difference per copy unit -0.045 nats [-0.121, +0.023] (40 units)
+    secondary: units with m < 0: 3 vs a 1 of 88; difference +2 [+0.0, +5.0]
+    m < 0 in d but >= 0 in a: ['copy slot 17 _decimal_lshift_exact @117000 (+1.755 -> -0.100)', 'copy slot 18 _decimal_lshift_exact @117000 (+1.143 -> -0.406)']
+    m < 0 in a but >= 0 in d: none
+
+== Sensitivity (information only, no line): repeated copy requests of one depth counted once ==
+  Adjacent copy slots that hold the same function send the same request; after the first it runs on the cached
+  path. Here each (depth, function) keeps its first slot only; the needles are unchanged. Bootstrap: units
+  resampled as clusters by (family, slot), the same seed.
+  distinct copy functions: 117k 13 of 20, 245k 18 of 20; units kept 79
+  b vs a: mean d -0.033 [-0.234, +0.171]
+  c vs a: mean d -0.157 [-0.285, -0.028]
+  d vs a: mean d -0.188 [-0.391, +0.032]
+
+== Lines (as written before any run; noise floor applied as GAPS # Smoke finding says) ==
+  L1 'the per-class choice matters for recall (graded)': needs the interval of (b) or (c) vs (a) entirely below 0 AND below -0.000 (noise floor).
+     (b) [-0.213, +0.146]: below 0 False, below -floor False; (c) [-0.224, +0.061]: below 0 False, below -floor False
+     -> NOT MET: even graded recall margins do not separate the blanket settings from the per-class one at this resolution
+  L2 (d) vs (a): 'costs' if the interval is below 0 (and below -floor); 'no measurable margin loss' only if the interval lies inside [-0.25, +inf); else 'inconclusive'.
+     (d) [-0.320, +0.090], point -0.120 -> INCONCLUSIVE
+  L3 no line on the copy log-probability (reported above); no 64k depth (not run).

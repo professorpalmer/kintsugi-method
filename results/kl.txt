@@ -1,0 +1,66 @@
+$ kl_docs.py p1 V3a V3b
+p1: documents covered by every file: 295; gen rows 376,086
+name                       mean KL    top-1
+V3a                        0.05647   90.91%
+V3b                        0.07720   89.13%
+V3b against V3a: mean KL +36.7 % [+33.7, +39.7] (bootstrap over documents); lower KL on 17 of 295 documents
+
+$ kl_docs.py p1 V3a V3c
+p1: documents covered by every file: 295; gen rows 376,086
+name                       mean KL    top-1
+V3a                        0.05647   90.91%
+V3c                        0.06491   89.87%
+V3c against V3a: mean KL +15.0 % [+12.8, +17.2] (bootstrap over documents); lower KL on 49 of 295 documents
+
+$ kl_docs.py p1 V3a V3h1
+p1: documents covered by every file: 295; gen rows 376,086
+name                       mean KL    top-1
+V3a                        0.05647   90.91%
+V3h1                       0.08256   88.72%
+V3h1 against V3a: mean KL +46.2 % [+43.1, +49.3] (bootstrap over documents); lower KL on 8 of 295 documents
+
+$ kl_docs.py p1 V3a V3s2
+p1: documents covered by every file: 295; gen rows 376,086
+name                       mean KL    top-1
+V3a                        0.05647   90.91%
+V3s2                       0.05119   91.36%
+V3s2 against V3a: mean KL -9.3 % [-10.5, -8.3] (bootstrap over documents); lower KL on 253 of 295 documents
+
+$ kl_docs.py p2 V3a V3s2
+p2: documents covered by every file: 294; gen rows 358,942
+name                       mean KL    top-1
+V3a                        0.06840   90.83%
+V3s2                       0.06276   91.34%
+V3s2 against V3a: mean KL -8.2 % [-11.1, -5.8] (bootstrap over documents); lower KL on 260 of 294 documents
+
+$ kl_docs.py p1 V3ac-h32 V5bc-h32
+p1: documents covered by every file: 295; gen rows 376,086
+name                       mean KL    top-1
+V3ac-h32                   0.05640   90.93%
+V5bc-h32                   0.05245   91.28%
+V5bc-h32 against V3ac-h32: mean KL -7.0 % [-8.3, -5.6] (bootstrap over documents); lower KL on 242 of 295 documents
+
+$ kl_docs.py p1 V3ac-h32 V5t
+p1: documents covered by every file: 295; gen rows 376,086
+name                       mean KL    top-1
+V3ac-h32                   0.05640   90.93%
+V5t                        0.05192   91.29%
+V5t against V3ac-h32: mean KL -7.9 % [-9.1, -6.9] (bootstrap over documents); lower KL on 254 of 295 documents
+
+$ kl_docs.py p1 box-V3ac-h32 box-U1c-h32 box-H1c-h32
+p1: documents covered by every file: 295; gen rows 376,086
+name                       mean KL    top-1
+box-V3ac-h32               0.05640   90.93%
+box-U1c-h32                0.05423   91.19%
+box-H1c-h32                0.06357   90.46%
+box-U1c-h32 against box-V3ac-h32: mean KL -3.8 % [-6.0, -1.6] (bootstrap over documents); lower KL on 191 of 295 documents
+box-H1c-h32 against box-V3ac-h32: mean KL +12.7 % [+10.6, +14.7] (bootstrap over documents); lower KL on 74 of 295 documents
+
+$ kl_docs.py p2 box-V3ac-h32 box-U1c-h32 box-H1c-h32
+p2: documents covered by every file: 294; gen rows 358,942
+name                       mean KL    top-1
+box-V3ac-h32               0.06840   90.87%
+box-U1c-h32                0.06758   91.18%
+box-H1c-h32                0.07688   90.48%
+box-U1c-h32 against box-V3ac-h32: mean KL -1.2 % [-6.6, +4.4] (bootstrap over documents); lower KL on 217 of 294 documents
+box-H1c-h32 against box-V3ac-h32: mean KL +12.4 % [+9.8, +14.7] (bootstrap over documents); lower KL on 82 of 294 documents

@@ -1,0 +1,39 @@
+G-B2 result (tools/gb2/gb2_score.py; GAPS.md # G-B2). Probe P1 at 117,000, rig RTX 4070, sprint131 profile, bin-p10-5599dede7, thinking off, layer off.
+Capped min margin m (cap 5.0 nats). Bootstrap: 10000 resamples of the items, seed 20261122, percentile 95 %.
+
+== Determinism check ==
+  shipped S1 = 207.334 (11-21: 207.334) -> EQUAL: PASS
+
+== Per arm ==
+  shipped Kintsugi-27B-12G.gguf (0510bae8...): S1 207.334; mean capped m 4.712 (needles 4.712, copies 4.712); items m < 0: 0 []; tokens < 0: 0; bound flags 0
+  U1 U1c-h32 (d02dabb4...): S1 213.79; mean capped m 4.859 (needles 4.963, copies 4.734); items m < 0: 1 ['copy item 29: _check_tzname (-0.325)']; tokens < 0: 1; bound flags 0
+  H1 H1c-h32 (fa49974c...): S1 213.193; mean capped m 4.845 (needles 4.935, copies 4.737); items m < 0: 1 ['copy item 29: _check_tzname (-0.258)']; tokens < 0: 1; bound flags 0
+
+== _check_tzname (item 29 of 44; copy slot 5) in each arm ==
+  shipped: min +0.264; first-token margin +5.902; minimum at position 3 of 56; tokens < 0: 0; mean per-token 10.222
+  U1: min -0.325; first-token margin +10.099; minimum at position 3 of 56; tokens < 0: 1; mean per-token 10.898
+  H1: min -0.258; first-token margin +10.593; minimum at position 3 of 56; tokens < 0: 1; mean per-token 11.342
+
+== Paired vs shipped ==
+  U1 vs shipped:
+    PRIMARY, 43 items without _check_tzname: mean d +0.164 nats, 95 % [+0.016, +0.379]
+    all 44 items: mean d +0.147, 95 % [-0.004, +0.357]
+    by family (information, 43-item set): needles +0.251, copies +0.054
+    secondary, copy family mean per-token margin difference (20 copies): +0.812 nats [+0.706, +0.926]
+    items m < 0 in U1 but >= 0 in shipped: ['_check_tzname (item 29) +0.264 -> -0.325']
+    items with d != 0 (the rest are capped at 5.0 in both arms or equal): 6 ['vault 8 (item 7) +2.802', 'vault 10 (item 9) +3.224', '_check_tzname (item 29) -0.589', 'setcontext (item 34) +0.340', 'setcontext (item 35) +0.340', 'setcontext (item 36) +0.340']
+  H1 vs shipped:
+    PRIMARY, 43 items without _check_tzname: mean d +0.148 nats, 95 % [+0.016, +0.356]
+    all 44 items: mean d +0.133, 95 % [-0.001, +0.338]
+    by family (information, 43-item set): needles +0.223, copies +0.054
+    secondary, copy family mean per-token margin difference (20 copies): +1.331 nats [+1.157, +1.498]
+    items m < 0 in H1 but >= 0 in shipped: ['_check_tzname (item 29) +0.264 -> -0.258']
+    items with d != 0 (the rest are capped at 5.0 in both arms or equal): 6 ['vault 8 (item 7) +3.660', 'vault 10 (item 9) +1.702', '_check_tzname (item 29) -0.522', 'setcontext (item 34) +0.340', 'setcontext (item 35) +0.340', 'setcontext (item 36) +0.340']
+
+== Sensitivity (information only, no line): repeated copy requests counted once (first slot), 43-item set ==
+  U1: 36 distinct items, mean d +0.177 [+0.000, +0.434]
+  H1: 36 distinct items, mean d +0.158 [+0.000, +0.407]
+
+== Line (as written before any run) ==
+  U1: 43-item interval [+0.016, +0.379] -> U1 HAS MORE RECALL MARGIN THAN THE SHIPPED MAP (reported, no other claim)
+  H1: 43-item interval [+0.016, +0.356] -> H1 HAS MORE RECALL MARGIN THAN THE SHIPPED MAP (reported, no other claim)

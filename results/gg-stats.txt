@@ -1,0 +1,85 @@
+G-G statistics pass (tools/paper/gg_stats.py). AppWorld test_normal; counts are task-runs pooled over the seeds named.
+Wilson = 95 % Wilson interval of the count. Paired: exact two-sided sign test on discordant (task, seed) pairs;
+MDD = minimum difference with p < 0.05 at the observed number of discordant pairs; boot = 95 % paired bootstrap
+interval of the difference over tasks (seeds of a task kept together, 10000 resamples, seed 20261122).
+
+== Arms ==
+  V3ac-h32 (S)                               seeds 100+101: 302 / 336 (89.9 %), Wilson [289.6, 311.4]
+  V5bc-h32 (S)                               seeds 100+101: 285 / 336 (84.8 %), Wilson [270.8, 296.6]
+  V5t (S)                                    seeds 100+101: 301 / 336 (89.6 %), Wilson [288.5, 310.5]
+  L0xRE-V2 body (S)                          seeds 100+101: 288 / 336 (85.7 %), Wilson [274.1, 299.2]
+  BF16 our engine (S)                        seeds 100+101: 281 / 336 (83.6 %), Wilson [266.4, 293.0]
+  naive UD-Q2_K_XL our engine (S)            seeds 100+101: 267 / 336 (79.5 %), Wilson [251.4, 280.4]
+  Inkling Unsloth setup (100+101)            seeds 100+101: 283 / 336 (84.2 %), Wilson [268.6, 294.8]
+  Kintsugi shipped (F 102+103)               seeds 102+103: 294 / 336 (87.5 %), Wilson [280.7, 304.5]
+  Kintsugi weights-only (F 102+103)          seeds 102+103: 295 / 336 (87.8 %), Wilson [281.8, 305.3]
+  BF16 (F 102+103)                           seeds 102+103: 293 / 336 (87.2 %), Wilson [279.6, 303.6]
+  Inkling Unsloth setup (102+103)            seeds 102+103: 283 / 336 (84.2 %), Wilson [268.6, 294.8]
+  Inkling Unsloth setup (104+105)            seeds 104+105: 281 / 334 (84.1 %), Wilson [266.6, 292.8]  [PARTIAL / unfinished runs]
+  Inkling OURS M2 (102+103)                  seeds 102+103: 298 / 336 (88.7 %), Wilson [285.1, 307.9]
+  Inkling OURS M2 (104+105)                  seeds 104+105: 298 / 336 (88.7 %), Wilson [285.1, 307.9]
+  Inkling OURS M2 (102-105)                  seeds 102+103+104+105: 596 / 672 (88.7 %), Wilson [578.4, 610.6]
+  Inkling exact weights RAW (102-105)        seeds 102+103+104+105: 592 / 672 (88.1 %), Wilson [574.1, 607.0]
+  Inkling q4_0 global cache Q65 (102-105)    seeds 102+103+104+105: 595 / 672 (88.5 %), Wilson [577.3, 609.7]
+  Inkling OURS M2 (102+103) for Q262         seeds 102+103: 298 / 336 (88.7 %), Wilson [285.1, 307.9]
+  Inkling Q262 (102+103)                     seeds 102+103: 296 / 336 (88.1 %), Wilson [282.9, 306.2]
+  V3ac-h32 (B 104+105)                       seeds 104+105: 292 / 336 (86.9 %), Wilson [278.5, 302.7]
+  V5bc-h32 (B 104+105)                       seeds 104+105: 296 / 336 (88.1 %), Wilson [282.9, 306.2]
+  V5tc-h32 (B 104+105)                       seeds 104+105: 299 / 336 (89.0 %), Wilson [286.2, 308.8]
+  L0xRE-V2 body (B 104+105)                  seeds 104+105: 289 / 336 (86.0 %), Wilson [275.2, 300.1]
+  BF16 (B 104+105)                           seeds 104+105: 294 / 336 (87.5 %), Wilson [280.7, 304.5]
+  naive UD-Q2_K_XL our engine (B 104+105)    seeds 104+105: 256 / 336 (76.2 %), Wilson [239.8, 270.3]
+  V3ac-h32 (T3 challenge 106+107)            seeds 106+107: 670 / 834 (80.3 %), Wilson [646.4, 691.3]
+  V5bc-h32 (T3 challenge 106+107)            seeds 106+107: 610 / 834 (73.1 %), Wilson [584.1, 634.2]
+  V3ac-h32 (T3 challenge 106)                seeds 106: 335 / 417 (80.3 %), Wilson [318.0, 349.7]
+  V5bc-h32 (T3 challenge 106)                seeds 106: 304 / 417 (72.9 %), Wilson [285.4, 320.9]
+  V3ac-h32 (T3 challenge 107)                seeds 107: 335 / 417 (80.3 %), Wilson [318.0, 349.7]
+  V5bc-h32 (T3 challenge 107)                seeds 107: 306 / 417 (73.4 %), Wilson [287.5, 322.7]
+
+== Paired comparisons (X vs Y) ==
+  [E1.8] C1 V5bc-h32 vs V3ac-h32, selection seeds: 285 vs 302 of 336 paired task-runs (168 tasks, seeds 100+101); discordant 15 / 32, p = 0.0186; diff -17, boot [-30, -3]; MDD at 47 discordant = 15
+  [E1.9] C1 V5t vs V3ac-h32, selection seeds: 301 vs 302 of 336 paired task-runs (168 tasks, seeds 100+101); discordant 17 / 18, p = 1.0000; diff -1, boot [-14, +12]; MDD at 35 discordant = 13
+  [E3.8] C3 V2 body vs V3ac-h32, selection seeds: 288 vs 302 of 336 paired task-runs (168 tasks, seeds 100+101); discordant 16 / 30, p = 0.0541; diff -14, boot [-29, +1]; MDD at 46 discordant = 16
+  [E3.6] C3 V3ac-h32 vs BF16, selection seeds: 302 vs 281 of 336 paired task-runs (168 tasks, seeds 100+101); discordant 33 / 12, p = 0.0025; diff +21, boot [+8, +34]; MDD at 45 discordant = 15
+  [E1.20] C1 V3ac-h32 vs naive (ours), selection seeds: 302 vs 267 of 336 paired task-runs (168 tasks, seeds 100+101); discordant 52 / 17, p = 2.93e-05; diff +35, boot [+18, +53]; MDD at 69 discordant = 19
+  [E3.9] C3 Kintsugi vs Inkling Unsloth, 100+101: 302 vs 283 of 336 paired task-runs (168 tasks, seeds 100+101); discordant 33 / 14, p = 0.0079; diff +19, boot [+4, +34]; MDD at 47 discordant = 15
+  [E3.7] C3 shipped vs BF16, 102+103: 294 vs 293 of 336 paired task-runs (168 tasks, seeds 102+103); discordant 25 / 24, p = 1.0000; diff +1, boot [-14, +17]; MDD at 49 discordant = 15
+  [E3.7] C3 weights-only vs BF16, 102+103: 295 vs 293 of 336 paired task-runs (168 tasks, seeds 102+103); discordant 23 / 21, p = 0.8804; diff +2, boot [-13, +17]; MDD at 44 discordant = 14
+  [E2.14] C2 shipped vs weights-only, 102+103: 294 vs 295 of 336 paired task-runs (168 tasks, seeds 102+103); discordant 19 / 20, p = 1.0000; diff -1, boot [-13, +11]; MDD at 39 discordant = 15
+  [E3.9] C3 Kintsugi vs Inkling Unsloth, 102+103: 294 vs 283 of 336 paired task-runs (168 tasks, seeds 102+103); discordant 27 / 16, p = 0.1263; diff +11, boot [-3, +25]; MDD at 43 discordant = 15
+  [E3.12] C3 Inkling OURS vs Unsloth setup, 102+103: 298 vs 283 of 336 paired task-runs (168 tasks, seeds 102+103); discordant 24 / 9, p = 0.0135; diff +15, boot [+4, +27]; MDD at 33 discordant = 13
+  [E3.13] C3 Inkling OURS vs Unsloth setup, 104+105: 296 vs 281 of 334 paired task-runs (168 tasks, seeds 104+105); discordant 22 / 7, p = 0.0081; diff +15, boot [+5, +26]; MDD at 29 discordant = 13
+  [E4.8] C4 Inkling OURS vs exact weights, 102-105: 596 vs 592 of 672 paired task-runs (168 tasks, seeds 102+103+104+105); discordant 22 / 18, p = 0.6358; diff +4, boot [-9, +18]; MDD at 40 discordant = 14
+  [E4.12] C2 Inkling Q65 vs exact weights, 102-105: 595 vs 592 of 672 paired task-runs (168 tasks, seeds 102+103+104+105); discordant 26 / 23, p = 0.7754; diff +3, boot [-10, +17]; MDD at 49 discordant = 15
+  [E4.12] C2 Inkling Q65 vs OURS (q8_0 cache), 102-105: 595 vs 596 of 672 paired task-runs (168 tasks, seeds 102+103+104+105); discordant 21 / 22, p = 1.0000; diff -1, boot [-14, +11]; MDD at 43 discordant = 15
+  [E4.12] C2 Inkling Q262 vs OURS, 102+103: 296 vs 298 of 336 paired task-runs (168 tasks, seeds 102+103); discordant 13 / 15, p = 0.8506; diff -2, boot [-12, +8]; MDD at 28 discordant = 12
+  [E1.31] G-A1 V5bc-h32 vs V3ac-h32, 104+105: 296 vs 292 of 336 paired task-runs (168 tasks, seeds 104+105); discordant 28 / 24, p = 0.6778; diff +4, boot [-10, +18]; MDD at 52 discordant = 16
+  [E3.16] G-A2 V5tc-h32 vs V3ac-h32, 104+105: 299 vs 292 of 336 paired task-runs (168 tasks, seeds 104+105); discordant 26 / 19, p = 0.3713; diff +7, boot [-5, +20]; MDD at 45 discordant = 15
+  [E3.16] G-A2 V2 body vs V3ac-h32, 104+105: 289 vs 292 of 336 paired task-runs (168 tasks, seeds 104+105); discordant 24 / 27, p = 0.7798; diff -3, boot [-16, +10]; MDD at 51 discordant = 15
+  [E3.16] G-A2 BF16 vs V3ac-h32, 104+105 (PARTIAL if < 336): 294 vs 292 of 336 paired task-runs (168 tasks, seeds 104+105); discordant 27 / 25, p = 0.8899; diff +2, boot [-11, +16]; MDD at 52 discordant = 16
+  [E1.36] STOP RULE 3 V5bc-h32 vs V3ac-h32, test_challenge 106+107: 610 vs 670 of 834 paired task-runs (417 tasks, seeds 106+107); discordant 63 / 123, p = 1.29e-05; diff -60, boot [-87, -33]; MDD at 186 discordant = 28
+  [E1.36] STOP RULE 3 V5bc-h32 vs V3ac-h32, test_challenge 106: 304 vs 335 of 417 paired task-runs (417 tasks, seeds 106); discordant 31 / 62, p = 0.0017; diff -31, boot [-49, -12]; MDD at 93 discordant = 21
+  [E1.36] STOP RULE 3 V5bc-h32 vs V3ac-h32, test_challenge 107: 306 vs 335 of 417 paired task-runs (417 tasks, seeds 107); discordant 32 / 61, p = 0.0035; diff -29, boot [-48, -10]; MDD at 93 discordant = 21
+  [E1.32] G-B3 / STOP RULE 2 V3ac-h32 vs naive, 104+105: 292 vs 256 of 336 paired task-runs (168 tasks, seeds 104+105); discordant 51 / 15, p = 1.01e-05; diff +36, boot [+20, +52]; MDD at 66 discordant = 18
+
+== G-A2 check (as the batch scorer; winner V3ac-h32; others V5t(c), V2 body, V5bc; S = 100+101, F = 104+105) ==
+  tasks 168; (S - F): V3ac-h32 +10, V5t +2, L0xRE-V2 body -1, V5bc-h32 -11
+  d_sel = +13.3, 95 % [+0.0, +27.0]; share of resamples <= 0: 0.027; < 0: 0.024
+  BF16 (never selected): (S - F) -13 on the 168 tasks with both fresh shards
+
+== HumanEval (164 problems; Wilson only) ==
+  V3ac-h32 rig: 161 / 164, Wilson [155.4, 163.0]
+  V3ac-h32 box: 159 / 164, Wilson [152.6, 161.9]
+  V5bc-h32: 162 / 164, Wilson [156.9, 163.5]
+  Inkling M2: 158 / 164, Wilson [151.3, 161.2]
+  Inkling Unsloth setup: 160 / 164, Wilson [154.0, 162.4]
+
+== Resolution of the sign test (power note) ==
+  20 discordant pairs: p < 0.05 needs a difference of at least 10 (15 / 5)
+  30 discordant pairs: p < 0.05 needs a difference of at least 12 (21 / 9)
+  33 discordant pairs: p < 0.05 needs a difference of at least 13 (23 / 10)
+  40 discordant pairs: p < 0.05 needs a difference of at least 14 (27 / 13)
+  45 discordant pairs: p < 0.05 needs a difference of at least 15 (30 / 15)
+  49 discordant pairs: p < 0.05 needs a difference of at least 15 (32 / 17)
+  52 discordant pairs: p < 0.05 needs a difference of at least 16 (34 / 18)
+  60 discordant pairs: p < 0.05 needs a difference of at least 18 (39 / 21)

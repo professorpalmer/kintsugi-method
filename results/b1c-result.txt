@@ -1,0 +1,14 @@
+B1c result (tools/b1/b1c_score.py; GAPS.md # B1c). Complete documents: 20 of 20 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+Cap 5.0 nats; bootstrap over documents, 10000 resamples, seed 20261122; line intervals at 99.72 %; 95 % for information.
+run floor (same box, another GPU): shipped doc 0 repeated, 40 records, mean |difference| 0.0; raw mins that differ: 0 of 40
+  V5c vs shipped: L -1.106 [-1.335, -0.880] (95 % [-1.255, -0.961]); S +0.072 [+0.031, +0.122] (95 % [+0.043, +0.103]); C -1.178 [-1.395, -0.958] (95 % [-1.321, -1.036]); 64k -0.089
+     items m < 0 by depth: shipped {'117000': 0, '245000': 0, '64000': 1, 'twin': 0}, V5c {'117000': 0, '245000': 0, '64000': 1, 'twin': 0}
+     mean d needle 64000: -0.258 (95 % [-0.457, -0.070])
+     mean d needle 117000: -1.384 (95 % [-1.763, -1.020])
+     mean d needle 245000: -3.249 (95 % [-3.516, -2.971])
+     mean d copy 64000: +0.080 (95 % [+0.032, +0.138])
+     mean d copy 117000: +0.139 (95 % [+0.031, +0.294])
+     mean d copy 245000: +0.069 (95 % [-0.030, +0.172])
+Floors: F_L = max(run 0.000, 0.212) = 0.212; F_C = max(run 0.000, 0.295) = 0.295
+Line: (a) L hi < -F_L True, (b) C hi < -F_C True, (c) NOT S hi < -F_L True
+B1c LINE: CONFIRMS the B1 pass: V5c loses recall at depth vs shipped on one box
