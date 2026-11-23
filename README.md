@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24455575.svg)](https://doi.org/10.5281/zenodo.24455575)
 
 **Find and repair quantization damage where tasks break, not where averages look.**
-Paper and evidence by Cary Palmer, version 1.0.1 (2026-11-23).
+Paper and evidence by Cary Palmer, version 1.0.2 (2026-11-23).
 
 - Paper: [`paper/kintsugi-method.pdf`](paper/kintsugi-method.pdf) (source: [`paper/kintsugi-method.md`](paper/kintsugi-method.md))
 - Every number in the paper cites a row of [`evidence/EVIDENCE.md`](evidence/EVIDENCE.md) as [E#.#].

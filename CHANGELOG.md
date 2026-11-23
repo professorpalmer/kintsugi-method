@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.0.2 (2026-11-23)
+
+Text corrections. No result changed.
+
+- The "recall loss is local" paragraph is rewritten against the held-out test: one gate item traces to a layer band,
+  but the band does not explain the held-out loss, and the effect does not add (abstract, introduction,
+  contributions, Section 4.1, E1.5). E1.5 now states the exception (V3sH1) with its log pointers.
+- Table 1: the KL-group row states its held-out result.
+- Section 4.1: the two B1 values the text did not state (KL-only winner and uniform map: slightly more long-range
+  margin than the shipped file, inside the refit floor).
+- Contributions: the KL-against-task evidence is on the dense model. On the looped MoE model the task probes did not
+  change the map choice (as Section 4.4 already said).
+- "External review" is now "an adversarial review by an LLM assistant, at the author's request". The AI use section
+  states it.
+
 ## v1.0.1 (2026-11-23)
 
 Presentation fixes: links, figure legends, removed editing notes; no change to any result.

@@ -188,7 +188,7 @@ Each entry ends with one sentence on how our method differs ("Ours:").
     https://arxiv.org/abs/2412.06464
     The linear-attention (GDN) layer type of the dense hybrid model we compress.
 
-## 9. Added 2026-11-22 after an external review (each checked on 2026-11-22 on the arXiv / proceedings page given)
+## 9. Added 2026-11-22 after an adversarial review by an LLM assistant (each checked on 2026-11-22 on the arXiv / proceedings page given)
 
 32. **EvoPress: Accurate Dynamic Model Compression via Evolutionary Search.** Oliver Sieberling, Denis Kuznedelev,
     Eldar Kurtic, Dan Alistarh. ICML 2025 (arXiv comment "ICML camera-ready"). https://arxiv.org/abs/2410.14649

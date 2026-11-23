@@ -2,7 +2,7 @@
 
 Cary Palmer
 
-*Version 1.0.1 (2026-11-23). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one.*
+*Version 1.0.2 (2026-11-23). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one.*
 
 ---
 
@@ -17,8 +17,10 @@ chat documents and gave no agent gain on fresh seeds of the standard benchmark s
 short-distance twin of each long item, one of six lower-KL maps (our five and a uniform baseline) lost long-range
 recall margin: about 1.1 nats on average at 117k-245k tokens and none at short distance, with no wrong answers;
 a rerun on one machine confirmed it. With
-teacher-forced margins we traced one recall loss to a band of MLP up-projections that KL rates as the cheapest place
-to remove bits; in the other direction, KL found general-text damage that our task probes missed. We describe a
+teacher-forced margins we traced the loss of one gate item to a band of MLP up-projections that KL rates as the
+cheapest place to remove bits. That band does not explain the held-out loss: a second map with the same change kept
+its margin there, and more bits in other groups restored the item. In the other direction, KL found general-text
+damage that our task probes missed. We describe a
 simple discipline, which we call the Kintsugi method: diagnose with task probes next to KL at the level of layer
 groups and runtime settings, repair only the damaged spot, gate every change with lines written before the run, and
 confirm on data that was not used to choose. We applied the last step to our own claims, and two did not hold on
@@ -51,8 +53,8 @@ a multi-step agent benchmark. Three observations shaped the method.
 
 1. **Average error hides task damage, and the reverse is also true** (Section 4.1). Maps with lower KL than the
    shipped map failed recall gates or long-chat checks, and on held-out documents one of six lost long-range recall
-   margin that short-range probes did not show; the KL-only winner lost agent work on a harder suite. The damage was
-   local: one band of layers. KL also found damage that our
+   margin that short-range probes did not show; the KL-only winner lost agent work on a harder suite. One gate item
+   failed because of one band of layers, but that band did not explain the held-out loss. KL also found damage that our
    task probes missed. The same blindness holds for faults outside the weights: a build that passed the KL gate failed
    every agent harness.
 2. **Local repair beats blanket precision** (Section 4.2). The cheapest safe fix was often a small, targeted change
@@ -68,8 +70,10 @@ a multi-step agent benchmark. Three observations shaped the method.
 - A reproducible loop (Section 3; full version in the supplement `evidence/ALGORITHM.md`): fit once, diagnose with KL and
   task probes, locate with one-group flips, repair under a byte budget, gate with pre-written lines, confirm on
   fresh data, and keep failures in the record.
-- Evidence on two architectures (dense hybrid; looped MoE) that KL rank and task rank disagree at 2-3 bits, with
-  margins that localize a recall loss to a layer band.
+- Evidence on a dense hybrid model that average KL does not rank bit maps by task quality at 2-3 bits: one of six
+  lower-KL maps lost long-range recall margin on held-out documents, and the KL-only winner lost agent work on a
+  harder split. Exact margins trace the loss of one gate item to a layer band, but not the held-out loss. On the
+  looped MoE model, the task probes did not change the map choice (Section 4.4).
 - On both architectures, a 12 GB build whose agent score is not significantly different from its reference weights
   on fresh seeds (BF16: 294 vs 293 and 292 vs 294 of 336 on two seed pairs; the official Inkling weights: 596 vs 592
   of 672).
@@ -176,7 +180,7 @@ seeds 100 + 101; fresh = seeds 104 + 105.*
 
 | Map | How chosen | KL vs start | Recall at 117k | AppWorld vs start, S; fresh | Verdict | Ref. |
 |---|---|---:|---|---|---|---|
-| KL-group | measured KL per group | -9.3 % [-10.5, -8.3]; p2 -8.2 % | 23/24 + 19/20 (a needle lost) | not run | fail | [E1.3] |
+| KL-group | measured KL per group | -9.3 % [-10.5, -8.3]; p2 -8.2 % | 23/24 + 19/20 (a needle lost). Held-out (B1): no loss past the refit floor | not run | fail on the gate, not confirmed on held-out documents | [E1.3, E1.34] |
 | KL-table A | KL table | -8.5 % (subset) | 24/24 + 19/20 (fragile item only) | not run | fail as written (weak) | [E1.6] |
 | KL-table B | KL table | -10.6 % (subset) | needle margin -1.94; held-out (B1): long-range margin loss | not run | fail | [E1.7, E1.34] |
 | KL-only winner | KL table | -7.0 % [-8.3, -5.6] | 24/24 + 20/20 (also at 245k) | 285 vs 302 (p = 0.019); 296 vs 292 (p = 0.68); harder split: 610 vs 670 of 834 (p = 1.3e-5) | long-chat flag; loses on the harder split | [E1.8, E1.31, E1.36] |
@@ -207,7 +211,8 @@ selection seeds (filled) and on fresh seeds 104 + 105 (open), with 95 % paired b
 agent loss of the KL-only winner did not replicate on this standard split; on the harder test_challenge split (not
 shown) it lost 60 of 834 task-runs [-87, -33] [E1.8, E1.31, E1.36, E3.16, E3.17].](figs/fig2-kl-vs-task.png){width=100%}
 
-**Held-out recall population (B1).** After an external review, the author fixed three tests and their lines before
+**Held-out recall population (B1).** After an adversarial review of the draft by an LLM assistant, at the author's request (see AI use), the author fixed
+three tests and their lines before
 any of them ran, with a family alpha of 0.0167 (Bonferroni over the three); no other test is added until one of them
 passes. The first asks whether a lower-KL map loses recall on material that no choice used. It has 20 haystack
 documents built from standard-library code that no recall gate of the selection used, 240 needles and 240 distinct
@@ -222,7 +227,9 @@ One of the six lower-KL maps meets the line. KL-table B (KL -10.6 % on the build
 needles at depth: -1.23 nats at 117k and -3.26 at 245k, against -0.16 at 64k; the copies are flat. It is a loss of
 margin, not of answers: no long item went below zero, so greedy decoding still answers every item. The other five
 lower-KL maps do not meet the line. This includes KL-group, whose needle loss on the gate's one document (Table 1) is
-small on held-out documents (L = -0.13 [-0.24, -0.03], inside the refit floor). So C1 on the 27B model is this: one
+small on held-out documents (L = -0.13 [-0.24, -0.03], inside the refit floor). Two lower-KL maps have slightly more
+long-range margin than the shipped file: the KL-only winner (L = +0.09 [+0.01, +0.18]) and the uniform map
+(L = +0.13 [+0.05, +0.21]), both inside the refit floor [E1.34]. So C1 on the 27B model is this: one
 of six maps with lower average KL lost long-range recall margin on held-out documents, which short-range probes and
 average KL did not show; the evidence is a margin, not a wrong answer, and it rests on the depth contrast.
 
@@ -274,12 +281,26 @@ allocation method and is not evidence for C1. The naive file ran with its own ch
 task-run had the same token count as the shipped file's (336 of 336). On the selection seeds the gap was 35 (302
 against 267) [E1.20].
 
-**The recall loss is local.** Margins on the gate's own prompts turned the pass / fail needle into a continuous,
-exact measurement. The failed needle ("vault 8") had a margin of +1.62 nats on the start map and between -1.6 and
--2.1 on every map that moved the MLP up-projections of layers 21-47 to 2 bits; every map without that change kept it
-[E1.5]. A one-group flip table on the shipped file (21 rows) agrees, and adds two small groups: the attention output
-projections (15 MiB) and the attention key / value projections (20 MiB) each pushed the needle below zero [E1.11].
-KL rates the layer 21-47 up-projections among the cheapest sources (0.024-0.026 % KL per MiB) [E2.13].
+**One gate item traces to a layer band, but the band does not explain the held-out loss.** Margins on the gate's own
+prompts turned the pass / fail needle into a continuous, exact measurement. The failed needle ("vault 8") had a margin
+of +1.62 nats on the start map. It was wrong, or between -1.6 and -2.1, on every map but one that moved the MLP
+up-projections of layers 21-47 to 2 bits. One of those maps has only that change (its 32 up-projection downgrades are
+layers 21-47 and five earlier layers, as in every map of this bisection). Every map without that change kept
+the needle [E1.5]. A one-group flip table on the shipped file (21 rows) agrees, and adds two small groups: the
+attention output projections (15 MiB) and the attention key / value projections (20 MiB) each pushed the needle below
+zero [E1.11]. KL rates the layer 21-47 up-projections among the cheapest sources (0.024-0.026 % KL per MiB) [E2.13].
+
+Three results limit this. First, the effect does not add. The one exception has the same band change and more bits
+in two other groups: the attention q / k / v projections of the 48 linear-attention layers, and the MLP gate of
+layers 35-38 (+339 MiB in total). It answered vault 8 correctly. Neither of the two groups alone restored the needle
+[E1.5]. The uniform baseline holds every projection of layers 0-33 at 2 bits, which includes the up-projections of
+layers 21-33 that the shipped map holds at 3 bits. Its vault 8 margin was +4.14 nats, against +1.34 for the shipped
+file (the start map with its 8-bit head) in the same run [E1.28, E1.33]. So a flip table from one start map does not
+predict the item on a different map. Second, the band does not explain the held-out loss. KL-group and KL-table B both
+have the band change. On the held-out documents, KL-table B lost 1.07 nats and KL-group lost 0.13, which is inside
+the refit floor [E1.34]. Third, the cause of the held-out loss of KL-table B is not located. So the claim is narrow:
+exact margins can trace the loss of one item to a group of layers on one map. We do not claim that this band holds
+long-range recall.
 
 **The reverse also holds.** KL rates the up-projections of layers 56-63 as the *worst* source (0.148 % per MiB).
 They broke no recall item. A candidate that took all of layers 48-63 kept every recall item above zero but was
@@ -634,6 +655,10 @@ this text, under the author's direction. The pass lines were written before each
 under his direction, and kept in a timestamped private record. The author checked the results against the logs and
 decided what ships and what is claimed. Every number in this paper is read from a log or a scorer output listed in
 `evidence/EVIDENCE.md`.
+
+An LLM assistant also wrote the adversarial review of the first draft, at the author's request and with access to
+the private record. The three stop-rule tests (B1, the naive file, test_challenge) came from that review. It is not
+an independent peer review.
 
 ## Acknowledgements
 
