@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.3 (2026-11-23)
+
+Scope statement. No result changed.
+
+- The abstract and the contributions now say plainly what the paper does and does not show: the method did not find a better bit map than the published allocation; the paper shows damage that average error hides, an instrument that measures it, and a protocol that kept our own claims honest.
+
 ## v1.0.2 (2026-11-23)
 
 Text corrections. No result changed.

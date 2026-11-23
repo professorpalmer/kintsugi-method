@@ -2,7 +2,7 @@
 
 Cary Palmer
 
-*Version 1.0.2 (2026-11-23). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one.*
+*Version 1.0.3 (2026-11-23). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one.*
 
 ---
 
@@ -11,7 +11,7 @@ Cary Palmer
 Low-bit quantization of large language models is usually tuned and reported by an average error, such as perplexity
 or the KL divergence to the full-precision model. We show, on a 27B dense hybrid model at 2.47 bits per weight,
 that average error does not rank bit maps by task quality: none of our five bit maps with 7-11 % lower KL than the
-published allocation could replace it. On our recall gate two lost a fact 117k tokens back (one also lost a code
+published allocation could replace it. The method did not find a better bit map than the published allocation; what this paper shows is damage that average error hides, an instrument that measures it, and a protocol that kept our own claims honest. On our recall gate two lost a fact 117k tokens back (one also lost a code
 copy), a third failed only on one fragile code-copy item (as two baselines did), and the other two were worse on long
 chat documents and gave no agent gain on fresh seeds of the standard benchmark split. On 20 held-out documents with 480 recall items and a
 short-distance twin of each long item, one of six lower-KL maps (our five and a uniform baseline) lost long-range
@@ -66,7 +66,8 @@ a multi-step agent benchmark. Three observations shaped the method.
    of the selection effect could not be separated from seed noise. So we state this step as a procedure, not as a
    measured effect.
 
-**Contributions.**
+**Contributions.** The method did not find a better bit map than the published allocation; what this paper shows is damage that average error hides, an instrument that measures it, and a protocol that kept our own claims honest. In detail:
+
 - A reproducible loop (Section 3; full version in the supplement `evidence/ALGORITHM.md`): fit once, diagnose with KL and
   task probes, locate with one-group flips, repair under a byte budget, gate with pre-written lines, confirm on
   fresh data, and keep failures in the record.
