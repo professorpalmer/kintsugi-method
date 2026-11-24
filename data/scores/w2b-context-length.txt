@@ -1,0 +1,23 @@
+W2-B (lab:aw_w2b.py): 834 task-runs per arm; L_t terciles: < 14608, 14608-20166, >= 20167 prompt tokens (L_t median 17322, max 69899)
+
+V5cc vs shipped: discordant shipped-only 142, V5cc-only 58; L_t median shipped-only 17481 vs V5cc-only 21577; Mann-Whitney U 2992, z -3.03, one-sided p 0.9988
+  by L_t tercile (shipped-only, V5cc-only, shipped-only share): T1 41, 8, 0.84; T2 51, 18, 0.74; T3 50, 32, 0.61
+  failing run's prompt tokens at its last call, median: V5cc in shipped-only 17590; shipped in V5cc-only 20332
+  LINE (V5cc): not shown (p 0.9988 vs 0.025; top-tercile share 0.61 vs bottom 0.84)
+
+V5bc vs shipped: discordant shipped-only 123, V5bc-only 63; L_t median shipped-only 18302 vs V5bc-only 20109; Mann-Whitney U 3491, z -1.11, one-sided p 0.8654
+  by L_t tercile (shipped-only, V5bc-only, shipped-only share): T1 33, 11, 0.75; T2 40, 21, 0.66; T3 50, 31, 0.62
+  failing run's prompt tokens at its last call, median: V5bc in shipped-only 18315; shipped in V5bc-only 19381
+  LINE (V5bc): not shown (p 0.8654 vs 0.025; top-tercile share 0.62 vs bottom 0.75)
+
+V5tc vs shipped: discordant shipped-only 76, V5tc-only 86; L_t median shipped-only 18029 vs V5tc-only 20402; Mann-Whitney U 2642, z -2.10, one-sided p 0.9822
+  by L_t tercile (shipped-only, V5tc-only, shipped-only share): T1 21, 13, 0.62; T2 24, 30, 0.44; T3 31, 43, 0.42
+  failing run's prompt tokens at its last call, median: V5tc in shipped-only 18678; shipped in V5tc-only 19620
+  (V5tc: report only)
+
+Shipped vs BF16 (report only): shipped-only 126, BF16-only 70
+  by L_t tercile (shipped-only, BF16-only, task-runs): T1: 22, 12, 278; T2: 50, 20, 278; T3: 54, 38, 278
+  by shipped step tercile (< 18, 18-25, >= 26) (shipped-only, BF16-only, task-runs): S1: 18, 12, 252; S2: 54, 22, 286; S3: 54, 36, 296
+  by AppWorld difficulty (shipped-only, BF16-only, task-runs): 1: 11, 3, 144; 2: 55, 31, 300; 3: 60, 36, 390
+  by num_apps (shipped-only, BF16-only, task-runs): 1: 48, 24, 312; 2: 37, 25, 252; 3: 32, 17, 222; 4: 9, 3, 42; 6: 0, 1, 6
+  by app called by the shipped run (shipped-only, BF16-only, task-runs): amazon: 79, 38, 448; file_system: 21, 17, 179; gmail: 57, 37, 436; phone: 55, 28, 345; simple_note: 6, 1, 42; splitwise: 3, 2, 18; spotify: 10, 6, 67; todoist: 0, 1, 6; venmo: 18, 8, 103

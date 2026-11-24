@@ -1,0 +1,7 @@
+W2-K (3-bit head / embedding, HEAD2=0) s106: 331/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+W2-K (3-bit head / embedding, HEAD2=0) s107: 339/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+
+  seed 106: 417 paired; W2-H(exact head) 347, W2-K(3-bit head) 331; W2-H(exact head)-only 46, W2-K(3-bit head)-only 30; sign p 0.08465
+  seed 107: 417 paired; W2-H(exact head) 340, W2-K(3-bit head) 339; W2-H(exact head)-only 39, W2-K(3-bit head)-only 38; sign p 1
+W2-H(exact head) vs W2-K(3-bit head), pooled: 834 paired task-runs; 687 vs 670; discordant 85 / 68; exact two-sided sign p = 0.1957; (W2-H(exact head) - W2-K(3-bit head)) +17, 95 % paired bootstrap [-7.0, +40.0]
+W2-K LINE: NOT SHOWN ON TASKS (exact 687 vs 3-bit 670, p 0.1957)

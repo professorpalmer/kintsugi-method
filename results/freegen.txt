@@ -1,0 +1,28 @@
+Free-generation check: 24 needle questions at 245,000 tokens, default thinking, temperature 0, max 4,096 tokens.
+run | items | correct | ended by the model | thinking chars min / median / max | items over 1,000 chars (vault: chars)
+bf16 | 24 | 24 | 24 | 199 / 223 / 232 | none
+shipped | 24 | 24 | 24 | 197 / 199 / 209 | none
+kl-tools | 24 | 24 | 24 | 207 / 209 / 1184 | 9: 1184
+kl-tools-repeat | 24 | 24 | 24 | 207 / 209 / 1184 | 9: 1184
+kl-tools-mtp | 24 | 24 | 24 | 207 / 209 / 1184 | 9: 1184
+kl-tools-no-drafting | 24 | 24 | 24 | 207 / 209 / 1184 | 9: 1184
+kl-tools-vault9-first | 24 | 24 | 24 | 207 / 209 / 1184 | 9: 1184
+kl-tools-qkv-back | 24 | 24 | 24 | 207 / 209 / 1186 | 5: 1184, 7: 1184, 21: 1186
+kl-tools-ssmout-back | 24 | 24 | 24 | 207 / 209 / 1186 | 7: 1184, 8: 1184, 21: 1186
+
+Vault 9 asked alone on a fresh server (one record per map; '<group>-back' = KL-tools with that group at the shipped bits):
+map | correct | thinking chars
+attn_output-back | 1 | 1184
+attn_qkv-0-14-back | 1 | 1184
+attn_qkv-32-46-back | 1 | 207
+attn_qkv-48-62-back | 1 | 209
+attn_qkv-back | 1 | 209
+ffn_down-back | 1 | 1183
+ffn_gate-back | 1 | 1184
+ffn_up-back | 1 | 1184
+kl-tools | 1 | 1184
+shipped | 1 | 209
+ssm_out-20-28-back | 1 | 1184
+ssm_out-32-49-back | 1 | 1184
+ssm_out-5-18-back | 1 | 209
+ssm_out-back | 1 | 209

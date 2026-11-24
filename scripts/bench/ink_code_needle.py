@@ -14,8 +14,12 @@ python bench/code_needle.py --base http://127.0.0.1:8080 --key-file artifacts/ap
 --only FN runs only the target named FN (same target choice). --span prints each target's KV cell span (token
 positions of its source in the prompt, from /tokenize plus the chat template's prefix) and exits without generating:
 the input for GGML_CUDA_FA_SPARSE_TRACE=a,b.
+
+--replies FILE (11-23, macrow run) appends one JSON line per request with the FULL reply: content, reasoning_content,
+finish_reason, usage, timings, the extracted code, ok / ok_lead, and the sha256 of the user message. Scoring and the
+--out records are unchanged.
 """
-import argparse, ast, difflib, json, os, re, sys, time, urllib.request
+import argparse, ast, difflib, hashlib, json, os, re, sys, time, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from quick_tps import n_tokens  # noqa: E402
@@ -50,6 +54,7 @@ def main():
     ap.add_argument("--only", default="")
     ap.add_argument("--span", action="store_true")
     ap.add_argument("--diff", action="store_true", help="print a unified diff for each miss")
+    ap.add_argument("--replies", default="", help="append the full reply of each request (JSON lines) to this file")
     a = ap.parse_args()
     key = open(a.key_file).read().strip()
     text = open(CORPUS, encoding="utf-8").read()
@@ -135,6 +140,16 @@ def main():
         if a.out:
             with open(a.out, "a", encoding="utf-8") as f:
                 f.write(json.dumps(rec) + "\n")
+        if a.replies:
+            ch = r["choices"][0]
+            full = dict(rec, finish_reason=ch.get("finish_reason"), content=ch["message"].get("content"),
+                        reasoning_content=ch["message"].get("reasoning_content"), extracted=got, want=t["code"],
+                        usage=r.get("usage"), timings=r.get("timings"), model=r.get("model"),
+                        system_fingerprint=r.get("system_fingerprint"), question=q,
+                        user_sha256=hashlib.sha256(body["messages"][0]["content"].encode("utf-8")).hexdigest(),
+                        request={k: v for k, v in body.items() if k != "messages"}, t=time.strftime("%Y-%m-%dT%H:%M:%S"))
+            with open(a.replies, "a", encoding="utf-8") as f:
+                f.write(json.dumps(full, ensure_ascii=False) + "\n")
     print(json.dumps({"tag": a.tag, "depth": a.depth, "correct": ok, "correct_lead": ok_lead, "of": len(targets)}), flush=True)
 
 

@@ -1,0 +1,16 @@
+V3ac-h32 (shipped) s106 (test 3, reused): 335/417
+V3ac-h32 (shipped) s107 (test 3, reused): 335/417
+U1c-h32 (uniform) s106: 325/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+U1c-h32 (uniform) s107: 305/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+H1c-h32 (HAWQ-style) s106: 334/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+H1c-h32 (HAWQ-style) s107: 303/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+
+  seed 106: 417 paired; U1c-h32 (uniform) 325, shipped 335; puni-only 41, shipped-only 51; sign p 0.3481
+  seed 107: 417 paired; U1c-h32 (uniform) 305, shipped 335; puni-only 34, shipped-only 64; sign p 0.003189
+U1c-h32 (uniform) vs shipped, pooled: 834 paired task-runs; 630 vs 670; discordant puni-only 75 / shipped-only 115; exact two-sided sign p = 0.004537; (map - shipped) -40, 95 % paired bootstrap [-68.0, -12.0]
+  LINE (U1c-h32 (uniform)): LOSES agent work on the harder split
+
+  seed 106: 417 paired; H1c-h32 (HAWQ-style) 334, shipped 335; phawq-only 46, shipped-only 47; sign p 1
+  seed 107: 417 paired; H1c-h32 (HAWQ-style) 303, shipped 335; phawq-only 35, shipped-only 67; sign p 0.001993
+H1c-h32 (HAWQ-style) vs shipped, pooled: 834 paired task-runs; 637 vs 670; discordant phawq-only 81 / shipped-only 114; exact two-sided sign p = 0.02169; (map - shipped) -33, 95 % paired bootstrap [-61.0, -6.0]
+  LINE (H1c-h32 (HAWQ-style)): LOSES agent work on the harder split

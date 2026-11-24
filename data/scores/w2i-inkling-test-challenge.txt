@@ -1,0 +1,20 @@
+W2-I (AppWorld test_challenge, seeds 112 + 113; evidence/LINES.md W2-I)
+
+m2 s112: pass 311/417 (task folders 417, unique 417 of 417)
+m2 s113: pass 327/417 (task folders 417, unique 417 of 417)
+u s112: pass 326/416 (task folders 416, unique 416 of 417)
+u s113: pass 323/417 (task folders 417, unique 417 of 417)
+full s112: pass 306/417 (task folders 417, unique 417 of 417)
+full s113: pass 298/417 (task folders 417, unique 417 of 417)
+
+Line 1, U vs M2:
+  seed 112: U 326/416, M2 311/416; only U 42, only M2 27; p 0.09119
+  seed 113: U 323/416, M2 327/416; only U 34, only M2 38; p 0.7239
+  pooled 832: U 649, M2 638; discordant 76 / 65; exact two-sided p 0.3998; (U - M2) +11, 95 % [-11, +35]
+  -> line 1 NOT MET
+Line 2 (W2-D KL by class): U tools-class gap +14.5 % (95 % [-0.00300, +0.01282]) vs all rows +2.5 % -> line 2 NOT MET
+Line 4, M2 vs FULL (non-inferiority, margin -25 of 834):
+  seed 112: M2 311/417, FULL 306/417; only M2 41, only FULL 36; p 0.6488
+  seed 113: M2 327/417, FULL 298/417; only M2 55, only FULL 26; p 0.001689
+  pooled 834: M2 638, FULL 604; discordant 96 / 62; exact two-sided p 0.008448; (M2 - FULL) +34, 95 % [+11, +58]
+  -> line 4: M2 is not worse than the official weights on the harder split

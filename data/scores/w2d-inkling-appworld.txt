@@ -1,0 +1,27 @@
+W2-D AppWorld (test_normal, seeds 108-111; v1.0 Linux launcher, Q65 settings; evidence/LINES.md W2-D)
+
+m2 s108: pass 151/168 (task folders 168, unique 168 of 168)
+m2 s109: pass 149/168 (task folders 168, unique 168 of 168)
+m2 s110: pass 148/168 (task folders 168, unique 168 of 168)
+m2 s111: pass 150/168 (task folders 168, unique 168 of 168)
+a s108: pass 144/168 (task folders 168, unique 168 of 168)
+a s109: pass 141/168 (task folders 168, unique 168 of 168)
+a s110: pass 146/168 (task folders 168, unique 168 of 168)
+a s111: pass 148/168 (task folders 168, unique 168 of 168)
+u s108: pass 149/168 (task folders 168, unique 168 of 168)
+u s109: pass 147/168 (task folders 168, unique 168 of 168)
+u s110: pass 148/168 (task folders 168, unique 168 of 168)
+u s111: pass 152/168 (task folders 168, unique 168 of 168)
+
+M2 vs A: Unsloth UD-Q2_K_XL:
+  seed 108: M2 151/168, a 144/168; only M2 8, only a 1; p 0.0391
+  seed 109: M2 149/168, a 141/168; only M2 13, only a 5; p 0.0963
+  seed 110: M2 148/168, a 146/168; only M2 6, only a 4; p 0.7539
+  seed 111: M2 150/168, a 148/168; only M2 8, only a 6; p 0.7905
+  pooled 672: M2 598, a 579; discordant 35 / 16; exact two-sided p 0.01097; (M2 - a) +19, 95 % [+5, +33], 97.5 % [+3, +35] -> M2 SCORES HIGHER (engine, K/V, budget and window held equal)
+M2 vs U: uniform map, equal bytes:
+  seed 108: M2 151/168, u 149/168; only M2 5, only u 3; p 0.7266
+  seed 109: M2 149/168, u 147/168; only M2 8, only u 6; p 0.7905
+  seed 110: M2 148/168, u 148/168; only M2 4, only u 4; p 1.0000
+  seed 111: M2 150/168, u 152/168; only M2 4, only u 6; p 0.7539
+  pooled 672: M2 598, u 596; discordant 21 / 19; exact two-sided p 0.8746; (M2 - u) +2, 95 % [-12, +16], 97.5 % [-14, +17] -> LEVEL (not separated)

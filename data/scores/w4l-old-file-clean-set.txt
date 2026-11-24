@@ -1,0 +1,42 @@
+OLD vs M2 by class (the w4l_bycat.py table run with --new lamq89: the NEW columns ARE the old file; only the NEW-M2 = OLD-M2 columns are meaningful here)
+W4-L per-class scored-row KL. NEW = lamq89 (rig), M2 = m2, OLD = lamq89 (A100). Clean set drops documents [204, 212, 348, 360, 548]. Paired bootstrap over documents, 10,000, default_rng(20261123); 95 % interval of the difference.
+
+== CLEAN set ==
+class         docs    rows |     NEW      M2     OLD | NEW-M2: rel, [95 %], words, L1 | NEW-OLD: rel, [95 %], words | OLD-M2: rel, [95 %]
+code            62   74053 | 0.0168 0.0130 0.0168 | +29.1% [+0.0032, +0.0044] M2 below new, L1 FAILS (new lower on 9/62) | +0.0% [+0.0000, +0.0000] no difference shown | +29.1% [+0.0032, +0.0044]
+tools           38    6530 | 0.0268 0.0199 0.0268 | +34.8% [+0.0009, +0.0129] M2 below new, L1 FAILS (new lower on 15/38) | +0.0% [+0.0000, +0.0000] no difference shown | +34.8% [+0.0008, +0.0129]
+agentic          2    7275 | 0.0125 0.0066 0.0125 | +90.1% [+0.0057, +0.0061] M2 below new, L1 FAILS (new lower on 0/2) | +0.0% [+0.0000, +0.0000] no difference shown | +90.1% [+0.0057, +0.0061]
+reasoning        4   31525 | 0.0210 0.0120 0.0210 | +74.1% [+0.0030, +0.0127] M2 below new, L1 FAILS (new lower on 0/4) | +0.0% [+0.0000, +0.0000] no difference shown | +74.1% [+0.0030, +0.0127]
+math            17   22276 | 0.0355 0.0325 0.0355 | +9.4% [-0.0050, +0.0094] no difference shown (new lower on 6/17) | +0.0% [+0.0000, +0.0000] no difference shown | +9.4% [-0.0049, +0.0094]
+chat            24   22664 | 0.0437 0.0448 0.0437 | -2.5% [-0.0046, +0.0028] no difference shown (new lower on 13/24) | +0.0% [+0.0000, +0.0000] no difference shown | -2.5% [-0.0046, +0.0029]
+prose          106  218651 | 0.0256 0.0341 0.0256 | -24.9% [-0.0134, -0.0045] new below M2 (new lower on 93/106) | +0.0% [+0.0000, +0.0000] no difference shown | -24.9% [-0.0134, -0.0045]
+multilingual    40   56588 | 0.0671 0.0550 0.0671 | +22.0% [+0.0076, +0.0159] M2 below new (new lower on 10/40) | +0.0% [+0.0000, +0.0000] no difference shown | +22.0% [+0.0076, +0.0159]
+ALL            293  439562 | 0.0304 0.0314 0.0304 | -3.5% [-0.0039, +0.0015] no difference shown (new lower on 146/293) | +0.0% [+0.0000, +0.0000] no difference shown | -3.5% [-0.0039, +0.0015]
+copy rows >1k   17         | 0.6570 0.4476 0.6570 | +46.8% [+0.1174, +0.2823] M2 below new | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 0-1k     286         | 0.0329 0.0350 0.0329 | -6.0% [-0.0038, -0.0004] new below M2 | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 1-4k     102         | 0.0318 0.0330 0.0318 | -3.8% [-0.0049, +0.0023] no difference shown | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 4-8k      27         | 0.0268 0.0291 0.0268 | -7.9% [-0.0082, +0.0033] no difference shown | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 8-16k     14         | 0.0212 0.0175 0.0212 | +21.1% [-0.0017, +0.0078] no difference shown | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 16-32k     4         | 0.0277 0.0235 0.0277 | +17.9% [+0.0033, +0.0111] M2 below new | +0.0% [+0.0000, +0.0000] no difference shown |
+
+== FULL set ==
+class         docs    rows |     NEW      M2     OLD | NEW-M2: rel, [95 %], words, L1 | NEW-OLD: rel, [95 %], words | OLD-M2: rel, [95 %]
+code            62   74053 | 0.0168 0.0130 0.0168 | +29.1% [+0.0032, +0.0044] M2 below new, L1 FAILS (new lower on 9/62) | +0.0% [+0.0000, +0.0000] no difference shown | +29.1% [+0.0032, +0.0044]
+tools           38    6530 | 0.0268 0.0199 0.0268 | +34.8% [+0.0009, +0.0129] M2 below new, L1 FAILS (new lower on 15/38) | +0.0% [+0.0000, +0.0000] no difference shown | +34.8% [+0.0008, +0.0129]
+agentic          4   16418 | 0.0140 0.0077 0.0140 | +82.6% [+0.0053, +0.0095] M2 below new, L1 FAILS (new lower on 0/4) | +0.0% [+0.0000, +0.0000] no difference shown | +82.6% [+0.0053, +0.0095]
+reasoning        4   31525 | 0.0210 0.0120 0.0210 | +74.1% [+0.0030, +0.0127] M2 below new, L1 FAILS (new lower on 0/4) | +0.0% [+0.0000, +0.0000] no difference shown | +74.1% [+0.0030, +0.0127]
+math            17   22276 | 0.0355 0.0325 0.0355 | +9.4% [-0.0047, +0.0094] no difference shown (new lower on 6/17) | +0.0% [+0.0000, +0.0000] no difference shown | +9.4% [-0.0048, +0.0095]
+chat            24   22664 | 0.0437 0.0448 0.0437 | -2.5% [-0.0046, +0.0028] no difference shown (new lower on 13/24) | +0.0% [+0.0000, +0.0000] no difference shown | -2.5% [-0.0046, +0.0029]
+prose          109  221531 | 0.0255 0.0341 0.0255 | -25.2% [-0.0135, -0.0046] new below M2 (new lower on 96/109) | +0.0% [+0.0000, +0.0000] no difference shown | -25.2% [-0.0134, -0.0047]
+multilingual    40   56588 | 0.0671 0.0550 0.0671 | +22.0% [+0.0076, +0.0159] M2 below new (new lower on 10/40) | +0.0% [+0.0000, +0.0000] no difference shown | +22.0% [+0.0077, +0.0158]
+ALL            298  451585 | 0.0300 0.0310 0.0300 | -3.3% [-0.0038, +0.0015] no difference shown (new lower on 149/298) | +0.0% [+0.0000, +0.0000] no difference shown | -3.3% [-0.0038, +0.0015]
+copy rows >1k   19         | 1.2337 0.7626 1.2337 | +61.8% [+0.1766, +0.6429] M2 below new | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 0-1k     289         | 0.0327 0.0350 0.0327 | -6.4% [-0.0039, -0.0005] new below M2 | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 1-4k     104         | 0.0317 0.0331 0.0317 | -4.1% [-0.0049, +0.0021] no difference shown | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 4-8k      29         | 0.0268 0.0289 0.0268 | -7.3% [-0.0078, +0.0035] no difference shown | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 8-16k     16         | 0.0211 0.0172 0.0211 | +22.6% [-0.0012, +0.0080] no difference shown | +0.0% [+0.0000, +0.0000] no difference shown |
+depth 16-32k     6         | 0.0238 0.0192 0.0238 | +23.9% [+0.0034, +0.0109] M2 below new | +0.0% [+0.0000, +0.0000] no difference shown |
+
+SENTENCE (CLEAN set; the CLEAN set gives the verdict): the gap closes in no class; the new file stays above M2 in code, tools, agentic, reasoning
+
+SENTENCE (FULL set; the CLEAN set gives the verdict): the gap closes in no class; the new file stays above M2 in code, tools, agentic, reasoning

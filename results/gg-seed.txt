@@ -1,0 +1,191 @@
+G-G (seed clustering): evidence/LINES.md section 6; CPU, deterministic
+
+(1a) Opening modes: first word of the first reply (reasoning), share of the task-runs of each arm-seed
+  shipped  s106: 417 task-runs; 'Let' 57.3 %, 'The' 42.7 %, 'We' 0.0 %; other 0.0 %
+  shipped  s107: 417 task-runs; 'Let' 47.5 %, 'The' 50.1 %, 'We' 2.4 %; other 0.0 %
+  shipped  s108: 417 task-runs; 'Let' 49.9 %, 'The' 50.1 %, 'We' 0.0 %; other 0.0 %
+  shipped  s109: 417 task-runs; 'Let' 55.9 %, 'The' 44.1 %, 'We' 0.0 %; other 0.0 %
+  shipped  mode x seed (106 vs 107): chi2 16.3, df 2, p 0.000284
+  BF16     s106: 417 task-runs; 'Let' 73.4 %, 'The' 26.6 %, 'This' 0.0 %; other 0.0 %
+  BF16     s107: 417 task-runs; 'Let' 55.4 %, 'The' 43.9 %, 'This' 0.7 %; other 0.0 %
+  BF16     s108: 417 task-runs; 'Let' 61.6 %, 'The' 37.6 %, 'This' 0.7 %; other 0.0 %
+  BF16     s109: 417 task-runs; 'Let' 72.9 %, 'The' 27.1 %, 'This' 0.0 %; other 0.0 %
+  BF16     mode x seed (106 vs 107): chi2 31.1, df 2, p 1.76e-07
+  W2-S     s106: 417 task-runs; 'Let' 55.9 %, 'The' 44.1 %, 'We' 0.0 %; other 0.0 %
+  W2-S     s107: 417 task-runs; 'Let' 43.9 %, 'The' 55.2 %, 'We' 1.0 %; other 0.0 %
+  W2-S     mode x seed (106 vs 107): chi2 15.1, df 2, p 0.000521
+  V5tc     s106: 417 task-runs; 'The' 49.9 %, 'Let' 47.7 %, 'We' 2.4 %; other 0.0 %
+  V5tc     s107: 417 task-runs; 'The' 25.4 %, 'Let' 19.7 %, 'We' 54.2 %; other 0.7 %
+  V5tc     mode x seed (106 vs 107): chi2 282.5, df 3, p 5.96e-61
+  V5bc     s106: 417 task-runs; 'The' 54.0 %, 'Let' 45.1 %, 'We' 1.0 %; other 0.0 %
+  V5bc     s107: 417 task-runs; 'The' 45.6 %, 'Let' 34.1 %, 'We' 20.4 %; other 0.0 %
+  V5bc     mode x seed (106 vs 107): chi2 83.1, df 2, p 9.09e-19
+  V5cc     s106: 417 task-runs; 'Let' 60.2 %, 'The' 39.8 %; other 0.0 %
+  V5cc     s107: 417 task-runs; 'Let' 53.7 %, 'The' 46.3 %; other 0.0 %
+  V5cc     mode x seed (106 vs 107): chi2 3.6, df 1, p 0.059
+  U1       s106: 417 task-runs; 'Let' 57.8 %, 'The' 38.1 %, 'I' 2.2 %; other 1.9 %
+  U1       s107: 417 task-runs; 'Let' 57.1 %, 'The' 42.9 %, 'I' 0.0 %; other 0.0 %
+  U1       mode x seed (106 vs 107): chi2 18.2, df 3, p 0.0004
+  H1       s106: 417 task-runs; 'Let' 59.0 %, 'The' 41.0 %, 'This' 0.0 %; other 0.0 %
+  H1       s107: 417 task-runs; 'Let' 55.2 %, 'The' 44.1 %, 'This' 0.7 %; other 0.0 %
+  H1       mode x seed (106 vs 107): chi2 4.0, df 2, p 0.134
+  g3       s106: 417 task-runs; 'Let' 60.2 %, 'The' 39.8 %; other 0.0 %
+  g3       s107: 417 task-runs; 'Let' 48.4 %, 'The' 51.6 %; other 0.0 %
+  g3       mode x seed (106 vs 107): chi2 11.6, df 1, p 0.000659
+  S-fd     s106: 417 task-runs; 'The' 53.5 %, 'Let' 46.5 %; other 0.0 %
+  S-fd     s107: 417 task-runs; 'The' 46.8 %, 'Let' 53.2 %; other 0.0 %
+  S-fd     mode x seed (106 vs 107): chi2 3.8, df 1, p 0.0525
+  noH2     s106: 417 task-runs; 'Let' 55.4 %, 'The' 44.6 %, 'We' 0.0 %; other 0.0 %
+  noH2     s107: 417 task-runs; 'Let' 44.1 %, 'The' 50.8 %, 'We' 4.8 %; other 0.2 %
+  noH2     mode x seed (106 vs 107): chi2 28.0, df 3, p 3.59e-06
+  W2-K     s106: 417 task-runs; 'The' 41.2 %, 'Let' 58.8 %, 'We' 0.0 %; other 0.0 %
+  W2-K     s107: 417 task-runs; 'The' 58.8 %, 'Let' 41.0 %, 'We' 0.2 %; other 0.0 %
+  W2-K     mode x seed (106 vs 107): chi2 26.9, df 2, p 1.41e-06
+
+(1b) Same first 8 words of the first reply, share of tasks (arm pairs on the same seed vs across seeds)
+  different arms, SAME seed: mean 51.2 % (range 13.2-89.2, 132 arm-pair-seeds)
+  different arms, seed 106 vs 107: mean 23.8 % (range 9.8-41.7)
+  same arm, seed 106 vs 107: mean 27.9 % (range 9.8-43.4)
+
+(1c) Design effect of one arm's seed total: z = (a - b) / sqrt(a + b) over the tasks of two seeds
+  27B     shipped s106/s107      only-first  38 / only-second  38: z +0.00
+  27B     shipped s108/s109      only-first  37 / only-second  35: z +0.24
+  27B     BF16 s106/s107         only-first  46 / only-second  54: z -0.80
+  27B     BF16 s108/s109         only-first  51 / only-second  58: z -0.67
+  27B     W2-S s106/s107         only-first  24 / only-second  50: z -3.02
+  27B     V5tc s106/s107         only-first  33 / only-second  47: z -1.57
+  27B     V5bc s106/s107         only-first  54 / only-second  56: z -0.19
+  27B     V5cc s106/s107         only-first  53 / only-second  55: z -0.19
+  27B     U1 s106/s107           only-first  54 / only-second  34: z +2.13
+  27B     H1 s106/s107           only-first  69 / only-second  38: z +3.00
+  27B     g3 s106/s107           only-first  46 / only-second  53: z -0.70
+  27B     S-fd s106/s107         only-first  44 / only-second  33: z +1.25
+  27B     noH2 s106/s107         only-first  39 / only-second  32: z +0.83
+  27B: phi1 = mean z^2 = 2.24 over 13; sum z^2 29.1, chi2(13) p 0.00636; rho = +0.0030
+  Inkling D:M2 s108/s109         only-first   6 / only-second   4: z +0.63
+  Inkling D:M2 s110/s111         only-first   3 / only-second   5: z -0.71
+  Inkling D:A s108/s109          only-first   9 / only-second   6: z +0.77
+  Inkling D:A s110/s111          only-first   7 / only-second   9: z -0.50
+  Inkling D:U s108/s109          only-first   5 / only-second   3: z +0.71
+  Inkling D:U s110/s111          only-first   1 / only-second   5: z -1.63
+  Inkling I:M2 s112/s113         only-first  31 / only-second  47: z -1.81
+  Inkling I:U s112/s113          only-first  34 / only-second  31: z +0.37
+  Inkling I:FULL s112/s113       only-first  44 / only-second  36: z +0.89
+  Inkling: phi1 = mean z^2 = 1.02 over 9; sum z^2 9.1, chi2(9) p 0.425; rho = +0.0000
+  LINE (1): the task-runs of a seed are CLUSTERED (27B phi1 2.24, chi2 p 0.00636; approximate: the arms share each seed's random stream)
+
+(1d) Design effect of a paired difference: h = sample var of D_s over seeds / mean discordant n_s
+  27B (55 pairs, 106/107): mean h 2.75, median 1.32, range 0.00-18.57, share h > 1: 0.56
+  Inkling W2-D (4 seeds): mean h 0.47, median 0.37, range 0.24-0.80, share h > 1: 0.00
+  Inkling W2-I (2 seeds): mean h 2.12, median 2.56, range 0.15-3.65, share h > 1: 0.67
+  shipped vs BF16 over 4 seeds: D_s [32, 24, 35, 26], n_s [104, 92, 105, 112]: h 0.25
+  phiD used: 27B 2.75; Inkling 1.29 (W2-D + W2-I pairs pooled); floored at 1
+
+(2) Seed-level re-analysis (D = X - Y task passes; V = var of sum D from a within-seed task bootstrap)
+  shipped vs BF16 (W2-A + W2-A2) [+]: s106 335-303=+32 (68/36, p 0.00221); s107 335-311=+24 (58/34, p 0.016); s108 331-296=+35 (70/35, p 0.000821); s109 329-303=+26 (69/43, p 0.0178)
+     total +117 of 1668; task-level sign p 9.17e-09 (as before); seed signs +4 / -0, sign test across seeds p 0.125; t across seeds t +11.42 df 3 p 0.00144
+     between-seed var of D_s 26.2 vs within-seed var 102.1 (ratio 0.26); design-effect test (phiD 2.75) z +3.48 p 0.000507; cluster-robust 95 % [+51.0, +183.0]
+     -> KEEPS p < 0.05 at the seed level
+  shipped vs BF16, not worse (W2-A + W2-A2) [NI]: s106 335-303=+32 (68/36, p 0.00221); s107 335-311=+24 (58/34, p 0.016); s108 331-296=+35 (70/35, p 0.000821); s109 329-303=+26 (69/43, p 0.0178)
+     total +117 of 1668; task-level sign p 9.17e-09 (as before); seed signs +4 / -0, sign test across seeds p 0.125; t across seeds t +11.42 df 3 p 0.00144
+     between-seed var of D_s 26.2 vs within-seed var 99.6 (ratio 0.26); design-effect test (phiD 2.75) z +3.55 p 0.000389; cluster-robust 95 % [+52.4, +181.6]
+     -> KEEPS 'not worse' (lower end +52.4 > -50.0)
+  W2-S vs BF16 [+]: s106 322-303=+19 (62/43, p 0.0785); s107 348-311=+37 (64/27, p 0.000132)
+     total +56 of 834; task-level sign p 7.71e-05 (as before); seed signs +2 / -0, sign test across seeds p 0.5; t across seeds t +3.11 df 1 p 0.198
+     between-seed var of D_s 162.0 vs within-seed var 95.4 (ratio 1.70); design-effect test (phiD 2.75) z +2.45 p 0.0141; cluster-robust 95 % [+11.3, +100.7]
+     -> KEEPS p < 0.05 at the seed level
+  W2-S vs shipped [report]: s106 322-335=-13 (37/50, p 0.198); s107 348-335=+13 (38/25, p 0.13)
+     total +0 of 834; task-level sign p 1 (as before); seed signs +1 / -1, sign test across seeds p 1; t across seeds t +0.00 df 1 p 1
+     between-seed var of D_s 338.0 vs within-seed var 74.4 (ratio 4.54); design-effect test (phiD 2.75) z +0.00 p 1; cluster-robust 95 % [-40.0, +40.0]
+     -> report only
+  V5tc vs V5bc [+]: s106 333-304=+29 (67/38, p 0.00602); s107 347-306=+41 (62/21, p 7.51e-06)
+     total +70 of 834; task-level sign p 3.59e-07 (as before); seed signs +2 / -0, sign test across seeds p 0.5; t across seeds t +5.83 df 1 p 0.108
+     between-seed var of D_s 72.0 vs within-seed var 91.3 (ratio 0.79); design-effect test (phiD 2.75) z +3.13 p 0.00175; cluster-robust 95 % [+26.2, +113.8]
+     -> KEEPS p < 0.05 at the seed level
+  V5tc vs shipped [report]: s106 333-335=-2 (40/42, p 0.912); s107 347-335=+12 (46/34, p 0.219)
+     total +10 of 834; task-level sign p 0.48 (as before); seed signs +1 / -1, sign test across seeds p 1; t across seeds t +0.71 df 1 p 0.605
+     between-seed var of D_s 98.0 vs within-seed var 81.7 (ratio 1.20); design-effect test (phiD 2.75) z +0.47 p 0.637; cluster-robust 95 % [-31.6, +51.6]
+     -> report only
+  V5bc vs shipped [-]: s106 304-335=-31 (31/62, p 0.00171); s107 306-335=-29 (32/61, p 0.00346)
+     total -60 of 834; task-level sign p 1.29e-05 (as before); seed signs +0 / -2, sign test across seeds p 0.5; t across seeds t -30.00 df 1 p 0.0212
+     between-seed var of D_s 2.0 vs within-seed var 90.7 (ratio 0.02); design-effect test (phiD 2.75) z -2.66 p 0.00776; cluster-robust 95 % [-104.2, -15.8]
+     -> KEEPS p < 0.05 at the seed level
+  V5cc vs shipped [-]: s106 292-335=-43 (27/70, p 1.48e-05); s107 294-335=-41 (31/72, p 6.6e-05)
+     total -84 of 834; task-level sign p 2.58e-09 (as before); seed signs +0 / -2, sign test across seeds p 0.5; t across seeds t -42.00 df 1 p 0.0152
+     between-seed var of D_s 2.0 vs within-seed var 96.8 (ratio 0.02); design-effect test (phiD 2.75) z -3.66 p 0.00025; cluster-robust 95 % [-129.0, -39.0]
+     -> KEEPS p < 0.05 at the seed level
+  U1 vs shipped [-]: s106 325-335=-10 (41/51, p 0.348); s107 305-335=-30 (34/64, p 0.00319)
+     total -40 of 834; task-level sign p 0.00454 (as before); seed signs +0 / -2, sign test across seeds p 0.5; t across seeds t -2.00 df 1 p 0.295
+     between-seed var of D_s 200.0 vs within-seed var 92.9 (ratio 2.15); design-effect test (phiD 2.75) z -1.77 p 0.0765; cluster-robust 95 % [-84.3, +4.3]
+     -> does NOT keep p < 0.05 at the seed level
+  H1 vs shipped [-]: s106 334-335=-1 (46/47, p 1); s107 303-335=-32 (35/67, p 0.00199)
+     total -33 of 834; task-level sign p 0.0217 (as before); seed signs +0 / -2, sign test across seeds p 0.5; t across seeds t -1.06 df 1 p 0.48
+     between-seed var of D_s 480.5 vs within-seed var 96.1 (ratio 5.00); design-effect test (phiD 2.75) z -1.44 p 0.15; cluster-robust 95 % [-77.9, +11.9]
+     -> does NOT keep p < 0.05 at the seed level
+  g3 vs shipped [-]: s106 310-335=-25 (27/52, p 0.00655); s107 317-335=-18 (37/55, p 0.0758)
+     total -43 of 834; task-level sign p 0.00125 (as before); seed signs +0 / -2, sign test across seeds p 0.5; t across seeds t -6.14 df 1 p 0.103
+     between-seed var of D_s 24.5 vs within-seed var 83.9 (ratio 0.29); design-effect test (phiD 2.75) z -2.01 p 0.0445; cluster-robust 95 % [-84.9, -1.1]
+     -> KEEPS p < 0.05 at the seed level
+  g3 vs V5cc [+]: s106 310-292=+18 (65/47, p 0.108); s107 317-294=+23 (64/41, p 0.0313)
+     total +41 of 834; task-level sign p 0.00649 (as before); seed signs +2 / -0, sign test across seeds p 0.5; t across seeds t +8.20 df 1 p 0.0773
+     between-seed var of D_s 12.5 vs within-seed var 105.9 (ratio 0.12); design-effect test (phiD 2.75) z +1.70 p 0.089; cluster-robust 95 % [-6.2, +88.2]
+     -> does NOT keep p < 0.05 at the seed level
+  S-fd vs shipped [report]: s106 341-335=+6 (41/35, p 0.567); s107 330-335=-5 (35/40, p 0.644)
+     total +1 of 834; task-level sign p 1 (as before); seed signs +1 / -1, sign test across seeds p 1; t across seeds t +0.09 df 1 p 0.942
+     between-seed var of D_s 60.5 vs within-seed var 75.7 (ratio 0.80); design-effect test (phiD 2.75) z +0.05 p 0.96; cluster-robust 95 % [-38.6, +40.6]
+     -> report only
+  noH2 vs shipped [report]: s106 347-335=+12 (36/24, p 0.155); s107 340-335=+5 (35/30, p 0.62)
+     total +17 of 834; task-level sign p 0.152 (as before); seed signs +2 / -0, sign test across seeds p 0.5; t across seeds t +2.43 df 1 p 0.249
+     between-seed var of D_s 24.5 vs within-seed var 63.3 (ratio 0.39); design-effect test (phiD 2.75) z +0.91 p 0.365; cluster-robust 95 % [-19.8, +53.8]
+     -> report only
+  noH2 vs BF16 [+]: s106 347-303=+44 (66/22, p 2.88e-06); s107 340-311=+29 (56/27, p 0.00193)
+     total +73 of 834; task-level sign p 2.27e-08 (as before); seed signs +2 / -0, sign test across seeds p 0.5; t across seeds t +4.87 df 1 p 0.129
+     between-seed var of D_s 112.5 vs within-seed var 81.8 (ratio 1.38); design-effect test (phiD 2.75) z +3.45 p 0.00057; cluster-robust 95 % [+31.5, +114.5]
+     -> KEEPS p < 0.05 at the seed level
+  Inkling W2-D M2 vs A (test_normal) [+]: s108 151-144=+7 (8/1, p 0.0391); s109 149-141=+8 (13/5, p 0.0963); s110 148-146=+2 (6/4, p 0.754); s111 150-148=+2 (8/6, p 0.791)
+     total +19 of 672; task-level sign p 0.011 (as before); seed signs +4 / -0, sign test across seeds p 0.125; t across seeds t +2.97 df 3 p 0.0592
+     between-seed var of D_s 10.2 vs within-seed var 12.6 (ratio 0.81); design-effect test (phiD 1.29) z +2.35 p 0.019; cluster-robust 95 % [+3.1, +34.9]
+     -> KEEPS p < 0.05 at the seed level
+  Inkling W2-D M2 vs U (test_normal) [report]: s108 151-149=+2 (5/3, p 0.727); s109 149-147=+2 (8/6, p 0.791); s110 148-148=+0 (4/4, p 1); s111 150-152=-2 (4/6, p 0.754)
+     total +2 of 672; task-level sign p 0.875 (as before); seed signs +2 / -1, sign test across seeds p 1; t across seeds t +0.52 df 3 p 0.638
+     between-seed var of D_s 3.7 vs within-seed var 10.0 (ratio 0.37); design-effect test (phiD 1.29) z +0.28 p 0.782; cluster-robust 95 % [-12.1, +16.1]
+     -> report only
+  Inkling W2-I U vs M2 [report]: s112 326-311=+15 (42/27, p 0.0912); s113 323-327=-4 (34/38, p 0.724)
+     total +11 of 833; task-level sign p 0.4 (as before); seed signs +1 / -1, sign test across seeds p 1; t across seeds t +0.58 df 1 p 0.666
+     between-seed var of D_s 180.5 vs within-seed var 70.6 (ratio 2.56); design-effect test (phiD 1.29) z +0.81 p 0.417; cluster-robust 95 % [-15.6, +37.6]
+     -> report only
+  Inkling W2-I M2 vs FULL, not worse [NI]: s112 311-306=+5 (41/36, p 0.649); s113 327-298=+29 (55/26, p 0.00169)
+     total +34 of 834; task-level sign p 0.00845 (as before); seed signs +2 / -0, sign test across seeds p 0.5; t across seeds t +1.42 df 1 p 0.391
+     between-seed var of D_s 288.0 vs within-seed var 78.2 (ratio 3.68); design-effect test (phiD 1.29) z +2.39 p 0.0169; cluster-robust 95 % [+6.1, +61.9]
+     -> KEEPS 'not worse' (lower end +6.1 > -25.0)
+  W2-K: noH2 (exact head) vs W2-K (3-bit head) [report]: s106 347-331=+16 (46/30, p 0.0846); s107 340-339=+1 (39/38, p 1)
+     total +17 of 834; task-level sign p 0.196 (as before); seed signs +2 / -0, sign test across seeds p 0.5; t across seeds t +1.13 df 1 p 0.46
+     between-seed var of D_s 112.5 vs within-seed var 76.8 (ratio 1.47); design-effect test (phiD 2.75) z +0.82 p 0.41; cluster-robust 95 % [-23.5, +57.5]
+     -> report only
+  W2-K vs shipped [report]: s106 331-335=-4 (38/42, p 0.738); s107 339-335=+4 (40/36, p 0.731)
+     total +0 of 834; task-level sign p 1 (as before); seed signs +1 / -1, sign test across seeds p 1; t across seeds t +0.00 df 1 p 1
+     between-seed var of D_s 32.0 vs within-seed var 76.1 (ratio 0.42); design-effect test (phiD 2.75) z +0.00 p 1; cluster-robust 95 % [-40.2, +40.2]
+     -> report only
+
+VERDICT TABLE: comparison | claim | total | task-level p (as before) | design-effect p | cluster-robust 95 % | seed signs | t across seeds p | verdict
+  shipped vs BF16 (W2-A + W2-A2) | + | +117 / 1668 | 9.2e-09 | 0.00051 | [+51, +183] | +4/-0 | 0.0014 | KEEPS p < 0.05 at the seed level
+  shipped vs BF16, not worse (W2-A + W2-A2) | NI | +117 / 1668 | 9.2e-09 | 0.00039 | [+52, +182] | +4/-0 | 0.0014 | KEEPS 'not worse' (lower end +52.4 > -50.0)
+  W2-S vs BF16 | + | +56 / 834 | 7.7e-05 | 0.014 | [+11, +101] | +2/-0 | 0.2 | KEEPS p < 0.05 at the seed level
+  W2-S vs shipped | report | +0 / 834 | 1 | 1 | [-40, +40] | +1/-1 | 1 | report only
+  V5tc vs V5bc | + | +70 / 834 | 3.6e-07 | 0.0017 | [+26, +114] | +2/-0 | 0.11 | KEEPS p < 0.05 at the seed level
+  V5tc vs shipped | report | +10 / 834 | 0.48 | 0.64 | [-32, +52] | +1/-1 | 0.61 | report only
+  V5bc vs shipped | - | -60 / 834 | 1.3e-05 | 0.0078 | [-104, -16] | +0/-2 | 0.021 | KEEPS p < 0.05 at the seed level
+  V5cc vs shipped | - | -84 / 834 | 2.6e-09 | 0.00025 | [-129, -39] | +0/-2 | 0.015 | KEEPS p < 0.05 at the seed level
+  U1 vs shipped | - | -40 / 834 | 0.0045 | 0.076 | [-84, +4] | +0/-2 | 0.3 | does NOT keep p < 0.05 at the seed level
+  H1 vs shipped | - | -33 / 834 | 0.022 | 0.15 | [-78, +12] | +0/-2 | 0.48 | does NOT keep p < 0.05 at the seed level
+  g3 vs shipped | - | -43 / 834 | 0.0013 | 0.045 | [-85, -1] | +0/-2 | 0.1 | KEEPS p < 0.05 at the seed level
+  g3 vs V5cc | + | +41 / 834 | 0.0065 | 0.089 | [-6, +88] | +2/-0 | 0.077 | does NOT keep p < 0.05 at the seed level
+  S-fd vs shipped | report | +1 / 834 | 1 | 0.96 | [-39, +41] | +1/-1 | 0.94 | report only
+  noH2 vs shipped | report | +17 / 834 | 0.15 | 0.36 | [-20, +54] | +2/-0 | 0.25 | report only
+  noH2 vs BF16 | + | +73 / 834 | 2.3e-08 | 0.00057 | [+31, +115] | +2/-0 | 0.13 | KEEPS p < 0.05 at the seed level
+  Inkling W2-D M2 vs A (test_normal) | + | +19 / 672 | 0.011 | 0.019 | [+3, +35] | +4/-0 | 0.059 | KEEPS p < 0.05 at the seed level
+  Inkling W2-D M2 vs U (test_normal) | report | +2 / 672 | 0.87 | 0.78 | [-12, +16] | +2/-1 | 0.64 | report only
+  Inkling W2-I U vs M2 | report | +11 / 833 | 0.4 | 0.42 | [-16, +38] | +1/-1 | 0.67 | report only
+  Inkling W2-I M2 vs FULL, not worse | NI | +34 / 834 | 0.0084 | 0.017 | [+6, +62] | +2/-0 | 0.39 | KEEPS 'not worse' (lower end +6.1 > -25.0)
+  W2-K: noH2 (exact head) vs W2-K (3-bit head) | report | +17 / 834 | 0.2 | 0.41 | [-23, +57] | +2/-0 | 0.46 | report only
+  W2-K vs shipped | report | +0 / 834 | 1 | 1 | [-40, +40] | +1/-1 | 1 | report only

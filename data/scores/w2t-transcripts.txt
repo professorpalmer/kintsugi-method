@@ -1,0 +1,26 @@
+W2-T transcript comparison (test_challenge; per arm-seed 417 tasks)
+
+Per arm and seed: calls per task mean / median; completion tokens per call mean; reasoning chars per call mean (tokens ~ chars / 4); budget-message calls; tasks with a budget hit; tasks at 50 calls; calls with finish 'length'; pass
+  BF16    s106: 417 tasks; calls 21.5 / 21; completion tok/call 139; reasoning chars/call 256 (~64 tok); budget calls 0, tasks 0; 50-call tasks 5; 'length' calls 0; pass 303
+  BF16    s107: 417 tasks; calls 21.2 / 20; completion tok/call 141; reasoning chars/call 256 (~64 tok); budget calls 0, tasks 0; 50-call tasks 1; 'length' calls 0; pass 311
+  BF16    s108: 417 tasks; calls 21.3 / 20; completion tok/call 143; reasoning chars/call 261 (~65 tok); budget calls 0, tasks 0; 50-call tasks 6; 'length' calls 0; pass 296
+  BF16    s109: 417 tasks; calls 21.1 / 20; completion tok/call 141; reasoning chars/call 262 (~66 tok); budget calls 0, tasks 0; 50-call tasks 8; 'length' calls 0; pass 303
+  shipped s106: 417 tasks; calls 22.6 / 21; completion tok/call 135; reasoning chars/call 250 (~63 tok); budget calls 0, tasks 0; 50-call tasks 3; 'length' calls 0; pass 335
+  shipped s107: 417 tasks; calls 22.6 / 22; completion tok/call 135; reasoning chars/call 252 (~63 tok); budget calls 0, tasks 0; 50-call tasks 5; 'length' calls 0; pass 335
+  shipped s108: 417 tasks; calls 22.1 / 22; completion tok/call 134; reasoning chars/call 242 (~61 tok); budget calls 0, tasks 0; 50-call tasks 5; 'length' calls 0; pass 331
+  shipped s109: 417 tasks; calls 22.3 / 21; completion tok/call 137; reasoning chars/call 253 (~63 tok); budget calls 0, tasks 0; 50-call tasks 6; 'length' calls 0; pass 329
+
+Calls per task by outcome (pooled over the 4 seeds): mean calls of passed / failed task-runs
+  shipped: passed 21.5 (1330), failed 26.0 (338); failed at 50 calls 19
+  BF16: passed 20.2 (1213), failed 24.1 (455); failed at 50 calls 20
+
+T1 discordant task-runs: BF16 failed where shipped passed 265, of them at 50 calls 10 (3.8 %); shipped failed where BF16 passed 148, at 50 calls 9 (6.1 %); Fisher p 0.329
+  LINE T1: not shown
+
+T2 reasoning chars per call, BF16 vs shipped per seed: s106 256 vs 250; s107 256 vs 252; s108 261 vs 242; s109 262 vs 253
+  LINE T2: BF16 THINKS LONGER PER CALL (every seed)
+
+T3 pass rate by the first word of the first reply (pooled over 4 seeds)
+  shipped: Let 686/878 = 78.1 %; The 636/780 = 81.5 %; We 8/10 = 80.0 %; Let vs The Fisher p 0.0869 -> LINE T3: not shown
+  BF16: Let 790/1098 = 71.9 %; The 422/564 = 74.8 %; other 1/6 = 16.7 %; Let vs The Fisher p 0.221 -> LINE T3: not shown
+  (G-G caveat: the openings are seed-driven; the same seed's random stream starts every task)

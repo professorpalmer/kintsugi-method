@@ -103,3 +103,65 @@ B1 arms (sha256 of each model file):
 | Inkling drafting at long context: +20 % at 117k and 245k | 11-22 | **failed** | E2.21 |
 | Inkling loop guard: >= 8 / 10 runs unstuck at each stuck point; prompt-cache reuse >= 0.9 after a firing | 11-22 | **both failed** | E2.24 |
 | Inkling two-slot memory: peak VRAM <= ceiling, 0 spill lines, 0 CUDA errors, shared memory <= start + 64 MiB | 11-22 | **failed** (shared 394 MiB) | E2.25 |
+
+## 6. Second batch (2026-11-23; every line before its run or its computation)
+
+The stop rule of section 1 permits new tests after a pass; each has its line written first. Verdicts are given at the
+task level as the line was written, and at the seed level (section 6.1) where the line is about AppWorld.
+
+### 6.1 Seed clustering (G-G, 11-23 20:4x, before any of its numbers; G-G2 the same evening, before its numbers)
+
+| Line | Verdict | Rows |
+|---|---|---|
+| "The task-runs of a seed are clustered" only if the mean squared z of one arm's seed difference is above 1 and the sum of z^2 is above the chi-square 95th percentile | **met for the 27B** (2.24, p 0.0064); not shown for Inkling (1.02) | E5.1 |
+| Per claim of a difference: "keeps p < 0.05 at the seed level" only if every seed's difference has the claim's sign AND the design-effect test gives two-sided p < 0.05 (design effect = mean over arm pairs of the sample variance of the per-seed differences / the mean number of discordant tasks, floored at 1) | per comparison, as in the paper's tables | E5.1 |
+| A claim of "not worse" (margin -25 of 834) keeps it only if the lower end of the cluster-robust interval is above the margin | shipped vs BF16: kept; M2 vs the official Inkling weights: kept | E5.4, E5.23 |
+| G-G2 (test_normal comparisons of v1.0.x): the same method; design effect = the larger of the G-G value and the test_normal value | 27B 2.75 used (test_normal value 0.19); the claims that keep and do not keep it are listed in the row | E5.28 |
+
+### 6.2 The 27B model on AppWorld test_challenge (417 tasks; seeds 106 + 107 unless named)
+
+| Test | Line | Verdict (task level, as written) | Seed level | Rows |
+|---|---|---|---|---|
+| W2-A, KL-tools and KL-table B | "loses agent work on the harder split" only if lower than shipped with p < 0.025 (Bonferroni over the two maps) | KL-tools: not shown (680 vs 670). KL-table B: loses (586 vs 670) | KL-table B keeps (p 2.5e-4) | E5.2 |
+| W2-A, class line | "KL-only selection costs agent work as a class" only if >= 2 of the 3 lower-KL maps pass their own line | met (KL-only winner, KL-table B); KL-tools is the exception | both keep | E5.2 |
+| W2-A, BF16 | "the 12 GB build is not worse than BF16" only if the lower end of the 95 % interval of (shipped - BF16) is above -25 of 834 | met; the interval is wholly above 0 (670 vs 614) | kept | E5.2, E5.4 |
+| W2-A2, fresh seeds 108 + 109 | "the 12 GB build scores higher than BF16 on the harder split" only if p < 0.05 and shipped > BF16 | **met** (660 vs 599) | four seeds: p 5.1e-4, [+51, +183] | E5.4 |
+| W2-S, weights or setup | "the lead comes from the weights" only if the shipped file in BF16's setup is above BF16 with p < 0.05 and not below the 12 GB run; "from the setup" only if below the 12 GB run and not above BF16 | **weights** (670 vs 614; 670 vs 670) | keeps (p 0.014) | E5.5 |
+| W2-H, two-stage head | "the head lifts the score" only if the head-off arm is lower than shipped with p < 0.05 | **not shown** (687 vs 670) | p 0.36 | E5.6 |
+| W2-K, head repair | "the head repair improves agent work" only if the exact head is above the 3-bit head with p < 0.05 | **not shown on tasks** (687 vs 670) | p 0.41 | E5.17 |
+| W2-U, baselines | "loses agent work" only if lower than shipped with p < 0.025 | uniform 630 and HAWQ-style 637: met as written | **not kept** (p 0.077, 0.15; seed 107 only) | E5.13 |
+| W2-F prediction (written before any score of the two baselines) | both baselines below shipped with p < 0.05 and under 640 | held as written | **not kept** | E5.13 |
+| W2-F (a), the band alone | the shipped map with only ffn_down 20-27 at 2 bits is below shipped with p < 0.05 | **not met** (671 vs 670) | level | E5.12 |
+| W2-F (b), the band restored | KL-table B with ffn_down 16-31 at 3 bits is NOT below shipped AND is above KL-table B with p < 0.05 | **not met** (627: below shipped) | below shipped p 0.045 (narrow); above KL-table B not kept (p 0.089) | E5.14 |
+| W2-F chat check | "the chat flag holds" for KL-tools only if its chat mean KL is above the shipped file's with the interval above 0 AND the median is above | **"two documents, not the class"** | - | E5.11 |
+| W2-B, context length (CPU) | "the loss grows with context length" only if the shipped-only pairs are on longer tasks (one-sided Mann-Whitney p < 0.025) and the share rises from the bottom to the top tercile | **not shown** (the direction is the opposite) | - | E5.10 |
+| W2-C, bisect on the B1 population | "group g carries the held-out recall loss" only if the flip map's L interval is not entirely below the floor AND the recovery interval is above 0 (98.75 % intervals) | **ffn_down 16-31 carries it** (recovery 98 %); the other three groups do not | - | E5.15 |
+| W2-T, transcripts (CPU) | T1 "BF16 fails by running out of steps more" (Fisher p < 0.05); T2 "BF16 thinks longer per call" (every seed); T3 "the opening word predicts the outcome" | T1 not shown; T2 met, small; T3 not shown | - | E5.9 |
+| W3-T, token classes | "the band damage concentrates on class X" only if X has the largest increase, its interval is above 0 and above the point value of the next class | **spread** | - | E5.16 |
+| W3-E, sharpness | "sharpness explains the agent ordering" only if both winners are sharper than BF16 and neither loser is | **not met** (every map is flatter than BF16) | - | E5.8 |
+| W2-T0, temperature 0 | "the lead over BF16 holds at temperature 0" only if shipped > BF16 with p < 0.05 over 417 paired task-runs | **not shown** (330 vs 319, p 0.235, +11 [-5, +28]); BF16 gains about 16 over its T = 1.0 mean | one run per arm (no seed clustering at T = 0) | E5.18 |
+| Card gate | another card may join only if the 50 identity prompts are token-identical to an RTX 4070 | an RTX 4080 failed (31 / 50); RTX 4070 only | - | E5.29 |
+
+### 6.3 Inkling 2 Mini (uniform rule fixed before the build; Bonferroni over the two baselines)
+
+| Test | Line | Verdict | Seed level | Rows |
+|---|---|---|---|---|
+| W2-D KL, M2 vs Unsloth's file | the gap holds on the release engine only if the 97.5 % interval of the difference is below 0 | **met** (-27.0 %) | - | E5.20 |
+| W2-D KL, M2 vs the uniform map | "the per-group map lowers KL" only if the 97.5 % interval is below 0; "the uniform rule is lower" if above 0; else "level" | **level** (-2.5 %) | - | E5.20 |
+| W2-D recall counts | a count difference is a recall difference only if one arm fails a depth that M2 passes | Unsloth's file misses one strict copy at 32k (lenient form full) | - | E5.21 |
+| W2-D graded recall | "less recall margin than M2" only if the 97.5 % interval of the mean difference is below 0; "more" if above 0 | uniform map **less** (-0.971); Unsloth's file **more** (+0.865) | - | E5.21 |
+| W2-D AppWorld test_normal, seeds 108-111 | "M2 scores higher than the baseline with the setup equal" only if p < 0.025; else "level" | vs Unsloth's file **higher** (598 vs 579); vs the uniform map level (598 vs 596) | keeps (p 0.019) | E5.22 |
+| W2-I line 1, test_challenge seeds 112 + 113 | "the uniform map loses agent work on the harder split" only if U < M2 with p < 0.05 | **not met** (649 vs 638) | p 0.42 | E5.23 |
+| W2-I line 2 | the uniform map's tools-class KL gap is larger than its all-rows gap with the interval above 0 | **not met** (interval holds 0) | - | E5.23 |
+| W2-I line 4 | "M2 is not worse than the official weights on the harder split" only if the lower end of the interval of (M2 - official) is above -25 of 834 | **met** (638 vs 604); the two arms differ in K/V precision and card class | kept ([+6, +62]) | E5.23 |
+
+### 6.4 Other lines of the second batch
+
+| Test | Line | Verdict | Rows |
+|---|---|---|---|
+| Free generation on the 24 needles at 245k | every item at most 1,000 characters of thinking, finish "stop", an answer given | KL-tools: one item with 1,184 characters. The limit is not a validated threshold (an independent port reports that the official Inkling weights exceed it on 3 of 20 held-out items), so the paper reports the lengths against the reference run and treats the item as an observation | E5.26, E5.27 |
+| Faithfulness of the free-generation item (before the BF16 run) | "KL-tools is faithful on vault 9" only if BF16's vault 9 thinking is over 1,000 characters AND it names the correct codes of at least 3 other vaults | **not faithful, as written** (BF16 221 characters, 0 other codes; all 24 items 199-232 characters). The line reads free-generation length only; the forced reading below overrules it as a statement about the KL-tools choice | E5.30 |
+| Forced reading under BF16 (LN2, before the rent) | "the fork is a near tie in the reference" only if BF16's gap at the first token where the two files differ is under 0.25 nats; "file X flips against the reference" if BF16's top token there is the other file's token with a gap >= 0.25 | **"the shipped (v1.1) file flips against the reference at vault 9"** (gap 2.68). Both files leave BF16 earlier at the same tokens (22, 34); after that BF16 prefers the long KL-tools reply (478 of 480 tokens) | E5.31 |
+| No map tuned to one item (rule, written when the item was found) | a later candidate must pass a fresh needle set; no map is tuned until the item passes | kept: the one-group maps are a diagnosis only (they move the event to other items) | E5.26 |
+| W4-L overlap check | a golden document is "in his text" at >= 50 % shared 50-character windows, "touched" at >= 5 %; with any document >= 5 % the clean set gives the verdict and the full set is reported next to it | **overlap found** (3 in, 2 touched); clean set 293 documents | E5.25 |
+| W4-L, new LookAtMyQuant file | "the gap to M2 closes in class c" only if the 95 % interval of (new - M2) includes 0 or is below 0, for code, tools, agentic, reasoning | not yet measured on our golden set (the rig port's check R0 did not pass) | E5.24 |

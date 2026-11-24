@@ -1,0 +1,9 @@
+V3ac-h32 (shipped) s108: 331/417 tasks passed; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+V3ac-h32 (shipped) s109: 329/417 tasks passed; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+BF16 s108: 296/417 tasks passed; task folders per shard [18, 18, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17] (sum 417, unique 417 of 417)
+BF16 s109: 303/417 tasks passed; task folders per shard [18, 18, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17] (sum 417, unique 417 of 417)
+  seed 108: 417 paired; shipped 331, BF16 296; shipped-only 70, BF16-only 35; sign p 0.0008215
+  seed 109: 417 paired; shipped 329, BF16 303; shipped-only 69, BF16-only 43; sign p 0.01777
+POOLED 108 + 109: 834 paired task-runs; shipped 660, BF16 599; discordant shipped-only 139 / BF16-only 78; exact two-sided sign p = 4.165e-05; (shipped - BF16) +61, 95 % paired bootstrap [+32.0, +91.0]
+LINE (W2-A2): the 12 GB build SCORES HIGHER than BF16 on the harder split (confirmed on fresh seeds) (shipped > BF16, p 4.165e-05)
+NON-INFERIORITY (margin -25 of 834): the 12 GB build is NOT WORSE than BF16

@@ -1,0 +1,35 @@
+W2-A CHECK (lab:aw_w2check.py): shipped V3ac-h32 (test 3, RTX 4070-class, v1.0.4 launcher) vs BF16 (W2-A, A100 80 GB, ours_server.sh); test_challenge 106 + 107; missing task logs: 0
+
+== shipped-only (BF16 fails): 126 task-runs
+  shipped: hit step limit (50, no complete_task) 0; complete_task called 126; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  shipped: steps mean 24.7 median 24; generated tokens mean 3197 median 3180; max tokens in one reply 1372
+  bf16: hit step limit (50, no complete_task) 3; complete_task called 123; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  bf16: steps mean 24.0 median 22; generated tokens mean 3271 median 3076; max tokens in one reply 1753
+
+== BF16-only (shipped fails): 70 task-runs
+  shipped: hit step limit (50, no complete_task) 5; complete_task called 65; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  shipped: steps mean 26.6 median 26; generated tokens mean 3653 median 3410; max tokens in one reply 2321
+  bf16: hit step limit (50, no complete_task) 0; complete_task called 70; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  bf16: steps mean 24.4 median 23; generated tokens mean 3540 median 3202; max tokens in one reply 1381
+
+== both pass: 544 task-runs
+  shipped: hit step limit (50, no complete_task) 0; complete_task called 544; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  shipped: steps mean 21.0 median 20; generated tokens mean 2755 median 2565; max tokens in one reply 3841
+  bf16: hit step limit (50, no complete_task) 0; complete_task called 544; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  bf16: steps mean 19.9 median 19; generated tokens mean 2705 median 2452; max tokens in one reply 3157
+
+== both fail: 94 task-runs
+  shipped: hit step limit (50, no complete_task) 3; complete_task called 91; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  shipped: steps mean 26.1 median 24; generated tokens mean 4083 median 3724; max tokens in one reply 5061
+  bf16: hit step limit (50, no complete_task) 3; complete_task called 91; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  bf16: steps mean 24.0 median 22; generated tokens mean 3817 median 3528; max tokens in one reply 2284
+
+== all 834: 834 task-runs
+  shipped: hit step limit (50, no complete_task) 8; complete_task called 826; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  shipped: steps mean 22.6 median 21; generated tokens mean 3047 median 2749; max tokens in one reply 5061
+  bf16: hit step limit (50, no complete_task) 6; complete_task called 828; any reply cut (finish_reason length) 0; any reply with the reasoning-budget message 0; any empty reply 0; any error response (client BREAKING_ERROR) 0; any code-execution timeout (100 s alarm) 0
+  bf16: steps mean 21.3 median 20; generated tokens mean 2986 median 2660; max tokens in one reply 3157
+
+decode speed shipped: median 72.7 tok/s, p10 59.7, p90 83.6 (replies with >= 64 generated tokens, n 15062)
+
+decode speed bf16: median 27.4 tok/s, p10 26.5, p90 27.9 (replies with >= 64 generated tokens, n 14306)

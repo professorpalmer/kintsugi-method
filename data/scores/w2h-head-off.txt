@@ -1,0 +1,12 @@
+shipped-noH2 (KINTSUGI_HEAD2=0) s106: 347/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+shipped-noH2 (KINTSUGI_HEAD2=0) s107: 340/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+
+  seed 106: 417 paired; noH2 347, shipped 335; noH2-only 36, shipped-only 24; sign p 0.155
+  seed 107: 417 paired; noH2 340, shipped 335; noH2-only 35, shipped-only 30; sign p 0.6201
+noH2 vs shipped, pooled: 834 paired task-runs; 687 vs 670; discordant 71 / 54; exact two-sided sign p = 0.1521; (noH2 - shipped) +17, 95 % paired bootstrap [-5.0, +39.0]
+  LINE (W2-H): not shown (noH2 687 vs shipped 670, p 0.1521)
+
+  seed 106: 417 paired; noH2 347, BF16 303; noH2-only 66, BF16-only 22; sign p 2.879e-06
+  seed 107: 417 paired; noH2 340, BF16 311; noH2-only 56, BF16-only 27; sign p 0.001931
+noH2 vs BF16, pooled: 834 paired task-runs; 687 vs 614; discordant 122 / 49; exact two-sided sign p = 2.268e-08; (noH2 - BF16) +73, 95 % paired bootstrap [+46.0, +99.0]
+  REPORT: noH2 vs BF16 687 vs 614, p 2.268e-08 (head line not met)

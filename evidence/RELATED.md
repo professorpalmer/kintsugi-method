@@ -42,11 +42,16 @@ Each entry ends with one sentence on how our method differs ("Ours:").
    Ours: we use their UD-Q2_K_XL files as baselines; our maps are lower in KL on Inkling and our runtime / map
    choices are gated by recall and agent tasks, not by KL alone.
 7. **LookAtMyQuant.** ShinMegamiBoson. Software (MIT), https://github.com/ShinMegamiBoson/lookatmyquant (read
-   2026-11-21; Inkling files on Hugging Face under shinmegamiboson/, Apache-2.0).
+   2026-11-21; Inkling files on Hugging Face under shinmegamiboson/, Apache-2.0). The file that we measured is the
+   8.9 GB pack at Hugging Face revision 1318b804e687 (2026-11-21; 8,874,213,027 B). A newer 8.9 GB file exists
+   (revision 6a953d2d1787 of 2026-11-23, code at GitHub commit 826e5dde); we did not measure it, and no sentence here
+   applies to it. The author's README (commit 92bb52d) lists eight ideas taken from the Kintsugi repositories, among them per-class KL on chat-templated text and dense expert Hessians.
    Measures how much each stored piece degrades the output, then picks a code per piece under a size budget, with a
    distillation fine-tune of the small tensors.
-   Ours: we found their allocation (M5) does not transfer to our codes (+43 % KL), and their file is equal to ours on
-   average KL but worse on long contexts and copy rows; we choose with task probes and confirm on held-out data.
+   Ours: we found the allocation of the old file (M5) does not transfer to our codes (+43 % KL), and the old file is
+   equal to ours on average KL but worse on long contexts and copy rows; we choose with task probes and confirm on
+   held-out data. Three of our golden documents are copies of public text that is in that project's calibration
+   text; the comparison holds without them (EVIDENCE E5.25).
 8. **L0xRE-V2-27b-Low.** YourHighnessLA. Hugging Face model release, 2026.
    https://huggingface.co/YourHighnessLA/L0xRE-V2-27b-Low (card licence: "qwen-research-terms-derivative", no text
    shown; noted in the paper's data and licence statement).

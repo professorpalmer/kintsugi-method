@@ -1,0 +1,72 @@
+G-G2 (seed level, test_normal): evidence/LINES.md section 6; CPU, deterministic
+
+(1) Design effect on test_normal: h = sample var of D_s over the two seeds of a pair / mean discordant n_s
+  27B: 33 arm pairs, mean h 0.19, median 0.13, range 0.00-0.82; G-G value 2.75; phi used = the larger = 2.75
+  Inkling: 2 arm pairs, mean h 0.98, median 0.98, range 0.27-1.69; G-G value 1.29; phi used = the larger = 1.29
+
+(2) Seed-level re-analysis (D = X - Y task passes; V = var of sum D from a within-seed task bootstrap)
+  [E1.8] KL-only winner vs shipped, selection seeds [-]: s100 141-151=-10 (7/17); s101 144-151=-7 (8/15)
+     total -17 of 336; task-level sign p 0.0186 (15/32); seed signs +0 / -2; t across seeds p 0.111; design-effect test (phi 2.75) z -1.53 p 0.126; cluster-robust 95 % [-38.8, +4.8] -> does NOT keep p < 0.05 at the seed level
+  [E1.9] KL-tools vs shipped, selection seeds [report]: s100 149-151=-2 (6/8); s101 152-151=+1 (11/10)
+     total -1 of 336; task-level sign p 1 (17/18); seed signs +1 / -1; t across seeds p 0.795; design-effect test (phi 2.75) z -0.10 p 0.919; cluster-robust 95 % [-20.2, +18.2] -> report only
+  [E3.8] author's fits vs shipped, selection seeds [report]: s100 141-151=-10 (7/17); s101 147-151=-4 (9/13)
+     total -14 of 336; task-level sign p 0.0541 (16/30); seed signs +0 / -2; t across seeds p 0.258; design-effect test (phi 2.75) z -1.25 p 0.21; cluster-robust 95 % [-35.9, +7.9] -> report only
+  [E3.6] shipped vs BF16, selection seeds [+]: s100 151-139=+12 (17/5); s101 151-142=+9 (16/7)
+     total +21 of 336; task-level sign p 0.00246 (33/12); seed signs +2 / -0; t across seeds p 0.0903; design-effect test (phi 2.75) z +1.91 p 0.0567; cluster-robust 95 % [-0.6, +42.6] -> does NOT keep p < 0.05 at the seed level
+  [E1.20] shipped vs naive, selection seeds [+]: s100 151-133=+18 (26/8); s101 151-134=+17 (26/9)
+     total +35 of 336; task-level sign p 2.93e-05 (52/17); seed signs +2 / -0; t across seeds p 0.0182; design-effect test (phi 2.75) z +2.62 p 0.00878; cluster-robust 95 % [+8.8, +61.2] -> KEEPS p < 0.05 at the seed level
+  [E3.9] Kintsugi-27B vs Inkling Unsloth setup, 100+101 [+]: s100 151-142=+9 (15/6); s101 151-141=+10 (18/8)
+     total +19 of 336; task-level sign p 0.00794 (33/14); seed signs +2 / -0; t across seeds p 0.0335; design-effect test (phi 2.75) z +1.69 p 0.0902; cluster-robust 95 % [-3.0, +41.0] -> does NOT keep p < 0.05 at the seed level
+  [E3.7] shipped vs BF16, 102+103 [report]: s102 143-142=+1 (15/14); s103 151-151=+0 (10/10)
+     total +1 of 336; task-level sign p 1 (25/24); seed signs +1 / -0; t across seeds p 0.5; design-effect test (phi 2.75) z +0.09 p 0.932; cluster-robust 95 % [-21.8, +23.8] -> report only
+  [E3.7] weights-only vs BF16, 102+103 [report]: s102 146-142=+4 (12/8); s103 149-151=-2 (11/13)
+     total +2 of 336; task-level sign p 0.88 (23/21); seed signs +1 / -1; t across seeds p 0.795; design-effect test (phi 2.75) z +0.18 p 0.854; cluster-robust 95 % [-19.3, +23.3] -> report only
+  [E2.14] shipped vs weights-only, 102+103 [report]: s102 143-146=-3 (10/13); s103 151-149=+2 (9/7)
+     total -1 of 336; task-level sign p 1 (19/20); seed signs +1 / -1; t across seeds p 0.874; design-effect test (phi 2.75) z -0.10 p 0.923; cluster-robust 95 % [-21.3, +19.3] -> report only
+  [E3.9] Kintsugi-27B vs Inkling Unsloth setup, 102+103 [report]: s102 143-145=-2 (11/13); s103 151-138=+13 (16/3)
+     total +11 of 336; task-level sign p 0.126 (27/16); seed signs +1 / -1; t across seeds p 0.597; design-effect test (phi 2.75) z +1.03 p 0.304; cluster-robust 95 % [-10.0, +32.0] -> report only
+  [E1.31] KL-only winner vs shipped, 104+105 [report]: s104 147-144=+3 (16/13); s105 149-148=+1 (12/11)
+     total +4 of 336; task-level sign p 0.678 (28/24); seed signs +2 / -0; t across seeds p 0.295; design-effect test (phi 2.75) z +0.34 p 0.737; cluster-robust 95 % [-19.4, +27.4] -> report only
+  [E3.16] KL-tools vs shipped, 104+105 [report]: s104 149-144=+5 (12/7); s105 150-148=+2 (14/12)
+     total +7 of 336; task-level sign p 0.371 (26/19); seed signs +2 / -0; t across seeds p 0.258; design-effect test (phi 2.75) z +0.63 p 0.528; cluster-robust 95 % [-14.7, +28.7] -> report only
+  [E3.16] author's fits vs shipped, 104+105 [report]: s104 143-144=-1 (13/14); s105 146-148=-2 (11/13)
+     total -3 of 336; task-level sign p 0.78 (24/27); seed signs +0 / -2; t across seeds p 0.205; design-effect test (phi 2.75) z -0.25 p 0.803; cluster-robust 95 % [-26.5, +20.5] -> report only
+  [E3.16] shipped vs BF16, 104+105 [report]: s104 144-147=-3 (12/15); s105 148-147=+1 (13/12)
+     total -2 of 336; task-level sign p 0.89 (25/27); seed signs +1 / -1; t across seeds p 0.705; design-effect test (phi 2.75) z -0.17 p 0.867; cluster-robust 95 % [-25.4, +21.4] -> report only
+  [E1.32] shipped vs naive, 104+105 [+]: s104 144-129=+15 (21/6); s105 148-127=+21 (30/9)
+     total +36 of 336; task-level sign p 1.01e-05 (51/15); seed signs +2 / -0; t across seeds p 0.105; design-effect test (phi 2.75) z +2.77 p 0.00563; cluster-robust 95 % [+10.5, +61.5] -> KEEPS p < 0.05 at the seed level
+  [E3.12] Inkling M2 setup vs Unsloth setup, 102+103 [+]: s102 151-145=+6 (9/3); s103 147-138=+9 (15/6)
+     total +15 of 336; task-level sign p 0.0135 (24/9); seed signs +2 / -0; t across seeds p 0.126; design-effect test (phi 1.29) z +2.30 p 0.0215; cluster-robust 95 % [+2.2, +27.8] -> KEEPS p < 0.05 at the seed level
+  [E3.13] Inkling M2 setup vs Unsloth setup, 104+105 (finished pairs) [+]: s104 149-145=+4 (8/4); s105 147-136=+11 (14/3)
+     total +15 of 334; task-level sign p 0.00813 (22/7); seed signs +2 / -0; t across seeds p 0.278; design-effect test (phi 1.29) z +2.51 p 0.0122; cluster-robust 95 % [+3.3, +26.7] -> KEEPS p < 0.05 at the seed level
+  [E3.12+E3.13] Inkling M2 setup vs Unsloth setup, 102-105 (finished pairs) [+]: s102 151-145=+6 (9/3); s103 147-138=+9 (15/6); s104 149-145=+4 (8/4); s105 147-136=+11 (14/3)
+     total +30 of 670; task-level sign p 0.000176 (46/16); seed signs +4 / -0; t across seeds p 0.017; design-effect test (phi 1.29) z +3.41 p 0.000642; cluster-robust 95 % [+12.8, +47.2] -> KEEPS p < 0.05 at the seed level
+  [E4.8] Inkling M2 vs official weights, 102-105 [report]: s102 151-149=+2 (6/4); s103 147-149=-2 (6/8); s104 149-149=+0 (3/3); s105 149-145=+4 (7/3)
+     total +4 of 672; task-level sign p 0.636 (22/18); seed signs +2 / -1; t across seeds p 0.495; design-effect test (phi 1.29) z +0.56 p 0.579; cluster-robust 95 % [-10.1, +18.1] -> report only
+  [E4.12] Inkling M2 4-bit global cache vs official weights, 102-105 [report]: s102 151-149=+2 (6/4); s103 144-149=-5 (7/12); s104 151-149=+2 (4/2); s105 149-145=+4 (9/5)
+     total +3 of 672; task-level sign p 0.775 (26/23); seed signs +3 / -1; t across seeds p 0.729; design-effect test (phi 1.29) z +0.37 p 0.708; cluster-robust 95 % [-12.7, +18.7] -> report only
+  [E4.12] Inkling M2 4-bit global cache vs 8-bit cache, 102-105 [report]: s102 151-151=+0 (4/4); s103 144-147=-3 (8/11); s104 151-149=+2 (4/2); s105 149-149=+0 (5/5)
+     total -1 of 672; task-level sign p 1 (21/22); seed signs +1 / -1; t across seeds p 0.824; design-effect test (phi 1.29) z -0.13 p 0.893; cluster-robust 95 % [-15.6, +13.6] -> report only
+
+VERDICT TABLE: row | comparison | claim | total | task-level p (v1.0.x) | design-effect p | cluster-robust 95 % | seed signs | verdict
+  E1.8 | KL-only winner vs shipped, selection seeds | - | -17 / 336 | 0.019 | 0.13 | [-39, +5] | +0/-2 | does NOT keep p < 0.05 at the seed level
+  E1.9 | KL-tools vs shipped, selection seeds | report | -1 / 336 | 1 | 0.92 | [-20, +18] | +1/-1 | report only
+  E3.8 | author's fits vs shipped, selection seeds | report | -14 / 336 | 0.054 | 0.21 | [-36, +8] | +0/-2 | report only
+  E3.6 | shipped vs BF16, selection seeds | + | +21 / 336 | 0.0025 | 0.057 | [-1, +43] | +2/-0 | does NOT keep p < 0.05 at the seed level
+  E1.20 | shipped vs naive, selection seeds | + | +35 / 336 | 2.9e-05 | 0.0088 | [+9, +61] | +2/-0 | KEEPS p < 0.05 at the seed level
+  E3.9 | Kintsugi-27B vs Inkling Unsloth setup, 100+101 | + | +19 / 336 | 0.0079 | 0.09 | [-3, +41] | +2/-0 | does NOT keep p < 0.05 at the seed level
+  E3.7 | shipped vs BF16, 102+103 | report | +1 / 336 | 1 | 0.93 | [-22, +24] | +1/-0 | report only
+  E3.7 | weights-only vs BF16, 102+103 | report | +2 / 336 | 0.88 | 0.85 | [-19, +23] | +1/-1 | report only
+  E2.14 | shipped vs weights-only, 102+103 | report | -1 / 336 | 1 | 0.92 | [-21, +19] | +1/-1 | report only
+  E3.9 | Kintsugi-27B vs Inkling Unsloth setup, 102+103 | report | +11 / 336 | 0.13 | 0.3 | [-10, +32] | +1/-1 | report only
+  E1.31 | KL-only winner vs shipped, 104+105 | report | +4 / 336 | 0.68 | 0.74 | [-19, +27] | +2/-0 | report only
+  E3.16 | KL-tools vs shipped, 104+105 | report | +7 / 336 | 0.37 | 0.53 | [-15, +29] | +2/-0 | report only
+  E3.16 | author's fits vs shipped, 104+105 | report | -3 / 336 | 0.78 | 0.8 | [-27, +21] | +0/-2 | report only
+  E3.16 | shipped vs BF16, 104+105 | report | -2 / 336 | 0.89 | 0.87 | [-25, +21] | +1/-1 | report only
+  E1.32 | shipped vs naive, 104+105 | + | +36 / 336 | 1e-05 | 0.0056 | [+11, +61] | +2/-0 | KEEPS p < 0.05 at the seed level
+  E3.12 | Inkling M2 setup vs Unsloth setup, 102+103 | + | +15 / 336 | 0.014 | 0.021 | [+2, +28] | +2/-0 | KEEPS p < 0.05 at the seed level
+  E3.13 | Inkling M2 setup vs Unsloth setup, 104+105 (finished pairs) | + | +15 / 334 | 0.0081 | 0.012 | [+3, +27] | +2/-0 | KEEPS p < 0.05 at the seed level
+  E3.12+E3.13 | Inkling M2 setup vs Unsloth setup, 102-105 (finished pairs) | + | +30 / 670 | 0.00018 | 0.00064 | [+13, +47] | +4/-0 | KEEPS p < 0.05 at the seed level
+  E4.8 | Inkling M2 vs official weights, 102-105 | report | +4 / 672 | 0.64 | 0.58 | [-10, +18] | +2/-1 | report only
+  E4.12 | Inkling M2 4-bit global cache vs official weights, 102-105 | report | +3 / 672 | 0.78 | 0.71 | [-13, +19] | +3/-1 | report only
+  E4.12 | Inkling M2 4-bit global cache vs 8-bit cache, 102-105 | report | -1 / 672 | 1 | 0.89 | [-16, +14] | +1/-1 | report only

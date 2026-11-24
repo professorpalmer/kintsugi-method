@@ -1,0 +1,42 @@
+P-A: 9 documents, 336,710 gen rows (all lengths; the scorer drops documents over its --max-doc-tokens)
+  NAME       1,473 rows    9 docs
+  KEY        1,305 rows    9 docs
+  VNUM       4,581 rows    9 docs
+  VSTR      36,448 rows    9 docs
+  VPUNC     19,020 rows    9 docs
+  KW         6,690 rows    9 docs
+  MARKUP    12,318 rows    9 docs
+  CTRL       1,635 rows    9 docs
+  CODE      26,512 rows    5 docs
+  PWORD    128,290 rows    9 docs
+  PNUM      10,032 rows    9 docs
+  PPUNC     60,007 rows    9 docs
+  WS        28,399 rows    9 docs
+P-T: 69 documents, 12,080 gen rows (all lengths; the scorer drops documents over its --max-doc-tokens)
+  NAME         240 rows   55 docs
+  KEY          288 rows   55 docs
+  VNUM         253 rows   33 docs
+  VSTR         544 rows   47 docs
+  VPUNC        288 rows   28 docs
+  KW            26 rows   10 docs
+  MARKUP     1,896 rows   55 docs
+  CTRL         555 rows   69 docs
+  CODE       1,006 rows    3 docs
+  PWORD      3,786 rows   65 docs
+  PNUM         592 rows   42 docs
+  PPUNC        889 rows   65 docs
+  WS         1,717 rows   69 docs
+examples (first 12 non-blank pieces per class, repr):
+  NAME    '=get' '_stock' '_price' '=get' '_stock' '_price' 'calculate' '_discount' '=b' 'ash' '=str' '_replace'
+  KEY     '=s' 'ymbol' '=s' 'ymbol' 'original' '_price' 'discount' '_percentage' 'command' 'command' '=path' 'command'
+  VNUM    '1' '0' '0' '2' '0' '7' '1' '8' '7' '5' '9' '8'
+  VSTR    'AAP' 'L' 'MS' 'FT' 'find' 'test' 'bed' 'type' ' f' 'name' 'py' ' grep'
+  VPUNC   ' /' ' -' ' -' ' "*.' '"' ' |' ' -' ' "' '"' '/' '/' '['
+  KW      'from' ' import' 'from' ' import' 'def' ' from' ' False' ' False' ' for' 'def' ' with' ' True'
+  MARKUP  '<tool_call>' '<' 'function' '>' '<' 'parameter' '>' '</' 'parameter' '>' '</' 'function'
+  CTRL    '<think>' '</think>' '<|im_end|>' '<think>' '</think>' '<|im_end|>' '<think>' '</think>' '<|im_end|>' '<think>' '</think>' '<|im_end|>'
+  CODE    '```' 'python' '#' ' BEFORE' ' (' 'Broken' ')' 'Py' 'Arrow' ':' ' [' 'true'
+  PWORD   'The' ' current' ' stock' ' price' ' of' ' AAP' 'L' ' is' 'The' ' current' ' stock' ' price'
+  PNUM    '1' '5' '0' '7' '5' '2' '1' '0' '2' '2' '2' '0'
+  PPUNC   ' $' '.' '.' ' $' '.' '.' '!' ',' '.' ',' '%' ','
+  WS      

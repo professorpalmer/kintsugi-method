@@ -1,10 +1,11 @@
-"""Recompute every statistic and figure of the paper from data/ (CPU only, a few minutes).
+"""Recompute the statistics and the figures of the paper from data/ (CPU only, a few minutes).
 
     python -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt      (Windows: .venv\\Scripts\\pip)
     .venv/bin/python -X utf8 scripts/reproduce.py
 
 Writes results/*.txt and paper/figs/*, then checks that every figure is byte-identical to the one in the repository
 (the hashes are taken before the figures are redrawn). Exit code 0 only if every step ran and every figure matched.
+Numbers that this repository gives only as lab result tables are in data/scores/ (see README.md).
 """
 import hashlib
 import os
@@ -15,7 +16,13 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 PY = sys.executable
 FIGS = os.path.join(ROOT, "paper", "figs")
 STEPS = [
-    ("AppWorld counts, intervals, sign tests, selection effect (E1.31, E1.32, E1.36, E3.x, E4.8, E4.12)", ["scripts/gg_stats.py"]),
+    ("Seed clustering and seed-level tests, test_challenge and Inkling second batch (E5.1, E5.2, E5.4-E5.6, E5.12-E5.14, E5.17, E5.22, E5.23)",
+     ["scripts/gg_seed.py"]),
+    ("Seed-level tests of the test_normal comparisons (E5.28)", ["scripts/gg_seed_tn.py"]),
+    ("AppWorld counts and task-level statistics of v1.0.x (E1.31, E1.32, E1.36, E3.x, E4.8, E4.12)", ["scripts/gg_stats.py"]),
+    ("W2-C flip maps on the held-out recall population (E5.15)", ["scripts/w2c_score.py", "--dir", "data/w2c/out"]),
+    ("W2-D graded recall of the Inkling baselines (E5.21)", ["scripts/w2d_margin.py"]),
+    ("Free-generation check: thinking length per item (E5.26)", ["scripts/freegen_summary.py"]),
     ("G-C2 graded K/V margins (E2.23)", ["scripts/gc2_score.py"]),
     ("G-B2 graded margins of the baselines (E1.33)", ["scripts/gb2_score.py"]),
     ("B1 recall population test (E1.34)", ["scripts/b1/b1_score.py", "--dir", "data/b1/out"]),

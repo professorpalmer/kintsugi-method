@@ -1,0 +1,55 @@
+his mix: 16918 documents, 44822335 distinct 50-character windows; {'arb_Arab': (746, 2917720), 'chat': (1052, 5699261), 'cmn_Hani': (2100, 2858721), 'code': (822, 4310254), 'deu_Latn': (1125, 2912508), 'en': (1400, 5905614), 'fra_Latn': (1056, 2931624), 'hin_Deva': (1340, 2884632), 'jpn_Jpan': (1995, 2861124), 'kor_Hang': (2430, 2760170), 'por_Latn': (1077, 2920244), 'rus_Cyrl': (836, 2928744), 'spa_Latn': (939, 2937914)}
+golden documents: 298; median share 0.00000, p99 0.11199, max 1.00000; >= 5 %: 5; >= 50 %: 3
+  fineweb-edu                      docs  52  max 1.00000  mean 0.05796
+  nemotron-swe                     docs   1  max 0.08453  mean 0.08453
+  swe-rebench-openhands            docs   1  max 0.06099  mean 0.06099
+  stackv2-edu                      docs  48  max 0.04610  mean 0.00178
+  doab                             docs   8  max 0.01088  mean 0.00136
+  wikimedia                        docs  15  max 0.00111  mean 0.00010
+  swe-smith                        docs   2  max 0.00067  mean 0.00034
+  glaive-fc-v2                     docs  21  max 0.00048  mean 0.00004
+  peS2o                            docs   3  max 0.00004  mean 0.00001
+  arxiv-long                       docs   1  max 0.00004  mean 0.00004
+  libretexts                       docs   4  max 0.00000  mean 0.00000
+  fineweb2-hq/spa_Latn             docs   6  max 0.00000  mean 0.00000
+  fineweb2-hq/tur_Latn             docs   2  max 0.00000  mean 0.00000
+  wildchat                         docs  11  max 0.00000  mean 0.00000
+  gutenberg                        docs   2  max 0.00000  mean 0.00000
+  finemath-4plus                   docs  13  max 0.00000  mean 0.00000
+  fineweb2-hq/cmn_Hani             docs   1  max 0.00000  mean 0.00000
+  stackexchange                    docs  22  max 0.00000  mean 0.00000
+  smoltalk2/systemchats            docs   8  max 0.00000  mean 0.00000
+  caselaw                          docs   2  max 0.00000  mean 0.00000
+  fineweb2-hq/ces_Latn             docs   3  max 0.00000  mean 0.00000
+  fineweb2-hq/rus_Cyrl             docs   3  max 0.00000  mean 0.00000
+  when2call                        docs   8  max 0.00000  mean 0.00000
+  arxiv                            docs   2  max 0.00000  mean 0.00000
+  fineweb2-hq/arb_Arab             docs   2  max 0.00000  mean 0.00000
+  smoltalk2/everyday               docs   5  max 0.00000  mean 0.00000
+  wikipedia/fi                     docs   1  max 0.00000  mean 0.00000
+  pubmed                           docs   2  max 0.00000  mean 0.00000
+  hermes-fc                        docs   9  max 0.00000  mean 0.00000
+  the-stack-smol-xl                docs  14  max 0.00000  mean 0.00000
+  fineweb2-hq/ind_Latn             docs   3  max 0.00000  mean 0.00000
+  fineweb2-hq/ell_Grek             docs   5  max 0.00000  mean 0.00000
+  wikipedia/he                     docs   1  max 0.00000  mean 0.00000
+  fineweb2-hq/dan_Latn             docs   3  max 0.00000  mean 0.00000
+  wikipedia/hi                     docs   1  max 0.00000  mean 0.00000
+  fineweb2-hq/hun_Latn             docs   1  max 0.00000  mean 0.00000
+  fineweb2-hq/nld_Latn             docs   2  max 0.00000  mean 0.00000
+  fineweb2-hq/pol_Latn             docs   1  max 0.00000  mean 0.00000
+  smoltalk2/table-gpt              docs   1  max 0.00000  mean 0.00000
+  fineweb2-hq/vie_Latn             docs   3  max 0.00000  mean 0.00000
+  smoltalk2/multi-turn-reasoning   docs   2  max 0.00000  mean 0.00000
+  openthoughts3                    docs   1  max 0.00000  mean 0.00000
+  fineweb2-hq/ita_Latn             docs   2  max 0.00000  mean 0.00000
+  top: {'doc': 348, 'source': 'fineweb-edu', 'category': 'web', 'kind': 'text', 'windows': 2535, 'share': 1.0}
+  top: {'doc': 360, 'source': 'fineweb-edu', 'category': 'web', 'kind': 'text', 'windows': 1866, 'share': 1.0}
+  top: {'doc': 548, 'source': 'fineweb-edu', 'category': 'web', 'kind': 'text', 'windows': 7983, 'share': 1.0}
+  top: {'doc': 212, 'source': 'nemotron-swe', 'category': 'agentic', 'kind': 'chat', 'windows': 174887, 'share': 0.08452886721139936}
+  top: {'doc': 204, 'source': 'swe-rebench-openhands', 'category': 'agentic', 'kind': 'chat', 'windows': 206716, 'share': 0.06098705470307088}
+  top: {'doc': 504, 'source': 'stackv2-edu', 'category': 'code', 'kind': 'text', 'windows': 5119, 'share': 0.04610275444422739}
+  top: {'doc': 66, 'source': 'stackv2-edu', 'category': 'code', 'kind': 'text', 'windows': 1626, 'share': 0.03874538745387454}
+  top: {'doc': 552, 'source': 'doab', 'category': 'books', 'kind': 'text', 'windows': 4226, 'share': 0.010884997633696167}
+  top: {'doc': 474, 'source': 'fineweb-edu', 'category': 'web', 'kind': 'text', 'windows': 1492, 'share': 0.006032171581769437}
+  top: {'doc': 464, 'source': 'fineweb-edu', 'category': 'web', 'kind': 'text', 'windows': 2586, 'share': 0.004640371229698376}

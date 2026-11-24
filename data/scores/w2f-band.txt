@@ -1,0 +1,26 @@
+psfd s106: 341/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+psfd s107: 330/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+
+  seed 106: 417 paired; S-fd 341, shipped 335; S-fd-only 41, shipped-only 35; sign p 0.5666
+  seed 107: 417 paired; S-fd 330, shipped 335; S-fd-only 35, shipped-only 40; sign p 0.6445
+S-fd vs shipped, pooled: 834 paired task-runs; 671 vs 670; discordant 76 / 75; exact two-sided sign p = 1; (S-fd - shipped) +1, 95 % paired bootstrap [-23.0, +26.0]
+  LINE (a) S-fd below shipped, p < 0.05: NOT MET
+pw2cg3 s106: 310/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+pw2cg3 s107: 317/417; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+
+  seed 106: 417 paired; g3 310, shipped 335; g3-only 27, shipped-only 52; sign p 0.006553
+  seed 107: 417 paired; g3 317, shipped 335; g3-only 37, shipped-only 55; sign p 0.07576
+g3 vs shipped, pooled: 834 paired task-runs; 627 vs 670; discordant 64 / 107; exact two-sided sign p = 0.001252; (g3 - shipped) -43, 95 % paired bootstrap [-69.0, -17.0]
+  seed 106: 417 paired; g3 310, V5cc 292; g3-only 65, V5cc-only 47; sign p 0.1078
+  seed 107: 417 paired; g3 317, V5cc 294; g3-only 64, V5cc-only 41; sign p 0.0313
+g3 vs V5cc, pooled: 834 paired task-runs; 627 vs 586; discordant 129 / 88; exact two-sided sign p = 0.006487; (g3 - V5cc) +41, 95 % paired bootstrap [+12.0, +70.0]
+  LINE (b) g3 not below shipped AND above V5cc with p < 0.05: NOT MET
+
+  seed 106: 417 paired; puni 325, shipped 335; puni-only 41, shipped-only 51; sign p 0.3481
+  seed 107: 417 paired; puni 305, shipped 335; puni-only 34, shipped-only 64; sign p 0.003189
+puni vs shipped, pooled: 834 paired task-runs; 630 vs 670; discordant 75 / 115; exact two-sided sign p = 0.004537; (puni - shipped) -40, 95 % paired bootstrap [-68.0, -12.0]
+  W2-F prediction for puni (below shipped p < 0.05 AND < 640): HOLDS
+  seed 106: 417 paired; phawq 334, shipped 335; phawq-only 46, shipped-only 47; sign p 1
+  seed 107: 417 paired; phawq 303, shipped 335; phawq-only 35, shipped-only 67; sign p 0.001993
+phawq vs shipped, pooled: 834 paired task-runs; 637 vs 670; discordant 81 / 114; exact two-sided sign p = 0.02169; (phawq - shipped) -33, 95 % paired bootstrap [-61.0, -6.0]
+  W2-F prediction for phawq (below shipped p < 0.05 AND < 640): HOLDS

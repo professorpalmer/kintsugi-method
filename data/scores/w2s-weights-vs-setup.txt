@@ -1,0 +1,11 @@
+W2-S (shipped file, BF16 setup) s106: 322/417; task folders per shard [18, 18, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17] (sum 417, unique 417 of 417)
+W2-S (shipped file, BF16 setup) s107: 348/417; task folders per shard [18, 18, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17] (sum 417, unique 417 of 417)
+
+  seed 106: 417 paired; W2-S 322, BF16 303; W2-S-only 62, BF16-only 43; sign p 0.07849
+  seed 107: 417 paired; W2-S 348, BF16 311; W2-S-only 64, BF16-only 27; sign p 0.0001322
+W2-S vs BF16, pooled: 834 paired task-runs; 670 vs 614; discordant 126 / 70; exact two-sided sign p = 7.705e-05; (W2-S - BF16) +56, 95 % paired bootstrap [+28.0, +85.0]
+  seed 106: 417 paired; W2-S 322, shipped 335; W2-S-only 37, shipped-only 50; sign p 0.198
+  seed 107: 417 paired; W2-S 348, shipped 335; W2-S-only 38, shipped-only 25; sign p 0.1299
+W2-S vs shipped, pooled: 834 paired task-runs; 670 vs 670; discordant 75 / 75; exact two-sided sign p = 1; (W2-S - shipped) +0, 95 % paired bootstrap [-25.0, +25.0]
+
+W2-S LINE: the lead over BF16 comes from the WEIGHTS (above BF16 at p < 0.05: True; below shipped at p < 0.05: False)

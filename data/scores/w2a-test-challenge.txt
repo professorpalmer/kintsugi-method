@@ -1,0 +1,27 @@
+V3ac-h32 (shipped) s106 (test 3, reused): 335/417
+V3ac-h32 (shipped) s107 (test 3, reused): 335/417
+V5bc-h32 s106 (test 3, reused): 304/417
+V5bc-h32 s107 (test 3, reused): 306/417
+V5tc-h32 (KL-tools) s106: 333/417 tasks passed; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+V5tc-h32 (KL-tools) s107: 347/417 tasks passed; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+V5cc-h32 (KL-table B) s106: 292/417 tasks passed; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+V5cc-h32 (KL-table B) s107: 294/417 tasks passed; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+BF16 s106: 303/417 tasks passed; task folders per shard [18, 18, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17] (sum 417, unique 417 of 417)
+BF16 s107: 311/417 tasks passed; task folders per shard [18, 18, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17] (sum 417, unique 417 of 417)
+
+  seed 106: 417 paired; V5tc-h32 (KL-tools) 333, shipped 335; pv5tc-only 40, shipped-only 42; sign p 0.9122
+  seed 107: 417 paired; V5tc-h32 (KL-tools) 347, shipped 335; pv5tc-only 46, shipped-only 34; sign p 0.2185
+V5tc-h32 (KL-tools) vs shipped, pooled: 834 paired task-runs; 680 vs 670; discordant pv5tc-only 86 / shipped-only 76; exact two-sided sign p = 0.4796; (map - shipped) +10, 95 % paired bootstrap [-14.0, +34.0]
+  LINE (V5tc-h32 (KL-tools)): not shown (not lower, p 0.4796 vs 0.025)
+  seed 106: 417 paired; V5cc-h32 (KL-table B) 292, shipped 335; pv5cc-only 27, shipped-only 70; sign p 1.477e-05
+  seed 107: 417 paired; V5cc-h32 (KL-table B) 294, shipped 335; pv5cc-only 31, shipped-only 72; sign p 6.596e-05
+V5cc-h32 (KL-table B) vs shipped, pooled: 834 paired task-runs; 586 vs 670; discordant pv5cc-only 58 / shipped-only 142; exact two-sided sign p = 2.579e-09; (map - shipped) -84, 95 % paired bootstrap [-112.0, -57.0]
+  LINE (V5cc-h32 (KL-table B)): LOSES agent work on the harder split (lower, p 2.579e-09 vs 0.025)
+
+CLASS LINE: 2 of 3 lower-KL maps pass their own line (['V5bc-h32', 'V5cc-h32 (KL-table B)']) -> KL-only selection costs agent work on the harder split AS A CLASS
+
+  seed 106: 417 paired; BF16 303, shipped 335; pbf16-only 36, shipped-only 68; sign p 0.002209
+  seed 107: 417 paired; BF16 311, shipped 335; pbf16-only 34, shipped-only 58; sign p 0.01602
+BF16 vs shipped, pooled: 834 paired task-runs; BF16 614, shipped 670; discordant BF16-only 70 / shipped-only 126; exact sign p 7.705e-05; (shipped - BF16) +56, 95 % paired bootstrap [+28.0, +85.0]
+  BF16 LINE (non-inferiority, margin -25 of 834): the 12 GB build is NOT WORSE than BF16 on the harder split
+RECALL-AGENT LINK (report only): V5cc-h32, the map with the held-out recall loss (B1 / B1c), also loses agent work by its line (numbers above).

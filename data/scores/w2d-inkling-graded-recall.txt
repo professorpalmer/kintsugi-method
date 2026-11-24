@@ -1,0 +1,12 @@
+W2-D graded recall (lab:w2d_margin.py; evidence/LINES.md W2-D). Rig RTX 4070, engine a20cc419b, launcher defaults, gf.
+Capped min margin (cap 5.0); bootstrap 10000 x 44 items, seed 20261122.
+  m2 (M2 (shipped)): 88 units; mean capped m 3.511; units m < 0: 3 ['c17@117k _decimal_lshift_exact -0.100', 'c18@117k _decimal_lshift_exact -0.406', 'c19@245k __getattr__ -0.370']; bound flags 0
+  a (A: Unsloth UD-Q2_K_XL): 88 units; mean capped m 4.376; units m < 0: 0 []; bound flags 0
+  u (U: uniform map, equal bytes): 88 units; mean capped m 2.540; units m < 0: 16 ['c1@117k _type_repr -0.830', 'c2@245k _get_class_module -3.541', 'c4@245k _isoweek1monday -4.338', 'c5@117k _check_tzname -3.089', 'c5@245k setcontext -2.370', 'c6@245k setcontext -1.367', 'c7@117k _isoweek1monday -3.475', 'c9@117k getcontext -4.334', 'c10@117k setcontext -4.018', 'c11@117k setcontext -3.835', 'c12@117k setcontext -3.835', 'c12@245k int_from_string -0.997', 'c16@245k _copy_items -0.996', 'c17@245k parse -3.458', 'c18@245k copy_location -0.817', 'c19@245k __getattr__ -6.253']; bound flags 0
+  a - M2: mean d +0.865, 95 % [+0.385, +1.366], 97.5 % [+0.310, +1.438] -> MORE recall margin than M2
+      needle: -0.364 [-0.679, -0.042] (information)
+      copy: +2.341 [+1.811, +2.869] (information)
+  u - M2: mean d -0.971, 95 % [-1.570, -0.410], 97.5 % [-1.664, -0.338] -> LESS recall margin than M2
+      needle: +0.493 [+0.224, +0.808] (information)
+      copy: -2.728 [-3.385, -2.099] (information)
+  information: M2 here vs G-C2 arm (d) (ad657a606, box): 88 units, mean |diff| 0.0000, max 0.0000, equal 83

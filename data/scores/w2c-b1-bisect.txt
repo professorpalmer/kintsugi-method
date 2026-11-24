@@ -1,0 +1,29 @@
+W2-C result (lab:w2c_score.py; evidence/LINES.md # W2-C). Complete documents: 20 of 20 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+run floor (W2-C box repeat vs B1 a rented box): 40 records, mean |d| 0.0000, raw mins that differ 0; F_L 0.212, F_C 0.295
+V5c (B1c same-box) L -1.106 [-1.292, -0.916] (98.75 %)
+
+W2Cg1 = V5c with G1 attn_qkv (48, K3 -> K2) set back to V3s2:
+  L -0.883 [-1.017, -0.747] (98.75 %); R_g = L - L(V5c) +0.223 [+0.144, +0.318]; recovery R_g / |L(V5c)| 0.20
+  long needles -1.825, long copies +0.060
+  B1 line at 99.72 %: L -0.883 [-1.047, -0.723], S +0.056 [+0.018, +0.105], C -0.938 [-1.098, -0.785]; (a) True, (b) True, (c) True
+  W2-C line: (i) L not entirely below -F_L False; (ii) R_g entirely above 0 True -> does not carry it alone
+
+W2Cg2 = V5c with G2 attn_output (12, K2 -> K3) set back to V3s2:
+  L -1.033 [-1.207, -0.848] (98.75 %); R_g = L - L(V5c) +0.073 [+0.024, +0.124]; recovery R_g / |L(V5c)| 0.07
+  long needles -2.163, long copies +0.096
+  B1 line at 99.72 %: L -1.033 [-1.242, -0.815], S +0.070 [+0.030, +0.121], C -1.104 [-1.309, -0.886]; (a) True, (b) True, (c) True
+  W2-C line: (i) L not entirely below -F_L False; (ii) R_g entirely above 0 True -> does not carry it alone
+
+W2Cg3 = V5c with G3 ffn_down (16, K2 -> K3) set back to V3s2:
+  L -0.019 [-0.126, +0.076] (98.75 %); R_g = L - L(V5c) +1.087 [+0.916, +1.238]; recovery R_g / |L(V5c)| 0.98
+  long needles -0.082, long copies +0.043
+  B1 line at 99.72 %: L -0.019 [-0.149, +0.091], S -0.025 [-0.078, +0.039], C +0.005 [-0.163, +0.138]; (a) False, (b) False, (c) True
+  W2-C line: (i) L not entirely below -F_L True; (ii) R_g entirely above 0 True -> CARRIES the held-out recall loss
+
+W2Cg4 = V5c with G4 ffn_gate (9, K2 -> K3) set back to V3s2:
+  L -0.802 [-0.938, -0.668] (98.75 %); R_g = L - L(V5c) +0.304 [+0.156, +0.455]; recovery R_g / |L(V5c)| 0.27
+  long needles -1.683, long copies +0.078
+  B1 line at 99.72 %: L -0.802 [-0.969, -0.642], S +0.035 [-0.032, +0.100], C -0.837 [-0.992, -0.672]; (a) True, (b) True, (c) True
+  W2-C line: (i) L not entirely below -F_L False; (ii) R_g entirely above 0 True -> does not carry it alone
+
+W2-C LINE: the held-out recall loss is carried by G3 ffn_down (16, K2 -> K3)

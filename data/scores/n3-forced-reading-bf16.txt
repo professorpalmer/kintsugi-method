@@ -1,0 +1,45 @@
+--- BF16 (a rented box, f16 K/V, exact head): 24 items
+vault  chars  tok p_code min gap<=code   at            token / 2nd min gap reply ans ok   gate F chars / head / tail
+    1    235   69     45        0.9152   22    ' this' /     ' it'        0.0636   True     None   None   None
+    2    235   69     45        0.4207   18 ' facility /   ' text'        0.4207   True     None   None   None
+    3    235   69     45        0.5852   18 ' facility /   ' text'        0.3768   True     None   None   None
+    4    235   69     45        0.4628   18 ' facility /   ' text'        0.4628   True     None   None   None
+    5    235   69     45        0.4182   18 ' facility /   ' text'        0.4182   True     None   None   None
+    6    235   69     45        0.4074   18 ' facility /   ' text'        0.4074   True     None   None   None
+    7    235   69     45        0.6569   18 ' facility /   ' text'        0.6569   True     None   None   None
+    8    235   69     45        0.5493   18 ' facility /   ' text'        0.5493   True     None   None   None
+    9    235   69     45        0.7030   18 ' facility /   ' text'        0.7030   True     None   None   None
+   10    237   71     47        0.6078   19 ' facility /   ' text'        0.6078   True     None   None   None
+   11    237   71     47        0.3975   19 ' facility /   ' text'        0.3975   True     None   None   None
+   12    237   71     47        0.4166   19 ' facility /   ' text'        0.4166   True     None   None   None
+   13    237   71     47        0.4021   19 ' facility /   ' text'        0.4021   True     None   None   None
+   14    237   71     47        0.2030   24 ' informat / ' specifi        0.2030   True     None   None   None
+   15    237   71     47        0.1510   19 ' facility /   ' text'        0.1510   True     None   None   None
+   16    237   71     47        0.0188   19 ' facility /   ' text'        0.0188   True     None   None   None
+   17    237   71     47        0.2105   24 ' informat / ' specifi        0.2105   True     None   None   None
+   18    237   71     47        0.2945   19 ' facility /   ' text'        0.2945   True     None   None   None
+   19    237   71     47        0.2189   24 ' informat / ' specifi        0.2189   True     None   None   None
+   20    246   72     48        0.1375   24 ' specific / ' informa        0.1375   True     None   None   None
+   21    237   71     47        0.0269   19 ' facility /   ' text'        0.0269   True     None   None   None
+   22    213   69     45        0.1392   19    ' text' / ' facilit        0.1392   True     None   None   None
+   23    246   72     48        0.2249   24 ' specific / ' informa        0.2249   True     None   None   None
+   24    213   69     45        0.1238   19    ' text' / ' facilit        0.1238   True     None   None   None
+items with min gap before the code < 0.10: 2; < 0.25: 10 (of 24)
+items with min gap over the reply < 0.10: 3; < 0.25: 11
+order by min gap before the code (lowest first): [16, 21, 24, 20, 22, 15, 14, 17, 19, 23, 18, 11, 13, 6, 12, 5, 2, 4, 8, 3, 10, 7, 9, 1]; vault 9 rank 23
+
+forced reading: prompt 244235 tokens; lead ''; trailer '</think>\n\n1950'
+  v11: 69 tokens, boundary equal True, BF16 top-1 = forced token on 65; sum log p -9.108 (0 tokens outside BF16's top-20)
+     i   22: forced 424 rank 2 lp -1.6954412460327148; BF16 top ' this' -0.2900, 2nd ' it' -1.6954; BF16 gap top1-top2 1.4055; gap to forced 1.4055
+     i   34: forced 198 rank 2 lp -3.004343032836914; BF16 top ' "' -0.0510, 2nd '\n' -3.0043; BF16 gap top1-top2 2.9533; gap to forced 2.9533
+     i   43: forced 24 rank 2 lp -2.749480724334717; BF16 top '1' -0.0661, 2nd '9' -2.7495; BF16 gap top1-top2 2.6834; gap to forced 2.6834
+     i   52: forced 4272 rank 2 lp -0.7715523838996887; BF16 top 'This' -0.6236, 2nd 'So' -0.7716; BF16 gap top1-top2 0.1479; gap to forced 0.1479
+  v12: 480 tokens, boundary equal True, BF16 top-1 = forced token on 478; sum log p -6.352 (0 tokens outside BF16's top-20)
+     i   22: forced 424 rank 2 lp -1.7027227878570557; BF16 top ' this' -0.2877, 2nd ' it' -1.7027; BF16 gap top1-top2 1.4150; gap to forced 1.4150
+     i   34: forced 198 rank 2 lp -3.00427508354187; BF16 top ' "' -0.0510, 2nd '\n' -3.0043; BF16 gap top1-top2 2.9533; gap to forced 2.9533
+  bf16: 68 tokens, boundary equal True, BF16 top-1 = forced token on 68; sum log p -1.424 (0 tokens outside BF16's top-20)
+
+FORK f = forced token 43: v1.1 token 24 rank (2, -2.749480724334717), v1.2 token 16 rank (1, -0.06610256433486938); BF16 top '1' (16) lp -0.0661; 2nd '9' -2.7495; top5 [['1', -0.0661], ['9', -2.7495], ['4', -13.2577], ['2', -14.1799], ['8', -14.3813]]
+(the v1.2 forced request at f has the same prefix: top-5 equal False)
+Gap_ref = lp(v1.1 token) - lp(v1.2 token) = -2.6834
+LN2: "the v1.1 file flips against the reference at vault 9"

@@ -1,0 +1,10 @@
+shipped T0: 330/417 tasks passed; task folders per shard [35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34] (sum 417, unique 417 of 417)
+BF16 T0: 319/417 tasks passed; task folders per shard [18, 18, 18, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17] (sum 417, unique 417 of 417)
+shipped T0 vs BF16 T0: 417 paired task-runs; 330 vs 319; discordant shipped-only 41 / BF16-only 30; exact two-sided sign p = 0.2351; (shipped - BF16) +11, 95 % paired bootstrap [-5.0, +28.0]
+LINE (W2-T0): NOT SHOWN at T0 (p 0.2351)
+
+Agreement of the T0 outcome with the T = 1.0 runs (seeds 106-109), per arm:
+  shipped T0: T0 passes by the number of T = 1.0 passes of the task (of 4 seeds): 0/4: 5/32, 1/4: 7/17, 2/4: 26/39, 3/4: 61/81, 4/4: 231/248
+     T0 = the majority of the 4 T = 1.0 runs on 329/378 tasks (87.0 %; 39 tasks at 2/4 left out); same outcome as one T = 1.0 seed: s106 338/417; s107 340/417; s108 338/417; s109 334/417; T = 1.0 mean pass 332.5 vs T0 330
+  BF16 T0: T0 passes by the number of T = 1.0 passes of the task (of 4 seeds): 0/4: 3/35, 1/4: 15/34, 2/4: 32/54, 3/4: 88/105, 4/4: 181/189
+     T0 = the majority of the 4 T = 1.0 runs on 320/363 tasks (88.2 %; 54 tasks at 2/4 left out); same outcome as one T = 1.0 seed: s106 319/417; s107 335/417; s108 328/417; s109 331/417; T = 1.0 mean pass 303.2 vs T0 319

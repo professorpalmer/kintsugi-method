@@ -132,7 +132,14 @@ Line types we used (all with the values written before the run):
 - Class lines: no class worse by more than 2 %; named documents within +25 % of the reference.
 - Recall: all items right (24/24 + 20/20) at each gate depth; no non-fragile item under 0 in margin form.
 - Agent: pooled count over two seeds at least a fixed number AND exact two-sided sign test on discordant pairs not
-  significantly worse ($p \geq 0.05$). "Better" only with $p < 0.05$.
+  significantly worse ($p \geq 0.05$). "Better" only with $p < 0.05$. **Correction (paper v1.1):** the task-runs of
+  one seed share one random stream when the client sends one seed on every call, so this task-level test is too
+  optimistic. Use the difference on each seed, the design-effect test and the cluster-robust interval (paper Section
+  4.1, `scripts/gg_seed.py`), at least three seeds for a claim of a difference, and per-call seeds in the client
+  (`SEED-FIX.md`).
+- Free generation: for each item of the deep recall gate, the answer, how the reply ended and the thinking length,
+  compared with the reference file on the same items. A fixed length limit is not a validated pass line. Do not tune
+  a map until one item passes: it can move the event to other items (paper Section 6).
 - Health: HumanEval at least a fixed count (saturated; never used to rank).
 - Speed (for runtime repairs): at least a fixed gain over off, pooled over all pre-declared runs.
 

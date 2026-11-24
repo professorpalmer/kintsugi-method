@@ -1,17 +1,22 @@
 """Figures of the Kintsugi-method paper, from data already in the record only (no new runs). Deterministic.
-    python -X utf8 scripts/make_figs.py      -> paper/figs/fig{1..5}-<name>.{png,pdf} (numbered in order of appearance)
+    python -X utf8 scripts/make_figs.py      -> paper/figs/fig{1..7}-<name>.{png,pdf} (numbered in order of appearance)
 
 Sources by output file (the paper numbers figures by the file prefix; every number is also in evidence/EVIDENCE.md):
-- fig2-kl-vs-task: KL change and recall-gate results per map (E1.3, E1.6-E1.9, E1.28, E1.29); AppWorld paired differences with
-  bootstrap intervals (data/ = scripts/gg_stats.py; E3.17).
-- fig5-seed-pairs: AppWorld counts per seed pair (E3.1-E3.8, E3.15, E3.16) and the shipped - BF16 gap with intervals (E3.17).
-- fig4-item-margins: per-item capped margins, data/ (G-B2, E1.33) and data/ (G-C2,
-  E2.23), paired by request order as the two scorers do.
-- fig6-inkling-appworld: Inkling AppWorld per seed from data/ (E4.8, E4.12, E3.12,
-  E3.13).
 - fig1-workflow: the workflow (no data).
-- fig3-b1-recall-population: data/ (scripts/b1/b1_score.py) and data/ (KL-table B = V5c by depth; E1.34).
-Style: light theme, Okabe-Ito colours (colour-blind safe) plus distinct markers / hatches (readable in grayscale).
+- fig2-bf16-per-seed: AppWorld test_challenge per seed for the shipped file, BF16 and the shipped file in BF16's setup
+  (per-task score files; E5.2, E5.4, E5.5) and the seed-level differences with cluster-robust intervals (the JSON output of
+  the seed-clustering script; E5.1, E5.4-E5.6).
+- fig3-kl-vs-task: KL change and recall-gate results per map (E1.3, E1.6-E1.9, E1.28, E1.29); test_challenge difference to the
+  shipped file with cluster-robust intervals (E5.2, E5.12, E5.13).
+- fig4-b1-recall-population: data/ (scripts/b1/b1_score.py) and data/ (KL-table B = V5c by depth; E1.34).
+- fig5-item-margins: per-item capped margins, data/ (G-B2, E1.33) and data/ (G-C2,
+  E2.23), paired by request order as the two scorers do.
+- fig6-seed-pairs: AppWorld test_normal counts per seed pair (E3.1-E3.8, E3.15, E3.16) and the shipped - BF16 gap with
+  cluster-robust intervals (E5.28).
+- fig7-inkling-appworld: Inkling AppWorld test_normal per seed: seeds 102-105 (E4.8, E4.12, E3.12, E3.13) and seeds 108-111 with
+  the setup equal (E5.22).
+Style: light theme, Okabe-Ito colours (colour-blind safe) plus distinct markers / hatches (readable in grayscale). Legends
+are outside the plot area.
 """
 import json
 import os
@@ -45,6 +50,30 @@ def jl(path):
         return [json.loads(x) for x in f if x.strip()]
 
 
+AW = os.path.join(ROOT, "data", "appworld")
+GGSEED = os.path.join(ROOT, "results", "gg-seed.json")
+
+
+def aw_score(stem):
+    """(passed, tasks) of one arm-seed"""
+    with open(os.path.join(AW, f"{stem}.csv"), encoding="utf-8") as f:
+        rows = [x.strip().split(",") for x in f.readlines()[1:] if x.strip()]
+    return sum(int(r[1]) for r in rows), len(rows)
+
+
+def seed_level(label):
+    """one comparison of the seed-clustering script: total, cluster-robust interval, design-effect p, per-seed D"""
+    with open(GGSEED, encoding="utf-8") as f:
+        for c in json.load(f)["comparisons"]:
+            if c["label"] == label:
+                return c
+    raise KeyError(label)
+
+
+def pfmt(p):
+    return f"{p:.2g}" if p >= 0.001 else f"{p:.1e}"
+
+
 # ------------------------------------------------------------------ Fig 1
 def fig1():
     # (name, KL change % vs shipped/start, recall items lost at 117k, kind, note)
@@ -73,24 +102,40 @@ def fig1():
     ax[0].set_xlabel("KL change vs the shipped allocation (%)\n(* = on the build subset T only)")
     ax[0].set_ylabel("recall items lost at 117k (of 44)")
     ax[0].set_yticks([0, 1, 2]); ax[0].set_ylim(-0.4, 2.6); ax[0].set_xlim(-13, 15)
-    ax[0].set_title("(a) Recall gate: lower KL did not mean full recall")
+    ax[0].set_title("(a) Recall gate at 117k")
     ax[0].legend(loc="upper center", frameon=False, fontsize=7, ncol=2, bbox_to_anchor=(0.5, -0.3),
                  columnspacing=0.8, handletextpad=0.3)
-    # (b) AppWorld paired difference vs shipped: selection seeds vs fresh seeds 104 + 105
-    rows = [("KL-only winner", -7.0, (-17, -30, -3), (4, -10, 18)), ("KL-tools", -7.9, (-1, -14, 12), (7, -5, 20))]
-    for i, (n, x, s, f) in enumerate(rows):
-        ax[1].errorbar(i - 0.12, s[0], yerr=[[s[0] - s[1]], [s[2] - s[0]]], fmt="o", ms=7, color=OK["verm"], mfc=OK["verm"],
-                       capsize=3, label="selection seeds 100 + 101" if i == 0 else None)
-        ax[1].errorbar(i + 0.12, f[0], yerr=[[f[0] - f[1]], [f[2] - f[0]]], fmt="s", ms=7, color=OK["blue"], mfc="white",
-                       mew=1.6, capsize=3, label="fresh seeds 104 + 105" if i == 0 else None)
-    ax[1].axhline(0, color=OK["grey"], lw=0.8, ls=":")
-    ax[1].set_xticks([0, 1]); ax[1].set_xticklabels(["KL-only winner\n(KL -7.0 %)", "KL-tools\n(KL -7.9 %)"])
-    ax[1].set_xlim(-0.6, 1.6)
-    ax[1].set_ylabel("AppWorld task-runs vs shipped\n(of 336; 95 % paired bootstrap)")
-    ax[1].set_title("(b) Standard split: selection vs fresh seeds")
-    ax[1].legend(loc="upper center", frameon=False, ncol=1, bbox_to_anchor=(0.5, -0.3))
+    # (b) AppWorld test_challenge, seeds 106 + 107: difference to the shipped file against the KL change (p1)
+    rows = [("KL-tools", -7.9, "V5tc vs shipped", "top"), ("band only", 4.1, "S-fd vs shipped", "top"),
+            ("HAWQ-style", 12.7, "H1 vs shipped", "top"), ("uniform", -3.8, "U1 vs shipped", "bottom"),
+            ("KL-only winner", -7.0, "V5bc vs shipped", "bottom-right"), ("KL-table B", -8.8, "V5cc vs shipped", "left")]
+    seen = set()
+    for n, x, key, side in rows:
+        c = seed_level(key)
+        tot, (lo, hi) = c["total"], c["ci"]
+        keeps = c["p_design"] < 0.05 and (all(d > 0 for d in c["D"]) or all(d < 0 for d in c["D"]))
+        lab = "seed-level p < 0.05, same sign on both seeds" if keeps else "not significant at the seed level"
+        ax[1].errorbar(x, tot, yerr=[[tot - lo], [hi - tot]], fmt="o" if keeps else "s", ms=7,
+                       color=OK["verm"] if keeps else OK["blue"], mfc=OK["verm"] if keeps else "white", mew=1.6, capsize=3,
+                       label=None if lab in seen else lab)
+        seen.add(lab)
+        if side == "bottom-right":
+            ax[1].annotate(n, (x, lo), xytext=(-3, -5), textcoords="offset points", ha="left", va="top", fontsize=7)
+        elif side == "left":
+            ax[1].annotate(n, (x, tot), xytext=(-8, 0), textcoords="offset points", ha="right", va="center", fontsize=7)
+        else:
+            ax[1].annotate(n, (x, hi if side == "top" else lo), xytext=(0, 4 if side == "top" else -4),
+                           textcoords="offset points", ha="center", va="bottom" if side == "top" else "top", fontsize=7)
+    ax[1].scatter([0], [0], marker="*", s=140, c=OK["black"], zorder=3)
+    ax[1].annotate("shipped", (0, 0), xytext=(0, 8), textcoords="offset points", ha="center", va="bottom", fontsize=7)
+    ax[1].axhline(0, color=OK["grey"], lw=0.8, ls=":"); ax[1].axvline(0, color=OK["grey"], lw=0.8, ls=":")
+    ax[1].set_xlim(-15, 17); ax[1].set_ylim(-160, 80)
+    ax[1].set_xlabel("KL change vs the shipped allocation (%)")
+    ax[1].set_ylabel("task-runs vs shipped (of 834)\ncluster-robust 95 %")
+    ax[1].set_title("(b) Harder agent split")
+    ax[1].legend(loc="upper center", frameon=False, ncol=1, fontsize=7, bbox_to_anchor=(0.5, -0.3))
     fig.tight_layout(w_pad=2.5)
-    save(fig, "fig2-kl-vs-task")
+    save(fig, "fig3-kl-vs-task")
 
 
 # ------------------------------------------------------------------ Fig 2
@@ -112,17 +157,17 @@ def fig2():
     ax[0].set_ylabel("AppWorld test_normal task-runs (of 336)")
     ax[0].set_title("(a) Score per seed pair")
     ax[0].legend(frameon=False, fontsize=7, loc="upper center", ncol=3, bbox_to_anchor=(0.5, -0.24), columnspacing=0.8, handletextpad=0.4)
-    g = [(21, 8, 34, 0.0025), (1, -14, 17, 1.0), (-2, -16, 11, 0.89)]
+    g = [(21, -1, 43, 0.057), (1, -22, 24, 0.93), (-2, -25, 21, 0.87)]   # cluster-robust 95 %, seed-level p (E5.28)
     for i, (p, lo, hi, pv) in enumerate(g):
         ax[1].errorbar(i, p, yerr=[[p - lo], [hi - p]], fmt="o", ms=8, color=OK["black"] if i == 0 else OK["blue"],
                        mfc=OK["black"] if i == 0 else "white", mew=1.6, capsize=4)
         ax[1].annotate(f"{p:+d}\np = {pv:g}", (i, hi), xytext=(0, 4), textcoords="offset points", ha="center", fontsize=7.5)
     ax[1].axhline(0, color=OK["grey"], lw=0.8, ls=":")
-    ax[1].set_xticks(x); ax[1].set_xticklabels(pairs); ax[1].set_xlim(-0.5, 2.5); ax[1].set_ylim(-22, 46)
-    ax[1].set_ylabel("shipped - BF16 (task-runs)\n95 % paired bootstrap")
+    ax[1].set_xticks(x); ax[1].set_xticklabels(pairs); ax[1].set_xlim(-0.5, 2.5); ax[1].set_ylim(-32, 58)
+    ax[1].set_ylabel("shipped - BF16 (task-runs of 336)\ncluster-robust 95 %")
     ax[1].set_title("(b) The +21 lead on the selection seeds")
     fig.tight_layout()
-    save(fig, "fig5-seed-pairs")
+    save(fig, "fig6-seed-pairs")
 
 
 # ------------------------------------------------------------------ Fig 3
@@ -164,33 +209,32 @@ def fig3():
     ax[1].set_title("(b) Inkling K/V settings: spread, no shift")
     ax[1].legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.2))
     fig.tight_layout(w_pad=2.5)
-    save(fig, "fig4-item-margins")
+    save(fig, "fig5-item-margins")
 
 
 # ------------------------------------------------------------------ Fig 4
 def fig4():
-    aw = os.path.join(ROOT, "data/appworld")
-    arms = [("M2, release K/V (ours)", "inkm", OK["blue"], ""), ("M2, 4-bit global cache", "q65", OK["sky"], "//"),
-            ("official weights (NVFP4 / MXFP8), same engine", "raw", OK["black"], ".."),
-            ("Unsloth's setup (setup vs setup)", "ink", OK["orange"], "xx")]
-    seeds = [102, 103, 104, 105]
-    fig, ax = plt.subplots(1, 1, figsize=(7.2, 2.7))
-    w = 0.2
-    for i, (n, key, c, h) in enumerate(arms):
-        vals, tots = [], []
-        for s in seeds:
-            with open(os.path.join(aw, f"{key}-s{s}.csv"), encoding="utf-8") as f:
-                rows = [x.strip().split(",") for x in f.readlines()[1:] if x.strip()]
-            vals.append(sum(int(r[1]) for r in rows)); tots.append(len(rows))
-        tot = sum(vals)
-        ax.bar(np.arange(4) + (i - 1.5) * w, vals, w, color=c if not h else "white", edgecolor=c, hatch=h, lw=1.2,
-               label=f"{n}: {tot} / {sum(tots)}")
-    ax.set_xticks(np.arange(4)); ax.set_xticklabels([f"seed {s}" for s in seeds])
-    ax.set_ylim(125, 158); ax.set_ylabel("AppWorld task-runs (of 168)")
-    ax.set_title("Inkling 2 Mini, AppWorld test_normal, seeds 102-105 (none used for a choice)")
-    ax.legend(frameon=False, ncol=2, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.12))
-    fig.tight_layout()
-    save(fig, "fig6-inkling-appworld")
+    panels = [("(a) Seeds 102-105 (none used for a choice)", [102, 103, 104, 105],
+               [("M2, release K/V (ours)", "inkm", OK["blue"], ""), ("M2, 4-bit global cache", "q65", OK["sky"], "//"),
+                ("official weights, same engine", "raw", OK["black"], ".."),
+                ("Unsloth's setup (setup vs setup)", "ink", OK["orange"], "xx")]),
+              ("(b) Seeds 108-111, one engine and launcher setting", [108, 109, 110, 111],
+               [("M2 (ours)", "w2dm2", OK["blue"], ""), ("uniform map, same bytes", "w2du", OK["green"], "//"),
+                ("Unsloth UD-Q2_K_XL, same engine", "w2da", OK["orange"], "xx")])]
+    fig, axs = plt.subplots(1, 2, figsize=(7.2, 3.3), gridspec_kw={"width_ratios": [4, 3]})
+    for ax, (title, seeds, arms) in zip(axs, panels):
+        w = 0.8 / len(arms)
+        for i, (n, key, c, h) in enumerate(arms):
+            sc = [aw_score(f"{key}-s{s}") for s in seeds]
+            vals = [v for v, _ in sc]
+            ax.bar(np.arange(len(seeds)) + (i - (len(arms) - 1) / 2) * w, vals, w, color=c if not h else "white", edgecolor=c,
+                   hatch=h, lw=1.2, label=f"{n}: {sum(vals)} / {sum(k for _, k in sc)}")
+        ax.set_xticks(np.arange(len(seeds))); ax.set_xticklabels([str(s) for s in seeds])
+        ax.set_ylim(125, 158); ax.set_xlabel("seed"); ax.set_title(title, fontsize=8.5)
+        ax.legend(frameon=False, ncol=1, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.2))
+    axs[0].set_ylabel("AppWorld test_normal\ntask-runs (of 168)")
+    fig.tight_layout(w_pad=1.5)
+    save(fig, "fig7-inkling-appworld")
 
 
 # ------------------------------------------------------------------ Fig 5
@@ -280,9 +324,45 @@ def fig6():
     ax[1].set_title("(b) KL-table B by depth and family")
     ax[1].legend(frameon=False, fontsize=7, loc="lower left")
     fig.tight_layout(w_pad=1.5)
-    save(fig, "fig3-b1-recall-population")
+    save(fig, "fig4-b1-recall-population")
+
+
+# ------------------------------------------------------------------ BF16 per seed (test_challenge)
+def fig_bf16():
+    seeds = [106, 107, 108, 109]
+    ship = [aw_score(("t3-pv3ac" if s < 108 else "w2-pv3ac") + f"-s{s}")[0] for s in seeds]
+    bf = [aw_score(f"w2-pbf16-s{s}")[0] for s in seeds]
+    ws = [aw_score(f"w2-pv3acB-s{s}")[0] for s in (106, 107)]
+    fig, ax = plt.subplots(1, 2, figsize=(7.2, 3.3), gridspec_kw={"width_ratios": [1.25, 1]})
+    x, w = np.arange(4), 0.27
+    ax[0].bar(x - w, ship, w, color=OK["black"], edgecolor=OK["black"], lw=1.2, label="shipped 2.47-bit file, 12 GB setup")
+    ax[0].bar(x, bf, w, color="white", edgecolor=OK["blue"], hatch="//", lw=1.2, label="BF16")
+    ax[0].bar(x[:2] + w, ws, w, color="white", edgecolor=OK["orange"], hatch="xx", lw=1.2, label="shipped file in BF16's setup")
+    for xs, vs in ((x - w, ship), (x, bf), (x[:2] + w, ws)):
+        for a_, v in zip(xs, vs):
+            ax[0].annotate(str(v), (a_, v), xytext=(0, 2), textcoords="offset points", ha="center", fontsize=6.5)
+    ax[0].set_xticks(x); ax[0].set_xticklabels([str(s) for s in seeds]); ax[0].set_xlabel("seed")
+    ax[0].set_ylim(270, 362); ax[0].set_ylabel("AppWorld test_challenge\ntask-runs (of 417)")
+    ax[0].set_title("(a) Score per seed")
+    ax[0].legend(frameon=False, fontsize=7, loc="upper center", ncol=1, bbox_to_anchor=(0.5, -0.2))
+    rows = [("shipped, 12 GB setup\n4 seeds, of 1,668", "shipped vs BF16 (W2-A + W2-A2)", OK["black"], "o"),
+            ("shipped in BF16's setup\n2 seeds, of 834", "W2-S vs BF16", OK["orange"], "s"),
+            ("shipped, two-stage head off\n2 seeds, of 834", "noH2 vs BF16", OK["green"], "D")]
+    for i, (n, key, c, m) in enumerate(rows):
+        r = seed_level(key)
+        tot, (lo, hi) = r["total"], r["ci"]
+        ax[1].errorbar(tot, len(rows) - 1 - i, xerr=[[tot - lo], [hi - tot]], fmt=m, ms=7, color=c, mfc=c, capsize=4)
+        ax[1].annotate(f"{tot:+d}  [{lo:+.0f}, {hi:+.0f}]\nseed-level p = {pfmt(r['p_design'])}", (tot, len(rows) - 1 - i),
+                       xytext=(0, 9), textcoords="offset points", ha="center", fontsize=7)
+    ax[1].axvline(0, color=OK["grey"], lw=0.8, ls=":")
+    ax[1].set_yticks(range(len(rows))); ax[1].set_yticklabels([n for n, *_ in rows][::-1], fontsize=7)
+    ax[1].set_ylim(-0.6, len(rows) - 0.3); ax[1].set_xlim(-20, 200)
+    ax[1].set_xlabel("difference to BF16 (task-runs)\ncluster-robust 95 % interval")
+    ax[1].set_title("(b) Lead over BF16")
+    fig.tight_layout(w_pad=1.5)
+    save(fig, "fig2-bf16-per-seed")
 
 
 if __name__ == "__main__":
-    fig1(); fig2(); fig3(); fig4(); fig5(); fig6()
+    fig5(); fig_bf16(); fig1(); fig6(); fig3(); fig2(); fig4()
     print("figures written to", os.path.abspath(OUT))
