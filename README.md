@@ -2,8 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24455575.svg)](https://doi.org/10.5281/zenodo.24455575)
 
-**Find and repair quantization damage where tasks break, not where averages look.**
-Paper and evidence by Cary Palmer, version 1.1 (2026-11-24).
+**Gate low-bit quantization on tasks, not on average error alone.**
+Paper and evidence by Cary Palmer, version 1.2 (2026-11-26).
 
 - Paper: [`paper/kintsugi-method.pdf`](paper/kintsugi-method.pdf) (source: [`paper/kintsugi-method.md`](paper/kintsugi-method.md))
 - Every number in the paper cites a row of [`evidence/EVIDENCE.md`](evidence/EVIDENCE.md) as [E#.#].
@@ -12,10 +12,10 @@ Paper and evidence by Cary Palmer, version 1.1 (2026-11-24).
   [`evidence/ALGORITHM.md`](evidence/ALGORITHM.md).
 - A patch proposal for per-call seeds in AppWorld runs: [`evidence/SEED-FIX.md`](evidence/SEED-FIX.md).
 
-**Version 1.1 corrects versions 1.0.x.** The task-runs of one AppWorld seed share one random stream, so the
-task-level p-values of versions 1.0.x were too small. Version 1.1 gives seed-level statistics for every AppWorld
-claim and adds a second batch of tests. Read [`CHANGELOG.md`](CHANGELOG.md) first: it lists the corrections before
-the new results.
+**Version 1.2 adds the mechanism of the agent result** (one end-of-task habit of the base model; Section 4.3 of the
+paper), the repair split, a held candidate map and the review changes. Version 1.1 corrected the statistics of
+versions 1.0.x: the task-runs of one AppWorld seed share one random stream, so every AppWorld claim is at the seed
+level. Appendix B of the paper and [`CHANGELOG.md`](CHANGELOG.md) list what each version changed.
 
 The models the paper is about:
 
@@ -42,6 +42,7 @@ byte-identical to the one in this repository (Python 3.12 and the pinned package
 | AppWorld counts and the task-level statistics of versions 1.0.x (Wilson and paired bootstrap intervals, sign tests, the selection effect) | `scripts/gg_stats.py` | `data/appworld/` | `results/gg-stats.txt` | E1.31, E1.32, E1.36, E3.x, E4.x (task-level values; the paper uses the two rows above for claims) |
 | Flip maps of KL-table B on the held-out recall population (W2-C) | `scripts/w2c_score.py --dir data/w2c/out` | `data/w2c/`, `data/b1/`, `data/b1c/` | `results/w2c-result.txt` | Section 4.3; E5.15 |
 | Graded recall of the Inkling baselines (W2-D) | `scripts/w2d_margin.py` | `data/margins/w2d/`, `data/margins/gc2/` | `results/w2d-margin-result.txt` | Section 4.6, Table 7; E5.21 |
+| Temperature 1.0 minus temperature 0 lead (scenario bootstrap and design effect); each arm's T 1.0 runs split by its greedy result | `scripts/v12_t0.py` | `data/appworld/` (`t3-pv3ac*`, `w2-pv3ac*`, `w2-pbf16*`) | `results/v12-t0.txt`, `.json` | Section 4.2, Table 1b; E6.1, E6.2 |
 | Free-generation check: thinking length per item | `scripts/freegen_summary.py` | `data/freegen/` | `results/freegen.txt` | Section 6; E5.26, E5.30 |
 | Graded K/V margins on Inkling 2 Mini | `scripts/gc2_score.py` | `data/margins/gc2/` | `results/gc2-result.txt` | Section 4.4; E2.23 |
 | Graded margins of the two baselines | `scripts/gb2_score.py` | `data/margins/gb2/` | `results/gb2-result.txt` | Section 4.3; E1.33 |
@@ -49,6 +50,13 @@ byte-identical to the one in this repository (Python 3.12 and the pinned package
 | B1c same-box confirmation | `scripts/b1/b1c_score.py --dir data/b1c/out` | `data/b1c/` | `results/b1c-result.txt` | E1.35 |
 | KL comparisons of the first batch | `scripts/kl/kl_docs.py <p1/p2> <base> <map>...` | `data/kl/` | `results/kl.txt` | Table 3; E1.1-E1.3, E1.8, E1.9, E1.28-E1.30 |
 | Figures 1-7 | `scripts/make_figs.py` | the above | `paper/figs/` | Figures 1-7 |
+
+### Numbers of version 1.2
+
+The per-task outcomes of the new AppWorld arms are in `data/appworld/` (`w2-pr8-*`, `w2-pc13-*`, `w2-pv5tc-s108`,
+`-s109`, `w2-pv5tcT-s106`, `w2-pv5bcT-s106`, `w2-pv5ccT-s106`, `w2-pv5td-*`); `scripts/v12_t0.py` recomputes E6.1 and
+E6.2. The failure classes of Section 4.3 (E6.4) are read from the transcripts and the evaluator reports, which hold
+task content and are not published; the counts are in the paper and in `evidence/EVIDENCE.md`.
 
 ### How to check each new number of version 1.1
 
@@ -112,5 +120,5 @@ AppWorld scores come from the AppWorld harness (not included); `data/appworld/` 
 
 ## Cite
 
-Palmer, C. (2026). *Kintsugi: Find and Repair Quantization Damage Where Tasks Break, Not Where Averages Look*. Zenodo.
+Palmer, C. (2026). *Kintsugi: Gate Low-Bit Quantization on Tasks, Not on Average Error Alone*. Zenodo.
 https://doi.org/10.5281/zenodo.24455575 (machine-readable: `CITATION.cff`; Zenodo gives each version its own DOI).

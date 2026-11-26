@@ -1,5 +1,51 @@
 # Changelog
 
+## v1.2 (2026-11-26)
+
+Text and evidence. No run was made for this text; the new results come from lab runs made after v1.1. Review items
+come from a second LLM review of v1.1.
+
+### Changes from the review
+
+- **Title.** "Kintsugi: Gate Low-Bit Quantization on Tasks, Not on Average Error Alone". A class-level KL table, not a
+  task probe, found the repair; the title no longer says more.
+- **Temperature.** The abstract and Section 4.2 no longer say that the lead "is in how the two files behave under
+  temperature-1 sampling". At temperature 0 the lead is +11 [-5, +28], and one greedy run cannot show whether it is
+  smaller: the difference of the two leads is +18 of 417, scenario bootstrap [+0.8, +36.5], but with the design effect
+  [-6, +43] (p 0.14), and every single-seed interval holds 0 (E6.1; `scripts/v12_t0.py`).
+- **Table 1b** (a description): each arm's temperature-1.0 runs split by its own greedy result (E6.2).
+- **Abstract** cut to about 260 words; the version history moved to Appendix B of the paper.
+- **Vault 9:** the two early departures are damage that both files share, not damage in the new map.
+- **AI use:** the lab found the shared seed stream; the review did not ask for the seed-level statistics.
+- **Clean numbers for two doubled shards** (two copies of one job ran into one folder): uniform vs shipped -37
+  (p 0.094; v1.1 -40, p 0.077); head off vs shipped +14 (p 0.44; v1.1 +17, p 0.36); head off vs BF16 +73
+  (p 6.2e-4); head repair +15 (p 0.46). No verdict changes (E6.3).
+- **Inkling 2 Mini is another lineage.** The allocation rule of the 27B model did not carry to it; the method expects
+  that. New Section 4.9: readings across compressions of one base.
+
+### New results
+
+- **The mechanism of the lead over BF16 (Section 4.3).** On test_challenge the arms differ almost only at one
+  decision: an unasked answer at `complete_task` on a task that needs an action and no answer. Every arm has the
+  habit, BF16 included (BF16 258 of 1,668 task-runs, shipped 112). With these runs counted as passes (a post hoc
+  class, not a score), the arms are within 697-723 of 834 and shipped and BF16 are level. Greedy decoding lowers
+  BF16's rate, which is most of the temperature-0 result (E6.4).
+- KL-tools on four seeds: +140 over BF16 (p 3.0e-5), level with the shipped file (E6.6). Three maps at
+  temperature 0 (E6.7).
+- Reasoning effort xhigh lowers the habit on a targeted set of 70 tasks (3 against 13, p 0.013); one targeted sentence
+  at medium does not (10 against 13, p 0.65) (E6.9, E6.10). The coded bias of the format, switched on, raises the
+  habit; it stays off (E6.12).
+- **The repair split:** the 8 raised projections carry the +70 of KL-tools (+53, p 0.021); the 13 cuts alone are not
+  separated (+38, p 0.097). With the band test, an interaction (E6.5).
+- **A held candidate:** KL-tools-2 (2.4 % lower KL, every other gate passed) scored 666 against 670 on AppWorld and 492
+  against 505 on BFCL multi-turn; held by the rule fixed before its AppWorld run (E6.14).
+- A coding-agent audit, as a description (Section 6; E6.16). A gradient map stopped at its gate (E6.13).
+
+### Repository
+
+- New script `scripts/v12_t0.py`; new per-task data for the v1.2 arms in `data/appworld/`.
+- `evidence/EVIDENCE.md` section W6 (E6.1-E6.16).
+
 ## v1.1 (2026-11-24)
 
 Corrections first, then the new results.

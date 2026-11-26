@@ -1,50 +1,29 @@
-# Kintsugi: Find and Repair Quantization Damage Where Tasks Break, Not Where Averages Look
+# Kintsugi: Gate Low-Bit Quantization on Tasks, Not on Average Error Alone
 
 Cary Palmer
 
-*Version 1.1 (2026-11-24). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one. Version 1.1 corrects the statistics of versions 1.0.x (Section 4.1) and adds the results of a second batch of tests; `CHANGELOG.md` lists the corrections first.*
+*Version 1.2 (2026-11-26). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one. Appendix B lists what each version changed.*
 
 ---
 
 ## Abstract
 
-Low-bit quantization of large language models is usually tuned and reported by an average error, such as the KL
-divergence to the full-precision model. We report four results from two models that run on one 12 GB GPU, and two
-corrections that our own checks made necessary.
-(1) On Qwen3.8-27B, at sampling temperature 1.0, a build at 2.47 bits per weight scores above the BF16 weights on
-the AppWorld test_challenge split: +32, +24, +35 and +26 task-runs of 417 on four seeds (+117 of 1,668; seed-level
-p = 5.1e-4, cluster-robust 95 % interval [+51, +183]). At temperature 1.0 the lead is in the weights, not in the
-setup: the same quantized file in the exact setup of the BF16 run scores 670 against 614 of 834. At temperature 0
-(greedy decoding, one run of 417 tasks for each arm) the lead is +11 (330 against 319) and not significant
-(p = 0.24): BF16 gains about 16 task-runs under greedy decoding and the quantized file does not. So the lead is in
-how the two files behave under temperature-1 sampling with the same sampler chain. We ruled out the setup, the
-two-stage output head, drafting and a sharper output distribution; the mechanism is open. The result is from one
-benchmark and one sampler chain.
-(2) Average KL does not rank bit maps. Six maps of the same size in the same codec score from 586 to 680 of 834
-task-runs, and the two lowest scores belong to maps with 7-9 % lower KL than the shipped map.
-(3) The nulls. A layer band that class-level KL flagged costs nothing when it alone goes to 2 bits (671 against 670).
-No single group of layers explains the losses of the lower-KL maps. The losses of a uniform map and of a
-Hessian-trace map are not significant at the seed level. A repair of the output head lowers KL by 32 % and shows no
-task effect. A rule from the 27B model (keep the MLP down-projections at 3 bits) does not transfer to a second model
-for agent work. A sharper output explains none of this.
-(4) On a looped mixture-of-experts model (Inkling 2 Mini), our 9.07 GB build scores above a public 2-bit file of the
-same model when the engine, the launcher, the cache types and the reasoning budget are equal: 598 against 579 of 672
-task-runs (four of four seeds, seed-level p = 0.019). It is not worse than the official weights. Its 27 % lower KL
-than that public file comes from the codec, the fits and the engine format: a uniform map at the same bytes keeps 93 %
-of it. The down projections carry long-range copy margin: the uniform map loses 2.73 nats on copy items, and the
-public file, which keeps exact down projections in 11 layers, has 2.34 nats more copy margin than our build.
-We describe a discipline, the Kintsugi method: diagnose with task probes next to KL, repair only the damaged spot,
-gate every change with lines written before the run, and confirm on data that no choice used. The method found and
-repaired damage in context: a map with one band restored scores 70 task-runs above the KL-only winner (seed-level
-p = 0.0017) and is level with the published allocation on agent work at 7.9 % lower KL. In free generation it
-thinks for 1,184 characters on one deep recall item, where the published allocation and BF16 think for about 210.
-A forced reading under BF16 shows that this is not damage: both quantized files leave BF16 at the same early tokens,
-and after that point BF16 itself prefers the long reply. The shipped build keeps the published allocation
-(L0xRE-V2 by YourHighnessLA) because the repaired map failed a line written before the run, not because damage was
-shown.
-The corrections: the task-runs of one seed share one random stream, so the task-level p-values of versions 1.0.x were
-overstated, and every AppWorld statistic here is at the seed level; and teacher-forced instruments (KL, margins)
-cannot see free-generation behaviour. We did not invent the quantizer, the trellis codec or the 27B bit allocation.
+Low-bit quantization of language models is usually tuned on an average error, such as the KL divergence to the
+full-precision model. The Kintsugi method gates every change on task probes next to KL, with each
+pass line written before its run, and confirms on data that no choice used. On two models that fit one 12 GB
+GPU:
+(1) On Qwen3.8-27B at temperature 1.0, a 2.47-bit build scores above BF16 on AppWorld test_challenge on four of four
+seeds (+117 of 1,668 task-runs; seed-level p = 5.1e-4), also in BF16's setup. Almost all of the gap is one
+end-of-task habit of the base model: on an action task, the run passes an unasked answer and fails. BF16 does this
+in 258 runs, the build in 112; with these runs counted as passes (a post hoc class), the two are level. At
+temperature 0 the lead is +11 [-5, +28]. Reasoning effort xhigh lowers the habit (3 against 13 runs on a targeted
+set); one targeted sentence does not.
+(2) Average KL does not rank bit maps: six maps of one size score 586 to 680 of 834. A class-level KL table found
+a repair worth 70 task-runs, and 8 raised projections carry it.
+(3) Lines written before the runs held two lower-KL maps out of the release.
+(4) On Inkling 2 Mini, another lineage, our build scores above a public 2-bit file with the setup equal
+(598 against 579 of 672; p = 0.019); the 27B allocation rule did not carry over.
+We did not invent the quantizer, the trellis codec or the 27B bit allocation.
 
 ## 1. Introduction
 
@@ -56,37 +35,43 @@ KL divergence [Unsloth; LookAtMyQuant]). Task accuracy is then measured once, at
 
 This paper reports what happened when we gated every bit map and every runtime setting on tasks that users of a
 12 GB build run: recall of an exact fact or a code function 117k-245k tokens back, long chat answers, and a
-multi-step agent benchmark. Versions 1.0.x reported a first batch of tests. This version adds a second batch (17
-new arms, about 14,500 more task-runs, most of them on a harder agent split) and a correction of the statistics.
+multi-step agent benchmark. Version 1.2 adds the mechanism of the agent result: a reading of every failed run of
+the second batch, and four tests that followed from it (Section 4.3).
 
-**Main results of this version.**
+**Main results.**
 
-1. **At temperature 1.0, a 2.47-bit build scores above BF16 on the harder agent split, and the lead is in the
-   weights; at temperature 0 the lead is not significant** (Section 4.2). At temperature 1.0 the shipped 27B file
-   leads BF16 on AppWorld test_challenge on each of four seeds (+32, +24, +35, +26 of 417; seed-level p = 5.1e-4)
-   [E5.4]. The same file in the exact setup of the BF16 run scores 670 against 614 [E5.5]. At temperature 0 (greedy,
-   one run of 417 tasks for each arm) it is 330 against 319 (+11, p = 0.24): BF16 gains about 16 task-runs over its
-   temperature-1.0 mean, the shipped file does not [E5.18]. On the standard split the two were level (Section 4.5).
-   The setup, the two-stage head, drafting exactness and sharpness are ruled out; the mechanism is open. Limits: one
-   benchmark, one sampler chain.
-2. **Average KL does not rank bit maps** (Section 4.3). At the same size and in the same codec, six maps score from
+1. **At temperature 1.0, a 2.47-bit build scores above BF16 on the harder agent split, and at that temperature the
+   lead is in the weights** (Section 4.2). The shipped 27B file leads BF16 on AppWorld test_challenge on each of
+   four seeds (+32, +24, +35, +26 of 417; seed-level p = 5.1e-4) [E5.4]. The same file in the exact setup of the BF16
+   run scores 670 against 614 [E5.5]. At temperature 0 (greedy, one run of 417 tasks for each arm) the lead is +11
+   [-5, +28] (p = 0.24), and one greedy run cannot show whether it is smaller than the lead at 1.0 [E5.18, E6.1]. On
+   the standard split the two were level (Section 4.6).
+2. **The lead is one end-of-task habit of the base model** (Section 4.3). On test_challenge, 369 of 417 tasks need an
+   action and no answer, and the prompt says so in every call. A run that passes an answer anyway fails the
+   evaluator's answer test. Every arm does this, BF16 included; BF16 does it in 258 of 1,668 task-runs, the shipped
+   file in 112. Wrong or missing actions are level over all eight arms. With the unasked-answer runs counted as
+   passes (a class added after the first reading showed it), the shipped file and BF16 are level, and the bit maps
+   of Section 4.4 are within 26 task-runs of each other [E6.4]. Reasoning effort xhigh lowers the habit (3 against 13
+   runs on a targeted set, p = 0.013); one targeted sentence at the default effort does not (10 against 13,
+   p = 0.65) [E6.9, E6.10].
+3. **Average KL does not rank bit maps** (Section 4.4). At the same size and in the same codec, six maps score from
    586 to 680 of 834 task-runs; the KL order and the task order do not agree [E5.2, E5.13].
-3. **Most of our mechanism hypotheses failed, and we report each one** (Sections 4.3, 4.4, 4.6): the flagged band
-   alone, a single-group cause, the uniform and Hessian-trace baselines at the seed level, the head repair on tasks,
-   the transfer of the down-projection rule to a second model, a context-length effect, a token-class effect, and
-   sharpness.
-4. **On Inkling 2 Mini the headline is a task result** (Section 4.6): with the setup equal, our build scores above a
-   public 2-bit file (598 against 579 of 672, seed-level p = 0.019) and is not worse than the official weights
-   [E5.22, E5.23]. The KL gap to that file belongs to the codec, the fits and the engine format, not to our
-   per-group map [E5.20].
+4. **A class-level KL table found a repair in context, and the raised band carries it** (Section 4.4). The repaired
+   map scores 70 task-runs above the KL-only winner; its 8 raised projections alone give +53 (seed-level p = 0.021),
+   but the same band costs nothing when it alone goes to 2 bits in the shipped map [E5.2, E5.12, E6.5].
+5. **Most of our mechanism hypotheses for the map losses failed, and we report each one** (Sections 4.4, 4.5, 4.7).
+6. **Lines written before the runs held two lower-KL maps out of the release** (Sections 4.4 and 6): KL-tools, on a
+   free-generation line, and a later candidate, on a rule for both agent benchmarks [E5.26, E6.14].
+7. **On Inkling 2 Mini, a model of another lineage, the headline is a task result** (Section 4.7): with the setup
+   equal, our build scores above a public 2-bit file (598 against 579 of 672, seed-level p = 0.019) and is not
+   worse than the official weights [E5.22, E5.23]. The KL gap to that file belongs to the codec, the fits and the
+   engine format, not to our per-group map [E5.20].
 
-**Two corrections to versions 1.0.x.**
+**Two findings about the instruments.**
 
 - **Seed clustering** (Section 4.1). The AppWorld client sends the same seed on every model call, and the server makes
-  a new sampler from that seed for each request. All task-runs of one seed thus share one random stream. The exact
-  sign test over task-runs, which versions 1.0.x used, treats them as independent. Its p-values were overstated. This
-  version gives a design-effect p, a cluster-robust interval and the per-seed signs for every AppWorld claim [E5.1,
-  E5.28], and it marks the effects that come from one seed only.
+  a new sampler from that seed for each request. All task-runs of one seed thus share one random stream. Every
+  AppWorld claim here has a design-effect p, a cluster-robust interval and the per-seed signs [E5.1, E5.28].
 - **Teacher-forced instruments are blind to free generation** (Section 6). KL, recall margins and the held-out
   recall test score forced tokens. A free-generation check found a change in thinking length that none of them
   showed. A line on output length then misread it: a forced reading under BF16 shows a departure that both quantized
@@ -98,26 +83,28 @@ new arms, about 14,500 more task-runs, most of them on a harder agent split) and
   task probes, locate with one-group flips, repair under a byte budget, gate with pre-written lines, confirm on
   fresh data, and keep failures in the record.
 - A measured case in which a 2.47-bit build scores above its BF16 reference on a hard agent split at temperature
-  1.0, with controls that put the lead in the weights at that temperature, a temperature-0 control in which the lead
-  is not significant, and the open points stated (Section 4.2).
+  1.0, with controls that put the lead in the weights at that temperature, a temperature-0 control, and the
+  mechanism: one habit of the base model whose rate the quantized files change (Sections 4.2, 4.3).
 - Evidence on a dense hybrid model that average KL does not rank bit maps by task quality at 2-3 bits, on agent
-  work and on held-out long-range recall, and a list of the mechanism hypotheses that failed (Section 4.3).
+  work and on held-out long-range recall, and a list of the mechanism hypotheses that failed (Section 4.4).
 - A repair in context: class-level KL pointed at one layer band, the repair was fixed before its results, and the
-  repaired map (KL-tools) scores 70 task-runs above the KL-only winner (seed-level p = 0.0017) [E5.2]. The repaired
-  map is level with the published allocation on agent work at 7.9 % lower KL [E5.11]. It thinks much longer than
-  the published allocation and BF16 on one deep item in free generation, so it failed a line written before the run
-  and did not replace the published allocation. A forced reading under BF16 then showed that the long reply is what
-  BF16 prefers after a departure that both files share (Section 6) [E5.26, E5.30, E5.31].
+  repaired map (KL-tools) scores 70 task-runs above the KL-only winner (seed-level p = 0.0017) [E5.2]. A split test
+  puts the gain in the raised band [E6.5]. The repaired map is level with the published allocation on agent work at
+  7.9 % lower KL [E5.11], also on four seeds [E6.6]. It failed a free-generation line written before the run, so it
+  did not replace the published allocation; a forced reading under BF16 then showed that the line misread a shared
+  departure (Section 6) [E5.26, E5.30, E5.31].
 - A seed-level statistics method for agent benchmarks that send one seed for each run, the finding that made it
   necessary, and a proposed fix for the client (Section 4.1).
+- Readings across compressions of one base model: what carries from one map to the next of the same base, and what
+  did not carry to a second lineage (Section 4.9).
 - On a second architecture, a task result with the setup held equal, and a split of a KL gap into the part from the
-  codec and the part from the bit map (Section 4.6).
+  codec and the part from the bit map (Section 4.7).
 
 **Scope.** We did not invent the quantizer (exllamav3), the trellis codec (QTIP / EXL3), or the 27B bit map, which
 is the L0xRE-V2 allocation by YourHighnessLA [L0xRE-V2], shipped unchanged. On the 27B model the method found and
 repaired damage in context, but the shipped build keeps the published allocation. On Inkling 2 Mini our rule chose
 the shipped map and the runtime settings; a uniform map at the same bytes is level with it on KL and on agent work
-and has less long-range copy margin (Section 4.6).
+and has less long-range copy margin (Section 4.7).
 
 **Availability.** Kintsugi-27B: [GitHub](https://github.com/professorpalmer/Kintsugi-27B) and
 [Hugging Face](https://huggingface.co/CaryPalmer/Kintsugi-27B). Kintsugi for Inkling 2 Mini:
@@ -167,7 +154,8 @@ loop layout [E1.23].
   (417 tasks). One *task-run* is one task on one seed. The client sends only the temperature and the seed, so the
   server's sampler defaults apply in every arm: top-k 20, top-p 0.95, min-p 0.05 [E5.6]. Seeds: 100 + 101 chose the
   Qwen maps ("selection seeds"); 102-105 (test_normal) and 106-109 (test_challenge) were never used for a choice
-  ("fresh"). Inkling: 102-105 and 108-111 (test_normal), 112 + 113 (test_challenge); no Inkling choice used AppWorld.
+  ("fresh"). Seeds 119-124 (test_challenge) belong to the effort tests of Section 4.3; none chose a map. Inkling:
+  102-105 and 108-111 (test_normal), 112 + 113 (test_challenge); no Inkling choice used AppWorld.
 - *Agent statistics.* For each comparison we give the difference in task-runs, the difference on each seed, a
   design-effect p and a cluster-robust 95 % interval (Section 4.1). "Seed-level p" means the design-effect p. Where we
   quote a task-level p (the exact sign test on discordant task-runs), we say so; it is too small by an unknown
@@ -213,10 +201,10 @@ move the failure to other items (Section 6) [E5.26].
 
 ## 4. Experiments
 
-### 4.1 A correction first: the task-runs of one seed are not independent
+### 4.1 The task-runs of one seed are not independent
 
-Versions 1.0.x tested every AppWorld comparison with an exact sign test on the discordant task-runs. That test
-assumes that each task-run is an independent draw. It is not.
+An exact sign test on the discordant task-runs assumes that each task-run is an independent draw. On AppWorld it is
+not.
 
 **The finding.** The AppWorld client sends the run's seed on every model call. The server makes a new sampler for each
 request and seeds it with that value. So every call of every task of every arm on one seed starts from the same
@@ -233,7 +221,7 @@ paired difference between two arms the same statistic, the *design effect*, is 2
 seeds 106 and 107; median 1.32, range 0-18.6). For the Inkling arms it is 1.29, and their single-arm statistic does
 not show clustering (1.02, p = 0.43) [E5.1].
 
-**The statistics that this version uses.** For a comparison with per-seed differences $D_s$: (i) the differences and
+**The statistics of this paper.** For a comparison with per-seed differences $D_s$: (i) the differences and
 their signs; (ii) the design-effect test $z = \sum_s D_s / \sqrt{\phi V}$, where $V$ is the variance of
 $\sum_s D_s$ from a bootstrap that resamples tasks inside each seed and $\phi$ is the design effect (2.75 for the 27B
 model, 1.29 for Inkling); (iii) the cluster-robust 95 % interval $\sum_s D_s \pm 1.96 \sqrt{\phi V}$. A claim of a
@@ -242,23 +230,13 @@ below 0.05 [E5.1]. For the standard split of versions 1.0.x we applied the same 
 design effect of the 27B arms is small (0.19 over 33 arm pairs), and we used the larger value 2.75, which is
 conservative there [E5.28].
 
-**What changed.** The large effects keep their verdicts; several smaller ones do not.
+Versions 1.0.x used the sign test over task-runs. Under this method the large effects keep their verdicts and
+several smaller ones do not; Appendix B lists both groups [E5.1, E5.28].
 
-- Keep p < 0.05: shipped above BF16 on the harder split at temperature 1.0 (four seeds); the same file above BF16
-  in BF16's setup;
-  KL-tools above the KL-only winner; the KL-only winner and KL-table B below the shipped file; our Inkling build above
-  the public 2-bit file with the setup equal; the shipped file above the naive 2-bit file. The three tests of the
-  stop rule of version 1.0 keep their verdicts at their family alpha of 0.0167 (the two AppWorld tests have seed-level
-  p = 0.0056 and 0.0078) [E5.1, E5.28].
-- Do not keep it: the losses of the uniform and the Hessian-trace maps on the harder split (Section 4.3); the partial
-  recovery of one flip map (Section 4.3); and three results on the selection seeds that versions 1.0.x already
-  reported as not replicated or withdrawn (the loss of the KL-only winner there, p 0.019 at the task level and 0.13
-  at the seed level; the lead of 21 over BF16, 0.0025 and 0.057; a public head-to-head, 0.0079 and 0.090) [E5.28].
-
-**Limits of the correction.** The design effect is a mean over arm pairs with a wide range, so the seed-level p is
+**Limits of the method.** The design effect is a mean over arm pairs with a wide range, so the seed-level p is
 approximate. Most comparisons have two seeds; a strict test with the seed as the only unit (a t-test of $D_s$) has
 almost no power there, and we give it only where it helps. Two comparisons have four seeds: shipped against BF16
-(t-test p = 0.0014) and the Inkling comparison of Section 4.6 (p = 0.059) [E5.1].
+(t-test p = 0.0014) and the Inkling comparison of Section 4.7 (p = 0.059) [E5.1].
 
 **A fix for later runs.** The client can send a seed derived from the run's seed, the task and the call number. The
 draws are then independent across tasks and calls, they stay reproducible, and two arms keep the same draw on the
@@ -267,7 +245,7 @@ paper used it [E5.1].
 
 ### 4.2 At temperature 1.0, a 2.47-bit build scores above BF16 on the harder split
 
-On the standard AppWorld split the shipped 27B file and BF16 are level on fresh seeds (Section 4.5). At the
+On the standard AppWorld split the shipped 27B file and BF16 are level on fresh seeds (Section 4.6). At the
 temperature of every AppWorld run in this paper (1.0), the harder split separates them, in the direction that we did
 not expect. At temperature 0 it does not separate them significantly (below).
 
@@ -308,8 +286,10 @@ seed can move.
   runs and 6.1 % of the shipped file's (Fisher p = 0.33) [E5.9].
 - *The two-stage head.* The 12 GB launcher computes exact logits only for 512 candidate tokens. Both setups sample
   with top-k 20, top-p 0.95 and min-p 0.05, so neither arm can draw a token outside its top 20 [E5.6]. With the
-  two-stage head off, the shipped file scored 687 against 670 with it on (+12 and +5; seed-level p = 0.36): the head
-  does not lift the score. The head-off arm leads BF16 by 73 (+44 and +29; seed-level p = 5.7e-4) [E5.6].
+  two-stage head off, the shipped file scored 687 against 670 with it on. One shard of the head-off arm ran twice
+  into one folder (19 mixed task-runs of seed 107); without them the difference is +14 (+12 and +2; seed-level
+  p = 0.44): the head does not lift the score. The head-off arm leads BF16 by 73 (+44 and +29; seed-level p = 6.2e-4)
+  [E5.6, E6.3].
 - *Drafting.* The 12 GB setup drafts tokens; the BF16 setup does not. In the engine, every emitted token is the
   target model's own sample, and a drafted token is kept only if it equals that sample. So drafting changes the
   speed, not the output distribution. This is from a reading of the code, not from a run [E5.7]. The run in BF16's
@@ -320,8 +300,8 @@ seed can move.
   (KL-tools and the KL-only winner; difference -0.0002 [-0.0007, +0.0003]) score 680 and 610. The line "sharpness
   explains the agent ordering" was not met [E5.8]. The text of this test is the golden set, not AppWorld traffic.
 - *Longer thinking, or longer tasks.* BF16 writes 2-8 % more reasoning for each call. It needs about one call fewer
-  for each task [E5.9]. The lead is spread over task lengths, step counts, difficulty levels and apps; no one place
-  holds it [E5.10].
+  for each task [E5.9]. The lead is spread over task lengths, step counts, difficulty levels and apps [E5.10]. It is
+  not spread over the steps of a task: Section 4.3 puts it at the last step.
 
 ![AppWorld test_challenge at temperature 1.0, 417 tasks per seed (the temperature-0 control is in Table 1). (a) Score per seed for the shipped 2.47-bit file in the 12 GB setup
 (seeds 106-109), for BF16 (106-109), and for the shipped file in BF16's exact setup (106 + 107). (b) Difference to
@@ -336,18 +316,118 @@ against 30 discordant, p = 0.24, difference +11 with a 95 % paired bootstrap int
 files move differently. Under greedy decoding BF16 scores 319, which is about 16 more than its mean of 303.2 over
 the four temperature-1.0 seeds; the shipped file scores 330, about the same as its mean of 332.5. Each arm's greedy
 outcome agrees with the majority of its four temperature-1.0 runs on 87-88 % of the tasks where the majority is not
-tied. So most of the temperature-1.0 lead comes from how the two files behave under temperature-1 sampling with the
-sampler chain of Section 2 (top-k 20, top-p 0.95, min-p 0.05). The run in BF16's setup still shows that, at that
-temperature, the difference is in the weights. The temperature-0 control is one run of 417 tasks for each arm; it
-can show a large lead, not a small one.
+tied. The temperature-0 control is one run of 417 tasks for each arm; it can show a large lead, not a small one.
+
+**Is the lead smaller at temperature 0? Not shown.** The lead at 1.0 (mean of four seeds, +29.25 of 417) minus the
+lead at 0 (+11) is +18. A bootstrap over the 139 AppWorld scenarios gives [+0.8, +36.5]. That interval treats the
+task-runs of a seed as independent. With the design effect of Section 4.1 on the temperature-1.0 part it is
+[-6, +43] (p = 0.14), and against each single temperature-1.0 seed every interval holds 0 [E6.1]. So we state: at
+temperature 0 the lead is +11 [-5, +28], and one greedy run cannot show whether it is smaller. At temperature 1.0,
+the run in BF16's setup shows that the difference is in the weights.
+
+*Table 1b. Each arm's temperature-1.0 runs (seeds 106-109) split by the arm's own greedy result on the same task. A
+description, not a test [E6.2].*
+
+| Arm | Greedy passes | T 1.0 runs that fail | Greedy fails | T 1.0 runs that pass |
+|------------|------:|--------------------:|------:|--------------------:|
+| BF16 | 319 | 209 of 1,276 (16.4 %) | 98 | 146 of 392 (37.2 %) |
+| Shipped file | 330 | 154 of 1,320 (11.7 %) | 87 | 164 of 348 (47.1 %) |
+
+At temperature 1.0, BF16 loses more of the tasks that its greedy run passes, and gains fewer of those that its greedy
+run fails. Section 4.3 shows which step these runs lose.
 
 **What we do not claim.** We do not claim that quantization improves this model in general, or that the 2.47-bit
-file is better than BF16 without naming the temperature. The mechanism is open. The result is from one benchmark and
-one sampler chain. On the standard split the two files are level. BF16 ran in our engine; in the stock engine it scored 272 against 281 in ours on the
+file is better than BF16 without naming the temperature. Section 4.3 gives the mechanism and its limits. The result
+is from one benchmark and one sampler chain. On the standard split the two files are level. BF16 ran in our engine; in the stock engine it scored 272 against 281 in ours on the
 standard split (not significant), which is some evidence that our engine does not handicap BF16, but that check was
 not repeated on the harder split [E3.11].
 
-### 4.3 Average KL does not rank bit maps
+### 4.3 The mechanism: one decision at the end of the task
+
+**How we read it.** After the temperature-0 control we read every failed run of the second batch: the transcripts,
+the API-call logs and the evaluator's list of failed tests (CPU only, spent seeds; a reading with no line) [E6.4]. The
+method (the first point where two runs part, and the kind of step there) was written before the script ran. The
+failure classes and the counts below were added after the first run showed the class. They are post hoc, and the
+record marks them as amendments.
+
+**The decision.** On test_challenge, 369 of the 417 tasks need an action and no answer (for example, "Start my music
+player"). The agent prompt states the rule in every call: if no answer is required, omit the answer argument of
+`complete_task`. A run that does the task and then passes a text as the answer (an order confirmation, a number, a
+name) fails the evaluator's answer test, also when every action is right. We call such a run an *unasked answer*.
+
+*Table 1c. AppWorld test_challenge, seeds 106 + 107, 834 task-runs per arm, temperature 1.0. "Unasked answer only" =
+the answer test is the only failed test of the run. "Pass + unasked only" is not an AppWorld score: it is the score if
+the answer were not tested on action tasks. Post hoc classes [E6.4].*
+
+| Arm | Pass | Wrong or missing action | Unasked answer (all) | Unasked answer only | Pass + unasked only |
+|------------------------------|------:|----------:|----------:|----------:|----------:|
+| KL-tools | 680 | 90 | 39 | 30 | 710 |
+| Band-only map | 671 | 85 | 62 | 48 | 719 |
+| Shipped (L0xRE-V2 allocation) | 670 | 94 | 58 | 46 | 716 |
+| HAWQ-style baseline | 637 | 81 | 99 | 86 | 723 |
+| Uniform baseline | 630 | 86 | 105 | 87 | 717 |
+| BF16 | 614 | 86 | 121 | 104 | 718 |
+| KL-only winner | 610 | 102 | 101 | 87 | 697 |
+| KL-table B | 586 | 90 | 144 | 125 | 711 |
+
+**What the table shows.**
+
+- Wrong or missing actions are level over the eight arms (81 to 102). The step limit, a full context window, loops
+  and length cuts do not order the arms.
+- The order of the arms is the order of one class. With it, the arms score from 586 to 680; without it, from 697 to
+  723.
+- Shipped against BF16: in the discordant pairs, the pairs in which the losing run's only failed test is the unasked
+  answer give -56 of BF16's -56. Over four seeds BF16 passes an unasked answer in 258 of 1,668 task-runs (57 % of its
+  failed runs), the shipped file in 112 (33 %); "pass + unasked only" is 1,434 against 1,420 [E6.4].
+- KL-tools on four seeds: 1,353 against BF16's 1,213 (+140, every seed positive, seed-level p = 3.0e-5) and level
+  with the shipped file (+23, p = 0.45). On "pass + unasked only", KL-tools and BF16 are level (-2) [E6.6].
+
+**The habit is the base model's; the quantized files change its rate.** Every arm has the habit, BF16 included. Its
+share of the task-runs goes from 4.7 % (KL-tools) and 7.0 % (shipped) to 14.5 % (BF16) and 17.3 % (KL-table B). So on
+this benchmark the lead over BF16, and the order of the maps, is a difference in the rate of one habit. Fidelity to
+BF16 does not give that order. The reasoning of the last call shows the habit: when it says that no answer is needed,
+the run passes one in 1-8 % of the cases; when it does not say so, in 15-27 % (keyword counts) [E6.4].
+
+**Temperature 0.** Greedy decoding lowers BF16's rate and leaves the shipped file's: for BF16, 51 unasked answers at
+temperature 0 against a mean of 64.5 per temperature-1.0 seed; for the shipped file, 32 against 28.0. On an action task
+where the greedy run passes no answer, a temperature-1.0 run passes one in 13 % of the cases for BF16 and in 5 % for
+the shipped file [E6.4]. This is most of the temperature-0 result of Section 4.2. Three maps also ran at temperature
+0, one run each. KL-tools scored 352 (shipped 330: +22, p = 0.0092; no line), the KL-only winner 322 and KL-table B
+312. The deficit of KL-table B is in the same class (57 unasked answers; "pass + unasked only" 360 against the shipped
+file's 353), and wrong or missing actions are level (41 to 44) in all five arms [E6.7].
+
+**Longer thinking lowers the habit; one sentence does not.** The release launcher runs the model at reasoning effort
+medium, and the model's template adds no instruction at medium. At xhigh the template adds one line at the start of
+the system turn, and the model thinks 2.1 to 2.9 times longer per call (a pilot of 8 tasks) [E6.8]. By a rule written
+first, we took the 70 tasks where earlier medium runs of the shipped file had given an unasked answer, and we ran both
+efforts on one fresh seed on one box. A set chosen this way regresses to the mean, so only the fresh medium run counts.
+The line was: "xhigh lowers the habit" only if it gives fewer unasked answers with an exact McNemar p < 0.05. It is
+met: 3 against 13 (discordant 2 / 12, p = 0.013) [E6.9]. "Pass or unasked only" is 56 against 56: the passes that
+xhigh gains are the unasked answers that it does not give. xhigh costs 1.7 times the minutes per task, and it ended 4
+runs at a full window (medium 1) and 3 by giving up (medium 0). Then we put one targeted sentence in the slot of the
+xhigh line, at medium: "When the task asks only for an action, finish it without giving an answer. Give an answer only
+when the task asks a question." The result was 10 against 13 (p = 0.65): not shown, with the same thinking length as
+medium [E6.10]. On the 48 tasks that need an answer, the sentence stopped no answer, but it lost 4 passes against a
+fresh medium control (p = 0.125); its guard line fails as written by one task. So the xhigh effect goes with the
+longer thinking, not with an instruction in that place. A forced read of the end-of-task decision under both efforts
+was planned; its AppWorld data were lost to a fault in the job (its cleanup deleted the files before they were
+reduced), so it has no result [E6.11]. The product release v1.2 of Kintsugi-27B keeps the same weights and offers
+xhigh as an opt-in [E6.15].
+
+**A part of the format that we keep off.** Every coded projection of the format has a bias vector, learned in the
+format author's own end-to-end tune. Our clean rebuild writes it as zero on purpose (the bytes in the older files were
+third-party data that our fits did not make), and the engine does not add it. On the refit file that keeps the
+original bytes, a forced read with the bias on moved the end-of-task decision toward the unasked answer, by about 12
+times the refit floor (100 items of our own, not AppWorld) [E6.12]. So the zero bias costs nothing on this habit.
+
+**Limits.** The classes were added after the first reading (post hoc). "Pass + unasked only" is not a score: an
+unasked answer is an error by the rules of the benchmark, and the prompt states the rule. The maps have two seeds. The
+417 task-runs of a seed are one cluster (Section 4.1), so the counts have no p value. Keyword counts are matches of
+fixed phrases, not a reading of each text. There is one harness, one prompt (its one worked example is a question and
+ends with `answer=`) and one sampler chain. The effort test is one seed on a selected set of 70 tasks, in a later
+release launcher (v1.1.6, tool layer on): it is a lead for a full arm, not an AppWorld score.
+
+### 4.4 Average KL does not rank bit maps
 
 **Same size, same codec, 586 to 680.** Table 2 gives every 27B map that ran the harder split. Six of them have the
 same size (within 0.1 %) and use the same codec and the same fit library: the shipped map, three maps that our KL
@@ -357,7 +437,8 @@ change.
 *Table 2. AppWorld test_challenge, seeds 106 + 107, 834 task-runs per map, 12 GB setup. KL change on the build half
 p1 against the shipped file. Differences are against the shipped file; "p" is the seed-level (design-effect) p;
 intervals are cluster-robust 95 %. Maps marked \* do not have the size of the others [E5.2, E5.12-E5.14, E5.16,
-E1.8, E1.9, E1.28, E1.29].*
+E1.8, E1.9, E1.28, E1.29, E6.3]. The uniform row is without the 32 task-runs of one doubled shard of seed 106 (two
+copies of one job ran into one folder); its totals are as scored.*
 
 | Map | KL change | Seed 106 | Seed 107 | Total | Difference (per seed) | p | 95 % interval |
 |---|---:|---:|---:|---:|---|---:|---|
@@ -365,7 +446,7 @@ E1.8, E1.9, E1.28, E1.29].*
 | Band-only map \* | +4.1 % | 341 | 330 | 671 | +1 (+6, -5) | 0.96 | [-39, +41] |
 | Shipped (L0xRE-V2 allocation) | 0 | 335 | 335 | 670 | - | - | - |
 | HAWQ-style baseline | +12.7 % | 334 | 303 | 637 | -33 (-1, -32) | 0.15 | [-78, +12] |
-| Uniform baseline | -3.8 % | 325 | 305 | 630 | -40 (-10, -30) | 0.077 | [-84, +4] |
+| Uniform baseline | -3.8 % | 325 | 305 | 630 | -37 (-7, -30) | 0.094 | [-80, +6] |
 | KL-table B, down band restored \* | not measured | 310 | 317 | 627 | -43 (-25, -18) | 0.045 | [-85, -1] |
 | KL-only winner | -7.0 % | 304 | 306 | 610 | -60 (-31, -29) | 0.0078 | [-104, -16] |
 | KL-table B | -8.8 % | 292 | 294 | 586 | -84 (-43, -41) | 2.5e-4 | [-129, -39] |
@@ -373,9 +454,11 @@ E1.8, E1.9, E1.28, E1.29].*
 The two lowest scores belong to two of the three maps with the lowest KL. The third map with low KL (KL-tools) has
 the highest score. The map with the *highest* KL of the six (the HAWQ-style baseline, +12.7 %) is not significantly
 below the shipped file. So on this split KL neither finds the damaged maps nor clears the sound ones.
-For reference, BF16 scores 614 on these seeds (Section 4.2).
+For reference, BF16 scores 614 on these seeds (Section 4.2). Section 4.3 shows that the order of this table is the
+order of one end-of-task habit; wrong or missing actions are level over all eight arms [E6.4].
 
-**A repair in context.** On 2026-11-20, a KL table by document class showed that one change of the KL-only winner cost
+**A repair in context, found by class-level KL.** No task probe found this repair. On 2026-11-20, a KL table by
+document class showed that one change of the KL-only winner cost
 the tool-call documents far more than the average: the MLP down-projections of layers 16-31 at 2 bits raised KL by
 16.6 % on tool-call rows against 7.6 % on all rows, and layers 20-27 carried 14.6 points of the 16.6 [E5.11]. We
 fixed a repaired map before we had any of its results: the KL-only winner with the down-projections of layers 20-27
@@ -387,9 +470,20 @@ level with the shipped file on agent work on every split we ran: 680 against 670
 302 and 299 against 292 on the standard split [E5.2, E5.11, E5.28]. It has 7.9 % lower KL [E1.9], and it keeps its
 held-out recall margin (below) [E1.34]. The long-chat flag that versions 1.0.x held against it is two documents,
 not the class: on the 22 chat documents of the untouched half its median KL is lower than the shipped file's, and
-one document carries the whole rise of the mean [E5.11]. It did not replace the shipped map because it failed a
-free-generation line written before the run, on one deep recall item; a later forced reading under BF16 shows no
-damage there (Section 6) [E5.26, E5.31].
+one document carries the whole rise of the mean [E5.11]. On four seeds it is 1,353 against the shipped file's 1,330
+of 1,668 (+23, seed-level p = 0.45): level [E6.6]. It did not replace the shipped map because it failed a
+free-generation line written before the run, on one deep recall item; a later forced reading under BF16 shows that
+the line misread a departure that both files share, not damage in the new map (Section 6) [E5.26, E5.31].
+
+**Which part of the repair carries the gain.** The 21 projections have two parts: 8 raises (the band) and 13 cuts that
+pay for them. We built two maps from the model files, each with one part only, and wrote the lines before any run
+[E6.5]. The 8 raises alone lift the KL-only winner by 53 task-runs (+19 and +34; seed-level p = 0.021; interval
+[+8, +98]) and are not separated from the full repair (-17, p = 0.41). The 13 cuts alone give +38 (+20 and +18;
+p = 0.097), which is not separated from 0. By the line written first, the raises carry the repair. The two shares of
+the +70 (0.76 and 0.54) add to 1.30, so "both parts help" is not excluded at this power (two seeds). With the band test
+below, this measures an interaction: the band lifts the KL-only winner, and the same band costs nothing when it alone
+goes to 2 bits in the shipped map (671 against 670). Its need depends on its neighbours, which is what "repaired in
+context" means here.
 
 **The band alone is not the cause.** The repair suggests a rule: "the down-projections of layers 20-27 at 2 bits cost
 hard agent work". We wrote that as a prediction and tested it in three ways. All three failed or were weak.
@@ -400,8 +494,9 @@ hard agent work". We wrote that as a prediction and tested it in three ways. All
    4.1 %. So a rise in tool-call KL is a lead to follow, not a verdict.
 2. *Two baselines that have the band at 2 bits.* The uniform map and the HAWQ-style map scored 630 and 637. Both are
    below the shipped file at the task level (p = 0.0045 and 0.022). Neither is significant at the seed level
-   (p = 0.077 and 0.15), and in both the loss is in seed 107 only: -10 and -30 for the uniform map, -1 and -32 for
-   the HAWQ-style map [E5.13]. We do not claim that these maps lose agent work.
+   (p = 0.094 without the doubled shard, and 0.15), and in both the loss is in seed 107 only: -7 and -30 for the
+   uniform map, -1 and -32 for the HAWQ-style map [E5.13, E6.3]. From seed 106 to seed 107 the score of each map falls
+   as its count of the unasked-answer class of Section 4.3 rises (uniform -20 and +27, HAWQ-style -31 and +22) [E6.4]. We do not claim that these maps lose agent work.
 3. *The band restored in KL-table B.* KL-table B with the down-projections of layers 16-31 back at 3 bits scored 627:
    41 above KL-table B (+18 and +23; seed-level p = 0.089, not significant) and 43 below the shipped file (-25 and
    -18; p = 0.045, weak). The prediction was "not below the shipped file". It was not met [E5.14].
@@ -411,6 +506,20 @@ shipped map. That was wrong; it came from a comparison with the wrong base map. 
 32 MLP up-projections (layers 4, 5, 10, 11, 15 and 21-47) [E5.14, E5.19]. So the map of item 3 still has that cut,
 and the cause of its remaining gap is not located. No single group explains the losses. The repair of the band
 holds in the map where we made it, and we do not state it as a rule.
+
+**A candidate held by its rule.** After KL-tools failed its free-generation line, a bisect on two free-generation list
+items that KL-tools failed and the shipped file passed gave a new candidate: KL-tools with 26 projections (the
+linear-attention output projections of 14 late layers and the 12 attention output projections) back at the shipped
+widths. We call it KL-tools-2. It is 90.6 MiB smaller than the shipped file and has 2.4 % lower KL [-3.4, -1.3]; it
+passed the recall gates at 117k and 245k (24/24 + 20/20), HumanEval (158, at its line), speed and memory [E6.14]. On
+AppWorld test_challenge it scored 666 against 670 (+1 and -5; interval [-45, +37]) and gave fewer unasked answers
+than the shipped file (41 against 58; BF16 121). On a second agent benchmark, BFCL v3 multi-turn (800 entries), it
+scored 492 against 505 (scenario p = 0.31, interval [-35, +10]). Both results pass their break-even screens. The
+author had fixed one rule before any AppWorld run of it: ship the candidate only if AppWorld is level or positive,
+and hold it if AppWorld is negative too, even inside its screen, because two soft results that point the same way
+are a pattern. Both benchmarks point the same way, so the candidate is held and the
+product keeps the published allocation [E6.14]. This is a result of the method, not a failure of it: a map with lower KL that passed every other
+gate stays out of the release.
 
 **Two more hypotheses that failed.** *Context length:* the losses of the KL-only winner and of KL-table B do not grow
 with the length of the task. The direction is the opposite: the share of discordant pairs that the shipped file wins
@@ -569,7 +678,7 @@ noise, so we do not read it as evidence that the rankings differ, only that KL d
 here. The task-guided search itself found no map that beat the start: the best of five task-guided maps missed one line
 (a 356-row non-English chat document) and the study is paused [E1.13].
 
-### 4.4 Local repair beats blanket precision
+### 4.5 Local repair beats blanket precision
 
 **K/V cache, by cache class (Inkling 2 Mini).** The model has 48 K/V caches: 8 for global-attention layers, which
 grow with context, and 40 for sliding-window layers, which are rings of about 1,024 cells. A blanket q4_0 cache was
@@ -624,7 +733,8 @@ embedding at 3 bits, a memory trade of its author. Our build has an exact 8-bit 
 head came first from the Escha Labs export) and fits them in 12 GB with a two-stage head. On the same body, the
 exact head lowers KL from 0.0889 to 0.0602, which is 32 % [E5.17]. Its task test had its line written first. On the
 harder split, with the two-stage head off in both arms, the shipped file scored 687 and the same file with the 3-bit
-head and embedding scored 670 (+16 and +1; seed-level p = 0.41; interval [-23, +57]). The result is "not shown on
+head and embedding scored 670; without the 19 mixed task-runs of one doubled shard of seed 107 the difference is +15
+(+16 and -1; seed-level p = 0.46; interval [-25, +55]) [E6.3]. The result is "not shown on
 tasks" [E5.17]. This is the largest KL change of any single repair in this paper, and the agent benchmark does not
 see it at this size of test.
 
@@ -637,7 +747,7 @@ the release K/V setting (q8_0 global + f16 sliding-window) against the official 
 
 **Repairs that did not pay.** See Section 5.
 
-### 4.5 Select, then confirm on fresh data
+### 4.6 Select, then confirm on fresh data
 
 On AppWorld seeds 100 and 101 (standard split) the shipped 27B build was compared with three alternatives (two of our
 KL-guided maps and the original author's own fits) and kept as the best of the four: 302 against 301, 288 and 285
@@ -692,7 +802,7 @@ rule written first: keep "better" only if ours is at least equal there. It was 2
 did not finish at the output cap, so we give a bound; on the 334 finished pairs +4 and +11, seed-level p = 0.012)
 [E3.13, E5.28]. No Inkling arm moved by more than 4 task-runs between seed pairs [E3.14], against +12 for the
 never-selected BF16
-arm on Qwen. This is a setup-against-setup result (engine, K/V type and reasoning budget differ). Section 4.6 gives
+arm on Qwen. This is a setup-against-setup result (engine, K/V type and reasoning budget differ). Section 4.7 gives
 the comparison with the setup equal.
 
 **Lesson (a procedure, not a measured effect).** A configuration chosen by its score on a benchmark needs a held-out
@@ -701,7 +811,7 @@ winner's curse [Thaler; Cawley & Talbot], whose size our data could not measure.
 one public claim and two claims of our own first draft on the standard split, and it kept one. The seed-level
 re-analysis of Section 4.1 is the same lesson applied to our statistics.
 
-### 4.6 A second model: Inkling 2 Mini
+### 4.7 A second model: Inkling 2 Mini
 
 The same loop ran on Inkling 2 Mini with the same tools: fit library, KL gate with paired bootstrap, recall gate at
 depth, pre-written lines. Both builds run on one 12 GB GPU with a 262,144-token window (K/V past the GPU limit is kept
@@ -717,7 +827,7 @@ noise floor of short documents [E2.6]. We record the miss and the decision to pr
 were full for every arm, so the choice of M2 was a choice on KL.
 
 **The task result, with the setup equal.** Versions 1.0.x compared our build with Unsloth's file as two whole setups
-(Section 4.5), and credited "the same steps" for a 27 % lower KL. A reviewer asked for the baselines that isolate the
+(Section 4.6), and credited "the same steps" for a 27 % lower KL. A reviewer asked for the baselines that isolate the
 method. We ran three files through one engine build and one launcher, with the K/V types, the window and the
 reasoning budget equal: M2; Unsloth's UD-Q2_K_XL file (0.78 % larger); and a uniform trellis map at the same bytes as
 M2, whose rule we fixed before the build (3 bits for both expert matrices of the last layers, 2 bits elsewhere). The
@@ -786,21 +896,24 @@ Three readings follow.
    the engine) points the same way as the margins [E1.16, E1.18]; that metric saturates (0.19 with no weight change),
    so we report it and do not rank by it [E1.17].
 
-**The down-projection rule does not transfer for agent work.** On the 27B model, the repair in context was in the MLP
-down-projections (Section 4.3). M2 keeps every down projection at 3 bits, and the uniform map does not. We wrote the
+**An allocation rule from one lineage did not carry to another.** Inkling 2 Mini is not a Qwen derivative: it is
+another base lineage and another architecture (a looped mixture of experts). On the 27B model, the repair in context
+was in the MLP down-projections (Section 4.4). M2 keeps every down projection at 3 bits, and the uniform map does not. We wrote the
 prediction before any score was read: the uniform map loses agent work on the harder split. It did not: 649 against
 638 for M2 [E5.23]. A second line asked if the tool-call documents show a larger KL gap for the uniform map than
 all rows do, with its interval above 0; the gap is larger (+14.5 % against +2.5 %) but its interval holds 0
-[E5.20, E5.23]. So we make no claim about agent work for the down projections on a second architecture. What
-transferred from the 27B model is narrower: KL alone does not decide, and the group that KL treats as equal can carry
-a behaviour that only a graded probe shows.
+[E5.20, E5.23]. So we make no claim about agent work for the down projections on a second lineage. The method expects
+this: it finds the allocation again for each quantized model, on that model's own probes. What transferred from the
+27B model is the procedure and two facts about instruments: KL alone does not decide, and the group that KL treats as
+equal can carry a behaviour that only a graded probe shows. What carries within one lineage is knowledge of the base
+model (Section 4.9).
 
 **A third-party file.** Versions 1.0.x compared M2 with a LookAtMyQuant file. To be exact, the file that we measured
 is the 8.9 GB pack at Hugging Face revision 1318b804e687 of 2026-11-21 (63 files, 8,874,213,027 B), which its author
 now calls v1 [E5.24]. It is level with M2 on average KL (-3.3 %, interval [-0.0037, +0.0016]) and 62 % higher on copy
 rows; by document group it is 25 % better on English prose and 29-83 % worse on code, tools, agent traces and
 reasoning [E1.19]. Two files with the same average differ by class by up to a factor of almost two. A check that we
-made for this version found that 3 of our golden web documents are word-for-word copies of public FineWeb-Edu
+made for version 1.1 found that 3 of our golden web documents are word-for-word copies of public FineWeb-Edu
 documents that are in the calibration text of that file, and that 2 agent-trace documents share 6-8 % of their text
 windows with it. Without these 5 documents the numbers are: all rows -3.5 % [-0.0039, +0.0015], prose -24.9 %,
 agent traces +90 % (2 documents left), copy rows +47 %. The reading is the same [E5.25]. A newer file of the same size
@@ -821,7 +934,7 @@ what these ideas do in his file. The new file is not yet measured on our golden 
 | Agent against a public 2-bit file, one engine | 292 vs 256 of 336 (a K-quant file) [E1.32] | 598 vs 579 of 672 [E5.22] |
 | Code (health gate) | HumanEval 159-161 / 164 [E4.9] | HumanEval 158 / 164 [E4.11] |
 
-### 4.7 Faults outside the weights (Inkling 2 Mini)
+### 4.8 Faults outside the weights (Inkling 2 Mini)
 
 The release candidate engine passed its
 KL gate (KL 0.003341, top-1 97.727 %) and failed the harness gate: 4/6, 4/6, 4/6 and 5/6 tasks in Claude Code, Codex,
@@ -844,10 +957,32 @@ record stays "failed"; the release states the behaviour as a known limit. A sepa
 malformed tokens in 81,646 generated tokens on the final build [E1.26]; it is reported as a passed gate, not as
 damage found.
 
+### 4.9 Readings across compressions of one base
+
+The 27B files of this paper are compressions of one base model: the shipped file and the seven other quantized arms
+of Table 1c, beside BF16 itself. We read such a set with a fixed rule. A behaviour that is in every compression and in
+the reference is a trait of the base. A behaviour that the compressions share and the reference does not is shared
+damage of what the files share (the codec and most of the fits). A behaviour in one map only is a candidate for damage
+in that map. Three readings follow.
+
+1. *The unasked answer* (Section 4.3) is in BF16 and in all eight quantized arms: a trait of the base. The maps
+   change its rate, from 4.7 % to 17.3 % of the task-runs [E6.4].
+2. *The vault 9 departure* (Section 6): the shipped file and KL-tools leave BF16's path at the same two early tokens,
+   where BF16's own gaps are 1.41 and 2.95 nats. That is shared damage of the two files, not damage in the new map
+   [E5.31].
+3. *Blind instruments.* KL, the recall margins and the held-out recall test did not see the free-generation change
+   (Section 6), and the teacher-forced agent-trace probe did not see a known loser (Section 3). Each is blind in the
+   same way on every map.
+
+For the next compression of the same base, these are known before any run: the habit to count, the tokens where the
+quantized files tend to leave the reference, and the instruments that cannot see a given failure. They are a product
+of the method. They did not carry to another lineage: on Inkling 2 Mini the down-projection rule of the 27B model did
+not hold (Section 4.7).
+
 ## 5. Negative results (repairs measured and rejected)
 
 All lines below were written before the run. Rejected items stay in the record. The hypotheses of Sections 4.2 and
-4.3 that failed are in Table 10.
+4.4 that failed are in Table 10.
 
 *Table 9. Repairs that we measured and rejected.*
 
@@ -873,11 +1008,12 @@ byte split costs far more [E2.10].
 
 ## 6. Limitations
 
-- **One benchmark, one sampler chain, and the temperature.** The lead over BF16 and the map ordering of Section 4.3
+- **One benchmark, one sampler chain, and the temperature.** The lead over BF16 and the map ordering of Section 4.4
   are from AppWorld test_challenge at temperature 1.0, with top-k 20, top-p 0.95 and min-p 0.05. On the standard
-  split the same files are level. At temperature 0 the lead over BF16 is +11 of 417 and not significant, because BF16
-  gains about 16 task-runs under greedy decoding [E5.18]; the map ordering of Section 4.3 has no temperature-0 run.
-  The temperature-0 control is one run of 417 tasks for each arm. We have no second hard agent benchmark.
+  split the same files are level. At temperature 0 the lead over BF16 is +11 [-5, +28] of 417, and one greedy run
+  cannot show whether it is smaller than the lead at 1.0 [E5.18, E6.1]. Three maps of Section 4.4 have one
+  temperature-0 run each [E6.7]. The temperature-0 control is one run of 417 tasks for each arm. A second agent
+  benchmark (BFCL v3 multi-turn) is used in this paper only for the screen of the held candidate [E6.14].
 - **Few seeds.** Most comparisons on the harder split have two seeds. The seed-level p uses a design effect that is a
   mean over arm pairs with a wide range, so it is approximate; a strict test across two seeds has almost no power.
   Three effects sit in one seed and are marked in the text: the losses of the uniform and the HAWQ-style maps (seed
@@ -909,8 +1045,9 @@ byte split costs far more [E2.10].
   file writes, a log probability of -2.75 (gap 2.68 nats). On the whole 1,184-character KL-tools reply, BF16's top
   token equals the forced token on 478 of 480 tokens. BF16 is short in free generation only because it never takes
   the list form. So the long reply is not a further departure of KL-tools from the reference; on this prefix the
-  shipped file's short answer is itself a departure (at token 43). The length fact stays true; the reading that the
-  length showed damage in the new map does not. This is the thesis of the paper in a small case: a line on an output
+  shipped file's short answer is itself a departure (at token 43). The two early departures are damage that both
+  files share; they are not damage in the new map. The length fact stays true; the reading that the length showed
+  damage in the new map does not. This is the thesis of the paper in a small case: a line on an output
   statistic (here, length) misread a departure that both files share, and only a reading against the reference at
   each token separated the two. The decision stays: the shipped build keeps the published allocation, because
   KL-tools failed a line written before the run and we do not ship a miss, not because damage was shown. Limits: BF16
@@ -922,13 +1059,26 @@ byte split costs far more [E2.10].
   maps go different ways. For the free-generation item above it is measured: the place where the two files go
   different ways is clear in BF16 (gap 2.68 nats), and the earlier shared departures are clear too (1.41 and 2.95)
   [E5.31]. Verdicts on fragile teacher-forced items in this paper use the first definition.
-- **The mechanism is open.** We do not know why the 2.47-bit file scores above BF16 at temperature 1.0 and not
-  significantly at temperature 0, and no single group explains
-  why the lower-KL maps score below it. The tests of Sections 4.2 and 4.3 rule causes out; they do not find one. The
-  sharpness and token-class tests use golden-set text, not AppWorld traffic, and drafting exactness is from code
-  reading [E5.7, E5.8, E5.16].
+- **The limits of the mechanism.** Section 4.3 puts the lead over BF16 and the map order at one decision, the
+  unasked answer at the end of an action task. Its classes were added after the first reading (post hoc); the maps
+  have two seeds; the counts have no p value, because the task-runs of a seed are one cluster; and "pass + unasked
+  only" is not a score. We do not know why a map changes the rate of the habit: no single group of layers explains
+  why the lower-KL maps give more unasked answers. The xhigh result is one seed on a selected set in a later
+  launcher. The sharpness and token-class tests use golden-set text, not AppWorld traffic, and drafting exactness is
+  from code reading [E5.7, E5.8, E5.16, E6.4, E6.9]. One benchmark and one prompt show the habit; on another
+  prompt its rate can differ.
+- **Another lineage.** The allocation rule of the 27B model did not carry to Inkling 2 Mini, a model of another
+  lineage and architecture (Section 4.7). What carries within one lineage is knowledge of the base (Section 4.9),
+  read from one base model here.
+- **Coding agents (a description, not a test).** On a public third-party board of 20 repository-repair tasks
+  [PatchEval] (one run, the Pi agent, a 12 GB card), the shipped file solved 13. We read each of its 7 misses against the hidden test
+  and the upstream fix: 6 are the model's own patches, 1 is a valid fix that an exact token snapshot rejects, and 0
+  come from the setup (no leaked tags, empty answers or loops in 1,112 tool calls). Against the official API run of
+  the base model on the same tasks, our file thinks about 30 % less per turn (1,404 against 1,982 characters) and
+  solves 3 tasks fewer (sign test p = 0.25, one run each) [E6.16]. We do not know whether effort xhigh closes this
+  gap on coding tasks.
 - **An error in our record.** Our record said for some hours that KL-table B had one cut against the shipped map. The
-  model files show two (Section 4.3). We now read bit maps from the model files, not from map tables [E5.19].
+  model files show two (Section 4.4). We now read bit maps from the model files, not from map tables [E5.19].
 - **One fragile item.** Three recall-gate failures (KL-table A and the uniform and HAWQ-style baselines) are on that
   one code copy; in the baselines the body was exact
   and the comment line above the function was copied too. The gate counted all three, as written, and the text treats
@@ -940,12 +1090,12 @@ byte split costs far more [E2.10].
   GPUs. On the harder split the run of the shipped file in BF16's setup removes that difference for two seeds
   [E5.5]. The Inkling official-weights arms differ from ours in the weights, the K/V precision and the card class;
   they have no weights-only arm [E4.8, E5.23].
-- **Setup against setup.** The Inkling rows of Section 4.5 compare two shipped products. The comparison with the
-  setup equal is Section 4.6. Two Unsloth task-runs on seed 105 did not finish (bound given).
+- **Setup against setup.** The Inkling rows of Section 4.6 compare two shipped products. The comparison with the
+  setup equal is Section 4.7. Two Unsloth task-runs on seed 105 did not finish (bound given).
 - **The golden set and a third party's calibration text.** Five of our 298 Inkling golden documents overlap the
   calibration text of the LookAtMyQuant files; we give the comparison with and without them [E5.25]. We measured only
   the old file of that project; its newer file is not yet measured on our golden set [E5.24].
-- **Copy-row KL** saturates and its meaning is unclear (Section 4.6).
+- **Copy-row KL** saturates and its meaning is unclear (Section 4.7).
 - **Runtime repair on tasks.** The per-class K/V choice changed KL and memory but not pass / fail recall (blanket
   arms were full at every depth) and not graded recall margins at a resolution of about 0.2 nats. On AppWorld only
   the global cache type was varied on fixed weights (4-bit 595 vs 8-bit 596 of 672 [E4.12]); the blanket settings
@@ -966,17 +1116,23 @@ byte split costs far more [E2.10].
 - **Every missed line.** Table 10 lists every pre-written line that a run missed and what we did.
 
 *Table 10. Every pre-written line that a run missed, and what we did. Lines that rejected a candidate map or repair
-are in Table 3 and Section 5. The first block is new in version 1.1.*
+are in Table 3 and Section 5. The first block is new in version 1.2, the second in version 1.1.*
 
 | Line (written before the run) | Measured | What we did | Ref. |
 |---|---|---|---|
+| The KL-only winner and KL-table B at temperature 0 are each within 17 of the shipped file (their loss is slip damage) | 322 and 312 (shipped 330) | not met: KL-table B is one task below; reported per map | [E6.7] |
+| One targeted sentence at medium effort lowers the unasked-answer habit (exact McNemar p < 0.05) | 10 vs 13, p 0.65 | not shown | [E6.10] |
+| The sentence does not suppress asked answers (missing answers rise by 2 at most, passes drop by 3 at most) | missing answers 0 vs 0; passes 43 vs 47 | failed as written by one task; no asked answer was stopped | [E6.10] |
+| The candidate map (KL-tools-2) ships only if AppWorld is level or positive | 666 vs 670 (and BFCL 492 vs 505) | held; the file is kept | [E6.14] |
+| The coded bias, switched on, lowers the habit (forced read) | it raises it: -0.951 against a floor of 0.079 | the bias stays off | [E6.12] |
+| Gradient map: a PyTorch forward equal to the engine's margins within 0.005 nats | max 0.041 | stopped before any gradient | [E6.13] |
 | The band alone (down-projections of layers 20-27 at 2 bits in the shipped map) is below the shipped file, p < 0.05 | 671 vs 670 | not met; no band rule | [E5.12] |
 | KL-table B with the down band restored is not below the shipped file and is above KL-table B | 627: below the shipped file (seed-level p 0.045); above KL-table B only at the task level (seed-level p 0.089) | not met; the cause of the remaining gap is open | [E5.14] |
-| The uniform and HAWQ-style maps are below the shipped file (p < 0.05) and under 640 | 630 and 637; task-level p 0.0045 and 0.022; seed-level p 0.077 and 0.15; seed 107 only | met as written at the task level; not kept at the seed level; no loss claimed | [E5.13] |
+| The uniform and HAWQ-style maps are below the shipped file (p < 0.05) and under 640 | 630 and 637; task-level p 0.0045 and 0.022; seed-level p 0.094 (without the doubled shard) and 0.15; seed 107 only | met as written at the task level; not kept at the seed level; no loss claimed | [E5.13] |
 | The agent loss of the lower-KL maps grows with context length | the direction is the opposite | not shown | [E5.10] |
 | The band damage concentrates on one token class | spread over four classes | not met | [E5.16] |
-| The two-stage head lifts the score | 670 with it, 687 without it (seed-level p 0.36) | not shown | [E5.6] |
-| The head repair improves agent work | 687 vs 670 (seed-level p 0.41) | not shown on tasks | [E5.17] |
+| The two-stage head lifts the score | 670 with it, 687 without it (+14 without the doubled shard, seed-level p 0.44) | not shown | [E5.6, E6.3] |
+| The head repair improves agent work | 687 vs 670 (+15 without the doubled shard, seed-level p 0.46) | not shown on tasks | [E5.17, E6.3] |
 | Sharpness explains the agent ordering | every map is flatter than BF16 | not met | [E5.8] |
 | BF16 fails by running out of steps more than the shipped file | 3.8 % vs 6.1 % of the failed runs | not shown | [E5.9] |
 | KL-tools is worse than the shipped file on chat documents (mean and median) | mean above with an interval that holds 0; median lower | "two documents, not the class" | [E5.11] |
@@ -1002,27 +1158,35 @@ are in Table 3 and Section 5. The first block is new in version 1.1.*
 
 We did not invent the quantizer, the trellis codec, or the 27B bit map, which is L0xRE-V2 by YourHighnessLA. We did
 not find a better 27B map that we could ship. The method found and repaired damage in context: KL-tools scores 70
-task-runs above the KL-only winner (seed-level p = 0.0017) and is level with the published allocation on agent work
-at 7.9 % lower KL. It thinks much longer than the published allocation on one deep item in free generation and so
-failed a line written before the run; a forced reading under BF16 shows that this is not damage (both files share the
-departure from BF16, and after it BF16 prefers the long reply). The shipped build keeps the published allocation
-because of the failed line, not because of shown damage. We did not explain the lead of the 2.47-bit file over BF16 at temperature 1.0, and at temperature 0 it is not
-significant. On Inkling 2 Mini our rule chose the map and
-the K/V setting; the measured value of the per-group map over a uniform one is in long-range copy margin, not in KL
-and not in agent work, and a public file with exact down projections has more copy margin than ours. The method
-kept six other changes out of that release (Section 5), held one public claim on fresh seeds, and its harness gate
-caught an engine fault that the KL gate passed. The engine fault came from our own porting, and the fix came from
-upstream work by others. The statistics of versions 1.0.x were too optimistic, and this version corrects them.
+task-runs above the KL-only winner (seed-level p = 0.0017), its 8 raised projections carry the gain, and it is level
+with the published allocation on agent work at 7.9 % lower KL. Class-level KL found that repair, not a task probe.
+KL-tools thinks much longer than the published allocation on one deep item in free generation and so failed a line
+written before the run; a forced reading under BF16 shows that this is not damage in the new map (both files share
+the departure from BF16, and after it BF16 prefers the long reply). A second candidate, with lower KL than the shipped
+file and every other gate passed, was held because both agent benchmarks came out a little negative. The shipped
+build keeps the published allocation because of these lines, not because of shown damage. We found where the lead
+of the 2.47-bit file over BF16 at temperature 1.0 sits (one end-of-task habit of the base model, at a lower rate), but
+not why a bit map changes that rate. At temperature 0 the lead is not significant. On Inkling 2 Mini our rule chose
+the map and the K/V setting; the measured value of the per-group map over a uniform one is in long-range copy
+margin, not in KL and not in agent work, and a public file with exact down projections has more copy margin than
+ours. The method kept six other changes out of that release (Section 5), held one public claim on fresh seeds, and
+its harness gate caught an engine fault that the KL gate passed. The engine fault came from our own porting, and the
+fix came from upstream work by others. The statistics of versions 1.0.x were too optimistic; version 1.1 corrected
+them (Appendix B).
 
 ## 8. Future work
 
-The results point to instruments that this paper does not have. We name four directions and claim no result for
+The results point to instruments that this paper does not have. We name five directions and claim no result for
 any of them. (1) Probes of fidelity to the reference: count the places where a map changes the reference's own
 choice, in place of an average distance. (2) Near-tie fragility: judge an item by the reference's own gap between
 its two best tokens, so that a flip at a near tie is not read as damage. (3) Drowning tests: for each repair that
 adds bits to a group, test the mirror map that removes them, to find groups whose bits buy nothing. (4) Signals
-inside the model, validated by planted damage before any use. For the agent benchmark itself: per-call seeds
-(Section 4.1), three or more seeds for each comparison, and a temperature-0 arm.
+inside the model, validated by planted damage before any use. (5) Decision-aware probes: count the end-of-task
+decision of Section 4.3 on the model's own agent paths, for each map and each reasoning effort, before any agent run.
+A gradient map from the reference's decision margins was planned for this; its forward pass did not match the
+engine within the line (0.041 nats against 0.005), so it stopped before any gradient [E6.13]. For the agent benchmark
+itself: per-call seeds (Section 4.1), three or more seeds for each comparison, a temperature-0 arm, and a full arm at
+effort xhigh on fresh seeds.
 
 ## 9. Related work
 
@@ -1067,8 +1231,11 @@ decided what ships and what is claimed. Every number in this paper is read from 
 
 An LLM assistant also wrote the adversarial review of the first draft, at the author's request and with access to
 the private record. The three stop-rule tests (B1, the naive file, test_challenge) came from that review. The review
-continued for this version: it asked for the baselines, the controls and the seed-level statistics of the second
-batch, and lab agents ran them. It is not an independent peer review.
+continued for version 1.1: it asked for the baselines and the controls of the second batch, and lab agents ran them.
+The review did not ask for the seed-level statistics: the lab found the shared seed stream while it compared the
+transcripts of passing and failing runs (Section 4.1). A second LLM review, of version 1.1, gave the text changes of
+version 1.2 and two recomputed numbers, which we recomputed from the per-task files [E6.1, E6.2]. Neither review is an
+independent peer review.
 
 ## Acknowledgements
 
@@ -1084,9 +1251,9 @@ Guyton, Strike3D, Ankit Khandelwal, Mark Schatza, Jason Titus, Tomer Weller (eng
 Unsloth (the Inkling build and GGUFs we compared against, and the UD-Q8_K_XL file we used to run the official
 weights) and ShinMegamiBoson (LookAtMyQuant); Piotr Wilkin (llama.cpp Inkling 2 support and the DSpark drafter
 code we ported); Aldehir Rojas (the llama.cpp Inkling chat parser and the grammar-trigger guard whose absence in our
-port caused the harness failures of Section 4.7, and the lazy-grammar reasoning gating); Alexey Fateev (alesha-pro)
+port caused the harness failures of Section 4.8, and the lazy-grammar reasoning gating); Alexey Fateev (alesha-pro)
 and Peasant Smith and the Project Maya contributors (the per-token launch-overhead measurement on Inkling 2 Mini and
-the idea to fuse its glue launches); Killy (the voxel-pagoda prompt behind the bad-token check); the authors of HumanEval and
+the idea to fuse its glue launches); Killy (the voxel-pagoda prompt behind the bad-token check); DogukanUrker (the PatchEval board and its public traces); the authors of HumanEval and
 AppWorld.
 No person or company named here endorses this work.
 
@@ -1166,6 +1333,9 @@ Models via Expert-Balanced Sampling and Affinity Guidance. ICML 2025. arXiv:2505
 [Nosek et al.] B. A. Nosek, C. R. Ebersole, A. C. DeHaven, D. T. Mellor. The preregistration revolution. PNAS
 115(11):2600-2606, 2018.
 
+[PatchEval] DogukanUrker. PatchEval: repository-repair tasks for coding agents. Board and public dataset
+DogukanUrker/PatchEval, 2026. <https://patcheval.dogukanurker.com/>
+
 [Prereg-ML] S. Albanie, J. F. Henriques, L. Bertinetto, A. Hernandez-Garcia, H. Doughty, G. Varol (eds.). NeurIPS
 2021 Workshop on Pre-registration in Machine Learning. PMLR 181, 2022.
 
@@ -1219,3 +1389,53 @@ arXiv:2406.11235.
 | seed-level statistics | G-G, G-G2 | the design-effect test and the cluster-robust interval |
 | tests of the first batch (agent ablation, selection effect, K/V ablation, graded K/V, graded baselines) | G-A1, G-A2, G-C, G-C2, G-B2 | test names in `evidence/LINES.md` |
 | tests of the second batch | W2-A to W2-U, W3-C, W3-E, W3-T, W4-L | test names in `evidence/LINES.md` |
+| KL-tools-2 (the held candidate) | V5td-h32 | KL-tools with 26 projections back at the shipped widths |
+| raises-only map, cuts-only map | R8c-h32, C13c-h32 (W6-R) | the KL-only winner with only the 8 raises, or only the 13 cuts, of KL-tools |
+| unasked answer; unasked answer only; pass + unasked only | history row A12; A12-only; pass + A12-only (L-S2) | the end-of-task class of Section 4.3 |
+| tests of version 1.2 | W6-R, W7-X, W7-A, W7-S, W8-S, W9-V, W10-T, L-S2 | test names in `evidence/LINES.md` |
+
+## Appendix B. Version history
+
+**Version 1.2 (2026-11-26).** Text and evidence. No run was made for this text; the new results come from lab runs
+made after version 1.1, and the review items from a second LLM review of version 1.1:
+
+- The title now says what the method does (it gates on tasks); class-level KL, not a task probe, found the repair.
+- The temperature claim is narrowed: at temperature 0 the lead is +11 [-5, +28], and one greedy run cannot show
+  whether it is smaller than at 1.0; the difference of the two leads does not keep p < 0.05 at the seed level (E6.1).
+  A descriptive split of each arm's temperature-1.0 runs by its greedy result is added (Table 1b, E6.2).
+- New Section 4.3: the mechanism of the lead over BF16, one end-of-task habit of the base model (the unasked answer),
+  with its post hoc limits; the maps at temperature 0; reasoning effort xhigh lowers the habit on a targeted set, one
+  targeted sentence does not; the coded bias stays off (E6.4, E6.6-E6.12).
+- The repair split: the 8 raised projections carry the gain of KL-tools; with the band test, an interaction (E6.5).
+  KL-tools on four seeds (E6.6). A held candidate, KL-tools-2 (E6.14).
+- Clean numbers for two doubled shards: uniform -37 (p 0.094), head off +14 (p 0.44), head repair +15 (p 0.46); no
+  verdict changes (E6.3).
+- Inkling 2 Mini is named as another lineage; new Section 4.9 on readings across compressions of one base.
+- Vault 9: the two early departures are damage that both files share, not damage in the new map.
+- The AI-use statement is corrected: the lab, not the review, found the shared seed stream.
+- A coding-agent audit is added to the limitations as a description (E6.16). The abstract is cut to about 260
+  words, and this appendix holds the version history.
+
+**Version 1.1 (2026-11-24).** A second batch of tests (17 new arms, about 14,500 more task-runs, most of them on the
+harder agent split) and a correction of the statistics of versions 1.0.x. Those versions tested every AppWorld
+comparison with an exact sign test over task-runs; Section 4.1 shows that the task-runs of one seed share one random
+stream, so those p-values were overstated. Under the seed-level method:
+
+- Keep p < 0.05: shipped above BF16 on the harder split at temperature 1.0 (four seeds); the same file above BF16 in
+  BF16's setup; KL-tools above the KL-only winner; the KL-only winner and KL-table B below the shipped file; our
+  Inkling build above the public 2-bit file with the setup equal; the shipped file above the naive 2-bit file. The
+  three tests of the stop rule of version 1.0 keep their verdicts at their family alpha of 0.0167 (the two AppWorld
+  tests have seed-level p = 0.0056 and 0.0078) [E5.1, E5.28].
+- Do not keep it: the losses of the uniform and the HAWQ-style maps on the harder split (Section 4.4); the partial
+  recovery of one flip map (Section 4.4); and three results on the selection seeds that versions 1.0.x already
+  reported as not replicated or withdrawn (the loss of the KL-only winner there, p 0.019 at the task level and 0.13
+  at the seed level; the lead of 21 over BF16, 0.0025 and 0.057; a public head-to-head, 0.0079 and 0.090) [E5.28].
+
+Version 1.1 also replaced the scope sentence of version 1.0.3 (the method found and repaired damage in context), made
+the Inkling headline a task result in place of a KL ratio (a uniform map at the same bytes keeps 93 % of the KL gap),
+named the measured LookAtMyQuant file exactly, and corrected one error of the record (KL-table B has two cuts against
+the shipped map, not one).
+
+**Versions 1.0-1.0.3 (2026-11-23).** The first public version (1.0) with the three tests of the stop rule; then
+presentation fixes (1.0.1), text corrections against the held-out recall test (1.0.2) and a scope statement (1.0.3).
+No result changed in 1.0.1-1.0.3. `CHANGELOG.md` of the evidence repository gives each item.
