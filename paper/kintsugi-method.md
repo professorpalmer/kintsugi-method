@@ -1,29 +1,30 @@
-# Kintsugi: Gate Low-Bit Quantization on Tasks, Not on Average Error Alone
+# Kintsugi: Task-Gated Repair Reaches Full-Precision Agent Scores at 2.5 Bits
 
 Cary Palmer
 
-*Version 1.2 (2026-11-26). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one. Appendix B lists what each version changed.*
+*Version 1.3 (2026-11-27). Every number cites a row of `evidence/EVIDENCE.md` as [E#.#]; `README.md` says how to recompute each one. Appendix B lists what each version changed.*
 
 ---
 
 ## Abstract
 
-Low-bit quantization of language models is usually tuned on an average error, such as the KL divergence to the
-full-precision model. The Kintsugi method gates every change on task probes next to KL, with each
-pass line written before its run, and confirms on data that no choice used. On two models that fit one 12 GB
-GPU:
-(1) On Qwen3.8-27B at temperature 1.0, a 2.47-bit build scores above BF16 on AppWorld test_challenge on four of four
-seeds (+117 of 1,668 task-runs; seed-level p = 5.1e-4), also in BF16's setup. Almost all of the gap is one
-end-of-task habit of the base model: on an action task, the run passes an unasked answer and fails. BF16 does this
-in 258 runs, the build in 112; with these runs counted as passes (a post hoc class), the two are level. At
-temperature 0 the lead is +11 [-5, +28]. Reasoning effort xhigh lowers the habit (3 against 13 runs on a targeted
-set); one targeted sentence does not.
-(2) Average KL does not rank bit maps: six maps of one size score 586 to 680 of 834. A class-level KL table found
-a repair worth 70 task-runs, and 8 raised projections carry it.
-(3) Lines written before the runs held two lower-KL maps out of the release.
-(4) On Inkling 2 Mini, another lineage, our build scores above a public 2-bit file with the setup equal
-(598 against 579 of 672; p = 0.019); the 27B allocation rule did not carry over.
-We did not invent the quantizer, the trellis codec or the 27B bit allocation.
+Low-bit quantization of language models is usually tuned on an average error such as KL divergence. The Kintsugi
+method gates every change and every repair on task probes next to KL, with pass lines written before each run. On two
+model families, the 12 GB builds that came out of this loop, at about 2.5 bits per coded weight, reach the AppWorld
+scores of the full-precision weights: on Qwen3.8-27B the shipped build (the published bit allocation with our fits,
+head and runtime) and the map that the loop repaired; on Inkling 2 Mini our map (596 against 592 of 672). On the 27B
+model, average KL would have picked lower-scoring maps. Such results sit at single decisions that a benchmark total
+hides: decision-point habits. We detect one by a turn-type split, replay the deciding call on a frozen history, and
+locate it by tensor copies between files.
+(1) Qwen3.8-27B, BFCL: when a held-back tool returns, the model often says the tool is absent although the new tool
+list is in its prompt. At temperature 0.001 in one setup, BF16 misses 61 of 200 such turns and the 2.47-bit
+build 36 (p = 1.1e-4). Stripping earlier thinking removes 40-62 % of the build's misses. Tensor copies pointed at the
+fits of two same-map files on the public entries; on the development half of a fresh private set that gap was not
+shown, and a graft chosen there was not confirmed on the sealed half.
+(2) Inkling 2 Mini, a pre-registered confirm on fresh tasks: the first reply that the client receives has no code in 46 % of
+calls for the official weights, 45 % for a public 2-bit file and 11 % for our map; no task cost is shown.
+No build was made to change a habit. A map built to remove one, confirmed on held-out turns, is the open step. We did
+not invent the quantizer, the trellis codec or the 27B bit allocation.
 
 ## 1. Introduction
 
@@ -35,10 +36,47 @@ KL divergence [Unsloth; LookAtMyQuant]). Task accuracy is then measured once, at
 
 This paper reports what happened when we gated every bit map and every runtime setting on tasks that users of a
 12 GB build run: recall of an exact fact or a code function 117k-245k tokens back, long chat answers, and a
-multi-step agent benchmark. Version 1.2 adds the mechanism of the agent result: a reading of every failed run of
-the second batch, and four tests that followed from it (Section 4.3).
+multi-step agent benchmark. Version 1.2 added the mechanism of the agent result: a reading of every failed run of
+the second batch, and four tests that followed from it (Section 4.3). Version 1.3 makes that reading a procedure and
+applies it to a second decision of the 27B model and to a second model family (Section 4.10).
 
-**Main results.**
+**The central result of this version: decision-point habits** (Section 4.10). A benchmark total can hide a choice
+that a model makes at one kind of turn. We give a procedure with four steps (detect, freeze and replay, locate,
+repair) and we do the first three.
+
+- *Detect.* A candidate map has level totals on two agent benchmarks. A split by turn type shows one turn where it
+  differs. When a held-back tool comes back (BFCL), it gives no call in 48 of 198 entries, against 28 of 199 for the
+  shipped file [E7.1].
+- *The mechanism.* In most of these misses the model says that the tool is not there, while the updated tool list is
+  in its prompt. It keeps its earlier belief over the tool block [E7.3].
+- *Replay.* One frozen history and one call per entry repeat the gap in about 35 minutes for each file. On the frozen
+  turn we tested the wording, the sampler, the thinking of earlier turns (stripping it removes 40 % to 62 % of the
+  shipped file's misses) and the parent. In one setup at temperature 0.001, BF16 misses 61 of 200 return turns and
+  the shipped file 36 [E7.4-E7.7].
+- *Locate.* On the public entries, tensor copies between two files with one bit map suggest that the fits carry
+  their gap, and that the head and the other tensors do not. The result does not hold under every miss rule. On a
+  fresh private set the gap between the two files is not shown on the development half (same direction, smaller),
+  and one of the four leads shows again. A graft that we chose on that half was not confirmed on the sealed half. We
+  call the result suggestive only [E7.9, E7.15, E7.16].
+- *A second family.* On Inkling 2 Mini, a pre-registered confirm on fresh tasks passed its three lines. At the first
+  call of a task, the first reply that the client receives has no code in 46 % of the calls for the official weights, 45 % for a public 2-bit
+  file and 11 % for our map. This decision has no measured task cost: it marks a departure from the parent that the
+  task total does not show [E7.11, E7.13].
+- *The open step.* Neither build was made to change a habit. A map that is built to remove a habit, and then
+  confirmed on held-out turns, is the step that this paper does not have.
+
+**What the title says.** On both families, the builds that came out of the task-gated loop reach the AppWorld
+scores of the full-precision weights (Section 2 defines the term). On Qwen3.8-27B these are the shipped build and the
+map that the loop repaired. The shipped build is the published bit allocation with our fits, an exact head and our
+runtime settings, each change gated on tasks. It is level with BF16 on the standard split, and above BF16 at
+temperature 1.0 on the harder split [E3.7, E3.16, E5.4]. The repaired map (KL-tools) was found by class-level KL and
+gated on tasks. It is level with the shipped build on four seeds of the harder split, and above BF16 on the same
+seeds [E6.6]; it did not ship (Section 4.4). On Inkling 2 Mini the build is M2: the loop chose its map and repaired
+its K/V setting by cache class, and it scores 596 against 592 of 672 for the official weights [E4.8]. So "repair" in
+the title is the loop (diagnose, locate, repair, gate), not the 27B bit allocation, which is the published one
+(Scope, below). Both builds have about 2.5 bits per coded weight: 2.47 and 2.44 [E4.1, E2.5].
+
+**The other main results.**
 
 1. **At temperature 1.0, a 2.47-bit build scores above BF16 on the harder agent split, and at that temperature the
    lead is in the weights** (Section 4.2). The shipped 27B file leads BF16 on AppWorld test_challenge on each of
@@ -79,6 +117,9 @@ the second batch, and four tests that followed from it (Section 4.3).
 
 **Contributions.**
 
+- A procedure for decision-point habits (detect by turn type, freeze and replay, locate by tensor copies) on two
+  model families, with a blind recount of every cell count, and a plain statement of the step that is missing
+  (Section 4.10).
 - A reproducible loop (Section 3; full version in the supplement `evidence/ALGORITHM.md`): fit once, diagnose with KL and
   task probes, locate with one-group flips, repair under a byte budget, gate with pre-written lines, confirm on
   fresh data, and keep failures in the record.
@@ -119,9 +160,10 @@ recompute every statistic and figure: the [evidence repository](https://github.c
 coded projections, each at 2 or 3 bits per weight (K2 / K3) [E4.1]. (b) Inkling 2 Mini: 24 layers, 128 routed experts
 (top-8) per layer, layers 6-17 run three times with shared weights (48 layer applications, each with its own K/V
 cache), 4 global-attention and 20 sliding-window layers; the official release is NVFP4 / MXFP8, with no BF16 release
-[E4.2]. Its reference is the official weights themselves (NVFP4 / MXFP8, not BF16), run as Unsloth's UD-Q8_K_XL file,
-whose every tensor equals our exact dequantization of the official release (max abs diff 0) [E4.10]. We call them
-"the official weights", not "full precision".
+[E4.2]. Its reference is the official weights themselves (NVFP4 / MXFP8), run as Unsloth's UD-Q8_K_XL file,
+whose every tensor equals our exact dequantization of the official release (max abs diff 0) [E4.10]. In this
+paper *full precision* means the weights as their authors released them: BF16 for Qwen3.8-27B, and for Inkling 2 Mini
+the official NVFP4 / MXFP8 release, which has no higher-precision form. The text calls them "the official weights".
 
 **Codec and fits.** Every coded projection is an EXL3 trellis code [QTIP; EXL3] in the Escha W2 layout (EXL3 code
 with Hadamard input / output scales) [Escha W2], fitted with exllamav3's quantizer.
@@ -156,6 +198,11 @@ loop layout [E1.23].
   Qwen maps ("selection seeds"); 102-105 (test_normal) and 106-109 (test_challenge) were never used for a choice
   ("fresh"). Seeds 119-124 (test_challenge) belong to the effort tests of Section 4.3; none chose a map. Inkling:
   102-105 and 108-111 (test_normal), 112 + 113 (test_challenge); no Inkling choice used AppWorld.
+- *Return-turn replay.* BFCL v3 multi-turn [BFCL], category miss_func (200 entries), temperature 0.001. The unit is
+  the first model call of the turn in which a held-back function comes back, sent again to each file on a recorded
+  history. Two miss rules; exact sign tests on paired units (Section 4.10).
+- *First-call replay.* The first call of an AppWorld task, built by the benchmark's own agent code: one call for each
+  task and seed, with an output cap of 1,024 tokens. The score is whether the reply has a code block (Section 4.10).
 - *Agent statistics.* For each comparison we give the difference in task-runs, the difference on each seed, a
   design-effect p and a cluster-robust 95 % interval (Section 4.1). "Seed-level p" means the design-effect p. Where we
   quote a task-level p (the exact sign test on discordant task-runs), we say so; it is too small by an unknown
@@ -198,6 +245,9 @@ before the check (the same task repeated on our build and on a reference build, 
 probabilities at the failing step), and keep the failed gate in the record whatever the check says [E1.25]. *No map
 tuned to one item:* when a single gate item fails, do not tune a map until that item passes; a map that passes it can
 move the failure to other items (Section 6) [E5.26].
+
+Version 1.3 adds a procedure for single decisions next to this loop: detect a turn type where two files differ,
+freeze one history and replay the deciding call, and locate the difference by tensor copies (Section 4.10).
 
 ## 4. Experiments
 
@@ -426,6 +476,11 @@ unasked answer is an error by the rules of the benchmark, and the prompt states 
 fixed phrases, not a reading of each text. There is one harness, one prompt (its one worked example is a question and
 ends with `answer=`) and one sampler chain. The effort test is one seed on a selected set of 70 tasks, in a later
 release launcher (v1.1.6, tool layer on): it is a lead for a full arm, not an AppWorld score.
+
+**The first case of a pattern.** The unasked answer is a habit at one decision point: one kind of turn, one choice, a
+rate that the files change. We found it by a reading of failed runs. Section 4.10 makes the reading a procedure
+(detect, freeze and replay, locate) and gives two more cases: a second decision of this model, and a decision of a
+second model family.
 
 ### 4.4 Average KL does not rank bit maps
 
@@ -934,6 +989,10 @@ what these ideas do in his file. The new file is not yet measured on our golden 
 | Agent against a public 2-bit file, one engine | 292 vs 256 of 336 (a K-quant file) [E1.32] | 598 vs 579 of 672 [E5.22] |
 | Code (health gate) | HumanEval 159-161 / 164 [E4.9] | HumanEval 158 / 164 [E4.11] |
 
+**A decision that these totals hide.** The AppWorld totals of M2 and of the official weights are level. Section 4.10
+shows one decision at which the two files differ by a wide margin, the first call of a task, and shows that the
+difference has no measured task cost.
+
 ### 4.8 Faults outside the weights (Inkling 2 Mini)
 
 The release candidate engine passed its
@@ -963,7 +1022,7 @@ The 27B files of this paper are compressions of one base model: the shipped file
 of Table 1c, beside BF16 itself. We read such a set with a fixed rule. A behaviour that is in every compression and in
 the reference is a trait of the base. A behaviour that the compressions share and the reference does not is shared
 damage of what the files share (the codec and most of the fits). A behaviour in one map only is a candidate for damage
-in that map. Three readings follow.
+in that map. Four readings follow.
 
 1. *The unasked answer* (Section 4.3) is in BF16 and in all eight quantized arms: a trait of the base. The maps
    change its rate, from 4.7 % to 17.3 % of the task-runs [E6.4].
@@ -973,11 +1032,481 @@ in that map. Three readings follow.
 3. *Blind instruments.* KL, the recall margins and the held-out recall test did not see the free-generation change
    (Section 6), and the teacher-forced agent-trace probe did not see a known loser (Section 3). Each is blind in the
    same way on every map.
+4. *The returned tool* (Section 4.10): BF16 and every quantized file that we ran miss the return turn of BFCL
+   miss_func. It is a trait of the base. The files change its rate: in one setup, from 36 of 200 (shipped) to 61 of
+   200 (BF16) [E7.4].
 
-For the next compression of the same base, these are known before any run: the habit to count, the tokens where the
+For the next compression of the same base, these are known before any run: the habits to count, the tokens where the
 quantized files tend to leave the reference, and the instruments that cannot see a given failure. They are a product
 of the method. They did not carry to another lineage: on Inkling 2 Mini the down-projection rule of the 27B model did
-not hold (Section 4.7).
+not hold (Section 4.7). The reading itself did carry: on Inkling 2 Mini the first-call decision is in the official
+weights and in a standard quant at one rate, and M2 changes that rate (Section 4.10).
+
+### 4.10 Decision-point habits: detect, replay, locate
+
+Section 4.3 found that one decision carries a benchmark gap. This section makes that reading a procedure. It applies
+the procedure to a second decision of the 27B model and to a second model family.
+
+A *decision-point habit* is a choice that a model makes at one kind of turn, at a rate that a count over many entries
+can measure. The procedure has four steps.
+
+1. **Detect.** Split a benchmark by turn type. Look for a turn type where two files differ.
+2. **Freeze and replay.** Record one history. Send the one call that decides the turn to each file again.
+3. **Locate.** Copy tensors between two files, and count again.
+4. **Repair.** Build a map that removes the habit. Confirm it on turns that no step used.
+
+This paper does steps 1 to 3. Step 4 is open: we state this at the end of the section. "Habit" means what these
+benchmarks punish, or what they count. It is not a general statement of quality.
+
+**Detect: the totals are level, and one turn type is not.** BFCL v3 multi-turn [BFCL] has 800 entries in four
+categories. In the category miss_func, one function is held back at first. A later turn (the *return turn*) puts it in
+the tool list, with the fixed user line "I have updated some more functions you can choose from. What about now?". The
+ground truth has calls at every return turn. We ran a third candidate map, KL-tools-3 (KL-tools with 29 projections
+set back to the shipped widths; it passed our long-copy gates). Its totals are level with the shipped file: 493
+against 505 of 800 on BFCL (scenario p = 0.34), and 1,354 against 1,335 of 1,668 on AppWorld test_challenge (four
+fresh seeds, seed-level p = 0.53) [E7.1]. A split of the BFCL entries by turn type showed one cell. At the return turn
+KL-tools-3 gave no tool call in 48 of 198 entries, and the shipped file in 28 of 199 (paired 29 / 9, exact sign
+p = 0.0017). This cell is 1 of about 10 turn classes, and we found it after the run [E7.1]. A repeat of that turn on
+our workstation gave 57 of 198 against 32 of 200 (paired 35 / 10, p = 2.5e-4) [E7.2].
+
+**Freeze and replay.** The benchmark records could not be replayed. The harness keeps the calls, but 63 % of the
+tool-call replies also hold a short text before the call, and the record does not keep it [E7.2]. So we ran each of
+the two files again on our workstation with every request kept: the official multi-turn loop, cut after the return
+turn. HS\* is the history that the shipped file made (200 entries). HT\* is the history that KL-tools-3 made (198
+entries; two entries are out). A *unit* is the first model call of the return turn of one entry on one history. The
+replay sends that exact request to a file, with the prompt cache off, at the benchmark's temperature (0.001) and with
+the same seed. One cell (one file on one history) takes about 35 minutes on one 12 GB card. The benchmark run takes
+about 9 hours of model time.
+
+Checks of the instrument [E7.2]: every replay prompt has the token count of the live call (200 of 200 and 198 of
+198). Two repeats of one cell, one with the same seeds and one with other seeds, gave the same outcome on 200 of 200
+units. At this temperature the replay is deterministic. The replay of a file on its own history equals its live call
+on 95.0 % (shipped) and 89.4 % (KL-tools-3) of the units; the live calls ran on the workstation and the replays on a
+rented box with the same card type.
+
+**Two miss rules.** Rule 1: the reply has no tool call. This is the rule of the study's plan, and every line was
+written for it. Rule 2: no call names the returned function. We added rule 2 after the first results, so it is
+exploratory. It is stricter: a reply that calls other functions is a miss. Table H1 gives both rules for every
+comparison. We say which results hold under both.
+
+*Table H1. The return turn. Misses of file X against file Y on the same requests, under both rules: counts, then the
+units where only X misses / only Y misses, then the exact sign p. "Both, by entry": the entry is the unit and the two
+histories are summed (the plan's pooled test); the first number is the difference in misses. All cells are
+near-greedy (temperature 0.001) except the sampling row [E7.2, E7.4-E7.7, E7.9].*
+
+| X against Y | History | Rule 1: no call | Rule 2: returned function not called |
+|--------------------------------|-------------|-----------------------------|-----------------------------|
+| KL-tools-3 against shipped | HS\* (200) | 48 / 40; 17 / 9; p = 0.17 | 80 / 61; 31 / 12; p = 0.0054 |
+| | HT\* (198) | 58 / 31; 31 / 4; p = 3.5e-6 | 84 / 59; 32 / 7; p = 7.0e-5 |
+| | both, by entry | +35; 40 / 10; p = 2.4e-5 | +44; 51 / 14; p = 4.5e-6 |
+| BF16 against shipped, one 80 GB card, one setup | HS\* | 61 / 36; 33 / 8; p = 1.1e-4 | 77 / 59; 33 / 15; p = 0.013 |
+| KL-tools-3 against shipped, the same card and setup | HS\* | 53 / 36; 24 / 7; p = 0.0033 | 81 / 59; 33 / 11; p = 0.0013 |
+| BF16 against KL-tools-3, the same card and setup | HS\* | 61 / 53; 23 / 15; p = 0.26 | 77 / 81; 22 / 26; p = 0.67 |
+| Shipped with earlier thinking stripped, against shipped | HS\* | 14 / 40; 6 / 32; p = 2.4e-5 | 31 / 61; 5 / 35; p = 1.4e-6 |
+| | HT\* | 13 / 31; 6 / 24; p = 0.0014 | 41 / 59; 7 / 25; p = 0.0021 |
+| KL-tools-3 against shipped, both with thinking stripped | both, by entry | +12; 16 / 4; p = 0.012 | +6; 12 / 5; p = 0.14 |
+| Wording (a), KL-tools-3 against shipped | both, by entry | 13 / 5 misses; +8; 10 / 3; p = 0.092 | 66 / 60 misses; +6; 13 / 7; p = 0.26 |
+| Wording (b), KL-tools-3 against shipped | both, by entry | 91 / 78 misses; +13; 29 / 15; p = 0.049 | 268 / 255 misses; +13; 34 / 21; p = 0.10 |
+| Wording (c), KL-tools-3 against shipped | both, by entry | 97 / 28 misses; +69; 58 / 5; p = 1.7e-12 | 127 / 63 misses; +64; 56 / 8; p = 5.6e-10 |
+| Sampling, three seeds, KL-tools-3 against shipped | both, by entry | 350 / 210 of 1,194; +140; 91 / 22; p = 3.7e-11 | 511 / 370 of 1,194; +141; 102 / 28; p = 4.4e-11 |
+| Second-fit file against shipped | HT\* | 46 / 31; 29 / 14; p = 0.032 | 70 / 59; 30 / 19; p = 0.15 |
+| | both, by entry | +26; 47 / 25; p = 0.013 | +23; 51 / 29; p = 0.018 |
+
+**The replay is valid, and the gap depends on the history.** The plan's line asked for the gap on one history or
+more (10 misses or more, p < 0.05), or on both together. Under rule 1 the gap is on HT\* (+27) and on both together
+(+35), and not on HS\* (+8, p = 0.17). By the plan's wording the reading is "mixed": the weights effect is larger on
+the history that the candidate made, and neither history effect is shown alone [E7.2]. Under rule 2 the gap is on
+both histories (+19 and +25). The plan's set for the locate step is HT\*, and its gap there is 27 misses.
+
+**The mechanism: the model says that the tool is not there.** The updated tool list is in the prompt of every unit.
+In most misses the reply, or the thinking before it, says that the tool is absent ("I still don't see a ... function
+in my available toolset", "these are the same tools"). Often the reply recites the old list. Counts of such misses: 46
+of 58 for KL-tools-3 on HT\*, 24 of 31 for the shipped file on HT\*, and 53 of 61 for BF16 on HS\* [E7.3]. So most
+misses are not a choice of text over a call. The model keeps its earlier belief about its tools over the tool block
+in front of it. Under wording (c), where the user names the new function, 50 of 50 misses of KL-tools-3 and 13 of 14
+of the shipped file still say that it is missing. These are counts of fixed phrases, not a reading of each text, and
+the blind recount (below) did not repeat them. A second phrase list gave 52, 24, 53, 50 and 14: the reading is the
+same, and the counts move by up to 6 [E7.3]. In the other misses the model sees the new tool and asks what to do with
+it.
+
+The misses are not explained by the length of the prompt. Split at the median prompt length, the shorter and the
+longer half have 31 and 27 misses (KL-tools-3, HT\*), 10 and 21 (shipped, HT\*), and 29 and 32 (BF16, HS\*): no
+consistent direction. Every reply ends normally or with calls. No reply is cut at a limit, and no call fails to
+decode [E7.3].
+
+**The trigger: three wordings of the return turn.** We changed only the last user message [E7.6].
+
+- *(a) A paraphrase:* "The list of tools is longer than it was. Please try my last request again." Under rule 1 the
+  misses almost go away for both files: 4 and 1 for the shipped file (40 and 31 with the benchmark line), 8 and 5 for
+  KL-tools-3. The two files are not separated (p = 0.092).
+- *(b) No announcement:* the user's request of the turn before, sent again word for word. Under rule 1 the rates
+  are those of the benchmark line (shipped 40 and 38; KL-tools-3 42 and 49). Under rule 2 they are high for both
+  files (125 to 136 of about 200), because many replies call other functions.
+- *(c) The function is named:* "I have added the function \<name\> to your tools. Use it now for my last request." The
+  shipped file misses 14 and 14. KL-tools-3 misses 47 and 50. The gap grows, under both rules.
+
+The benchmark line does not repeat the request and does not name the tool. Wording (a) asks for the last request
+again, and most misses go away. So the line is a trigger, and the weights decide how often a file falls for it. Of the
+three lines written first, one is met at the edge and two are not. With wording (b) the gap holds under rule 1
+(p = 0.049) and not under rule 2 (p = 0.10). With wording (a) the gap is not shown. With wording (c) the miss rate is
+not under 5 % for both files (7.0 % and 24.4 %), so the reading "the model can call the tool but does not notice it"
+is not established as written (Table 10).
+
+**Serving levers.** These are measurements, not product changes [E7.5].
+
+- *Earlier thinking stripped.* A template option drops the thinking text of the earlier turns from the prompt. The
+  shipped file then misses 14 and 13 in place of 40 and 31 under rule 1: 62 % fewer. Under rule 2 it misses 31 and 41
+  in place of 61 and 59: 40 % fewer. For KL-tools-3 the misses fall from 106 to 39 under rule 1. Both results hold
+  under both rules. With thinking stripped in both files, a small gap between them stays under rule 1 (+12,
+  p = 0.012) and is not shown under rule 2 (+6, p = 0.14). We did not measure what this option costs on other turns.
+- *Reasoning effort xhigh* on KL-tools-3: 67 misses against 106 (by entry -39; 17 / 45; p = 5.0e-4), which is level
+  with the shipped file at the default effort (-4, p = 0.78). The result is the same under rule 2.
+- *Sampling.* The benchmark is near-greedy. With the launcher's default sampler (temperature 1.0, top-k 20,
+  top-p 0.95, min-p 0.05) and three seeds, the gap between the two files holds on each seed: +49, +49 and +42 misses
+  under rule 1 (mean +46.7, 95 % t interval [+36.6, +56.7] over the three seeds; near-greedy +35), and +58, +51 and
+  +32 under rule 2 [E7.7]. The line written first ("the gap holds when the model samples") is met.
+
+**The parent check.** The benchmark's BF16 arm ran in another setup, so we ran BF16 and the shipped file on the same
+requests on one 80 GB card, with one engine build, one template, a 16-bit K/V cache, no drafting and temperature
+0.001 [E7.4]. On HS\*, BF16 misses 61 of 200 return turns and the shipped file 36 (33 / 8, p = 1.1e-4). Under rule 2
+it is 77 against 59 (33 / 15, p = 0.013). The line written first ("on identical prompts the shipped map misses the
+returned tool less often than the parent") is met, and the result holds under rule 2. KL-tools-3 on the same card is not separated
+from BF16 (53 against 61, p = 0.26; rule 2: 81 against 77). The setup has a small effect: the shipped file misses 36
+on this card and 40 in the 12 GB setup on the same requests; 10 entries differ (p = 0.34). The BF16 cell on HT\* did
+not finish in its time limit (190 of 198 units) and is in no claim.
+
+The statement is narrow. At the return turn of this benchmark, at temperature 0.001, on one history, in one setup,
+BF16 misses the returned tool more often than the 2.47-bit file. We do not claim that the file is better than BF16
+in general (Section 4.2 states the same limit for AppWorld).
+
+**Locate, part 1: what the candidate maps share (a negative result).** Three candidate maps (KL-tools, KL-tools-2,
+KL-tools-3) miss the return turn at about BF16's rate. Against the shipped map they share 73 changed projections: 40
+raises and 33 cuts. The plan fixed a rule before any cell ran. An arm "carries" the effect if it has 60 % or more of
+the gap on HT\* with p < 0.05. It is "clear" if it has 30 % or less with p >= 0.05. Otherwise it is "partial". The
+shipped map with the 40 raises misses 44 against 31 (+13, p = 0.029, share 0.48: partial). The shipped map with the
+33 cuts misses 36 (+5, p = 0.36, share 0.19: clear). No side carries. The plan's stop line for this case is "diffuse
+at the side level", and the hunt at the level of the map stopped there [E7.8]. Five arms with one kind of projection
+each had already run, and none carries: +8, +10, -3, +4 and +2 misses on HT\* (linear-attention q / k / v, MLP
+gate, linear-attention output, MLP down, MLP up). The planned candidate map without the carrying kind was not built. Under
+rule 2 no arm of this part separates from the shipped file.
+
+**An observation: closer to the parent, more of this habit.** The habit is the parent's: BF16 has the highest rate of
+the files that we ran in one setup (61 of 200, against 36 for the shipped file) [E7.4]. Three results point the same
+way. (1) More bits move the count toward the parent. The shipped file with the 40 common raises, each from 2 to 3
+bits, misses 18 turns more than the shipped file over both histories (26 / 11 by entry, p = 0.020; rule 2: +16,
+p = 0.059), while the 33 cuts do not move it (+2) [E7.8]. (2) The two candidate maps with a measured KL below the
+shipped file's (KL-tools, -7.9 %; KL-tools-2, -2.4 %) miss this turn in the benchmark runs in 59 of 200 and 52 of 195
+entries, against 28 of 199 for the shipped file and 54 of 200 for BF16 in its own setup [E1.9, E6.14, E7.1]. (3)
+KL-tools-3 is not separated from BF16 in one setup (53 against 61, p = 0.26) [E7.4]. So at this turn a file that is
+closer to the parent, in bits or in KL, has more of the parent's habit. This is an observation with its source rows,
+not a law. The raise arm is "partial" by the plan's rule, and the first-call decision of Inkling 2 Mini goes the
+other way: there the file with the lower KL is the one that departs from its parent (below).
+
+**Locate, part 2: two files with one bit map (suggestive only; mixed on a private set).** The second-fit file has the same bit map as the
+shipped file and a second set of fits (Table 5). We use the pair because a transplant
+between two files with one bit map is a byte-exact copy of tensors. It does not rank the two sets of fits: this is
+one turn of one benchmark. The second-fit file misses 51 and 46 return turns against 40 and 31 (both histories by entry: +26; 47 / 25; p = 0.013). By the plan's rule this arm is
+"partial" (share 0.56 on HT\*). So the low rate of the shipped file at this turn belongs to its fits as much as to
+its bit map.
+
+The two files differ in 1,653 tensors: 1,600 fit tensors (400 coded projections, each with a code, two scale vectors
+and a bias that the engine does not apply) and 53 others (the embedding, the output head, 48 convolution weights of
+the linear-attention layers and 3 norm weights). An amendment, written before any of its cells ran, set a *half-gap
+rule*: an arm meets it if its difference to the shipped file, by entry over both histories, is 13 misses or more with
+p < 0.05. An arm "carries" if it meets the rule and its complement arm does not. Table H2 gives every arm.
+
+*Table H2. Tensor copies between the shipped file and the second-fit file, against the shipped file, by entry over
+both histories (difference in misses; entries up / down; exact sign p). "Half-gap" is the label by the amendment's
+rule. "Plan" is the label by the plan's rule on HT\* against the gap of KL-tools-3 (27 misses), with the share
+[E7.9].*
+
+| Arm (base file + tensors copied in) | Rule 1 | Rule 2 | Half-gap | Plan |
+|------------------------------------|--------------------|--------------------|-----------|-------------|
+| Shipped + the 53 other tensors | -3; 15 / 17; p = 0.86 | 0; 20 / 19; p = 1 | not met | clear |
+| Second-fit + the shipped file's 53 other tensors (so: the 400 second fits) | +26; 47 / 23; p = 0.0056 | +24; 51 / 27; p = 0.0088 | met; carries | partial (0.59) |
+| Shipped + the output head alone | -7; 1 / 6; p = 0.12 | -5; 1 / 5; p = 0.22 | not met | clear |
+| Shipped + second fits, attention and linear-attention kinds (208 projections) | +31; 44 / 19; p = 0.0022 | +20; 40 / 26; p = 0.11 | met; carries | carries (0.67) |
+| Shipped + second fits, MLP kinds (192) | +18; 36 / 21; p = 0.063 | +21; 41 / 25; p = 0.064 | not met | partial (0.33) |
+| Shipped + second fits, layers 0-31 (200) | +31; 43 / 21; p = 0.0081 | +23; 43 / 28; p = 0.096 | met; carries | carries (0.85) |
+| Shipped + second fits, layers 32-63 (200) | +3; 28 / 25; p = 0.78 | +5; 30 / 28; p = 0.90 | not met | clear |
+| Shipped + second fits, attention q / k / v of the linear-attention layers (48) | +8; 23 / 15; p = 0.26 | +5; 28 / 20; p = 0.31 | not met | partial (0.33) |
+| Shipped + second fits, linear-attention gate (48) | -2; 21 / 23; p = 0.88 | -10; 21 / 30; p = 0.26 | not met | clear |
+| Shipped + second fits, linear-attention output (48) | +21; 32 / 17; p = 0.044 | +25; 40 / 20; p = 0.013 | met; carries | partial (0.44) |
+| Shipped + second fits, attention q, k, v, output of the full-attention layers (64) | +4; 18 / 15; p = 0.73 | +6; 28 / 21; p = 0.39 | not met | clear |
+
+What the table supports under rule 1: the fits carry the gap between the two files, and the head and the other
+tensors do not. The arm with the 400 second fits has the whole gap (+26), and the arm with the 53 other tensors has
+none (-3). Two arms with the shipped file's metadata reach the whole gap (+31 and +31), so the metadata keys of the
+second-fit file are not needed. The fits of layers 0-31 carry it and those of layers 32-63 do not (direct difference
++28, p = 0.0054). The split by kind is not sharp (direct difference +13, p = 0.28), and the parts do not add: +31 and
++18 against +26 for all 400. Inside the attention kinds, the output projections of the linear-attention layers meet
+the half-gap rule at the edge (p = 0.044); the three other group arms do not carry.
+
+We call this result **suggestive only**, for three reasons.
+
+1. *It does not hold under every rule.* Under rule 2 the gap between the two files is not shown on the plan's
+   history (HT\*: 70 against 59, p = 0.15; the arm with the 400 second fits: 71 against 59, p = 0.12). Over both
+   histories by entry it is there (+23, p = 0.018; +24, p = 0.0088), but the two half splits are not: the two kind
+   halves are level (+20 and +21), and the layer half is at p = 0.096.
+2. *The labels depend on the rule.* By the amendment's half-gap rule the arm with the 400 second fits and the
+   output-projection arm are "met". By the plan's own rule both are "partial" (shares 0.59 and 0.44). We give both
+   labels. The plan's rule was written for the transplants of part 1; its use here is an extension by the recount.
+3. *The test set is the set that gave the lead.* Every arm ran on the same public entries on which we found the
+   gap. The reference gap is small (47 entries up, 25 down), so an arm with half of it often cannot reach p < 0.05.
+   Six primary and six secondary tests ran, with no correction for their number; by chance alone about 0.3 of six
+   tests show p < 0.05.
+
+**A fresh private set.** To test the result on entries that no step had used, we generated a private set of return
+turns. It has the structure of BFCL miss_func and no overlap with the public entries, and it is split into a
+development half and a sealed half. The plan and its lines were committed before any model row. On the development
+half we made two histories in the same way (one by the shipped file, one by KL-tools-3) and replayed the return turn.
+The primary set is the 115 entries with a vague user line, on both histories: 230 units. Every count below is against
+the shipped file on those units, by entry, under rule 1 and then under rule 2 [E7.15].
+
+- *The control holds.* KL-tools-3 misses 83 units against 62 (+21; 27 / 10; p = 0.0076). Under rule 2 it is 89
+  against 71 (+18; 25 / 10; p = 0.017). So the instrument sees the gap of the candidate map on fresh entries.
+- *The gap between the two same-map files is not shown.* The second-fit file misses 74 against 62 (+12; 16 / 8;
+  p = 0.15). Under rule 2 it is 83 against 71 (+12; 17 / 8; p = 0.11). The line written first asked for a gap above 4
+  misses with p < 0.05 under both rules. It is not met. The direction is that of the public entries, and the rate is
+  a little lower (5.2 against 6.5 misses for each 100 units). The plan had stated the limit before the run: a gap of
+  the public size is about 15 misses on this set, with p near 0.05 at best. So this reads "not shown at this size",
+  not "absent". By the plan's rule, the lines on the fit copies and on the repair arms were then not read. The rest
+  of this list is a report.
+- *One of the public leads shows again, and the others do not.* The shipped file with the second fits of the
+  attention and linear-attention kinds (the kind half that led on the public entries, Table H2) misses 84 against 62
+  (+22; 24 / 8; p = 0.0070). Under rule 2 it is 90 against 71 (+19; 22 / 9; p = 0.029). The other leads of Table H2 do
+  not show again: the arm with all 400 second fits, the arm with the fits of layers 0-31 and the arm with the
+  linear-attention output fits are at +10, -1 and +1 misses (their counts are in the evidence row).
+- *A lead in the other direction, chosen after the look.* Five graft arms put the shipped file's fits into the
+  second-fit file. One of them has the shipped fits of the attention and linear-attention kinds: it is the reverse
+  of the copy above. It misses 51 units against 62 for the shipped file (-11; 7 / 18; p = 0.043). Under rule 2 it is
+  59 against 71 (-12; 6 / 19; p = 0.015). Against its own base, the second-fit file, it misses 23 units fewer (4 /
+  23; p = 3.1e-4), and 24 fewer under rule 2. We did not predict a count below the shipped file. We chose this arm
+  after we looked at the development half: it is 1 of 5 graft arms, and their lines were not read. A guard read of
+  the first turn of every entry found a valid tool call for every arm (150 of 150).
+- *Where these two leads sit.* The primary set has two vague user lines: the benchmark's line and a second wording.
+  Both leads sit mostly under the second wording (+19 of the +22, and -10 of the -11). There the control gap is small
+  (+2). Under the benchmark's line the control gap is +19, and the two arms are near the shipped file (+3 and -1).
+- *With the function named* (35 entries, 70 units), the shipped file, the second-fit file and the two arms almost
+  stop missing (2, 1, 1 and 3 misses). KL-tools-3 misses 9.
+
+**One read on the sealed half.** The graft arm of the list above then got one read on the sealed half. New lines
+were written before the read [E7.16]. *C, the control:* KL-tools-3 misses more than the shipped file, with p < 0.05
+under rule 1; if C fails, the other lines are not read. *S-1:* the graft misses less than its base, the second-fit
+file, with p < 0.05 under both rules, and with 75 % of the base's misses or fewer under both rules. *S-2:* the graft
+misses less than the shipped file, with p < 0.05 under both rules. *S-3:* the reverse copy misses more than the
+shipped file, with p < 0.05 under both rules. The histories of the sealed half were made in the same way. Every count
+is by entry on the 230 units of its primary set, under rule 1 and then under rule 2.
+
+- *C, the control, fails.* KL-tools-3 misses 78 units against 62 (+16; 24 / 12; p = 0.065). Under rule 2 it is 89
+  against 75 (+14; 22 / 13; p = 0.18). So by the rule written before the read, no repair line is read. The counts
+  that follow are a report.
+- *S-1, the graft against its base.* 55 misses against 79 (-24; 7 / 29; p = 3.1e-4; ratio 0.70). Under rule 2 it is
+  65 against 81 (-16; 9 / 24; p = 0.014; ratio 0.80, which is above the 0.75 of the line).
+- *S-2, the graft against the shipped file.* 55 against 62 (-7; 10 / 15; p = 0.42). Under rule 2 it is 65 against 75
+  (-10; 9 / 16; p = 0.23).
+- *S-3, the reverse copy against the shipped file.* 75 against 62 (+13; 19 / 9; p = 0.087). Under rule 2 it is 81
+  against 75 (+6; 15 / 12; p = 0.70).
+
+The lead of the development half did not hold. The control did not reach its line, so the lines are not read. With
+the control, the reading rule gives the same words: the graft is not below the shipped file (S-2 fails under both
+rules), and its cut against its own base misses the 75 % part of S-1 under rule 2. One thing repeats on unread data,
+as a report: the graft misses less often than its own base (55 against 79 under rule 1), mostly under the second
+vague wording (-15 of the -24). It brings the second-fit file to about the level of the shipped file, and not below
+it. We chose this arm after we looked at the development half, as 1 of 5 arms. The sealed read is the test that such
+a choice needs, and it does not confirm a repair. On the sealed half the gap between the two same-map files shows
+under rule 1 (+17; 26 / 12; p = 0.034) and not under rule 2 (+6; p = 0.49). A guard read of the first turn found a
+valid tool call for every arm (150 of 150). No repair is confirmed on held-out turns.
+
+One fact from the public entries agrees with the last point: with wording (c) the second-fit file is close to the
+shipped file (18 and 21 misses against
+14 and 14; p = 0.14), and KL-tools-3 is not (47 and 50). So the gap between the two same-map files and the gap of the
+candidate maps are not the same thing.
+
+**A blind recount.** A separate agent recounted both studies of this section from the raw rows. Before its first
+commit it read only the plans (for the rules) and the tools that wrote the rows (for the format). It did not read the
+entries, the reports or any result file. Every count of a complete cell matches: the misses, the paired counts, the
+differences and the p values [E7.14]. It also applied the plan's rule to the arms of Table H2, which gave the second
+set of labels. The scripts of the evidence repository repeat the counts of Tables H1 to H3 from per-unit outcome
+files.
+
+![The return turn of BFCL miss_func on the 27B model: share of units with a miss, for pairs of cells on the same
+requests. (a) Rule 1: no tool call. (b) Rule 2: the returned function is not called. Pairs: KL-tools-3 against the
+shipped file on each history; BF16 against the shipped file on one 80 GB card in one setup; the shipped file with and
+without the thinking of earlier turns (both histories); the two files under wording (c) (both histories). Numbers on
+the bars are misses [E7.2, E7.4-E7.6].](figs/fig8-return-turn.png){width=100%}
+
+**A second family: Inkling 2 Mini.** We asked two questions. Does a turn-type split find a class that holds a score
+gap, as on the 27B model? If not, does it find any decision where the files differ?
+
+*The turn split found no class that holds the gap (a negative result).* We classed every failed run of the recorded
+AppWorld runs of the standard split (168 tasks, seeds 102-105; Figure 7a): the official weights (run as Unsloth's
+UD-Q8_K_XL file, an exact copy of the release [E4.10]), the public 2-bit file (UD-Q2_K_XL) in its own build, and M2. The
+line was written first: "one class" if the top class has half of the gap or more and the sign test by task has
+p < 0.05; "no gap to split" under 10 task-runs. The official weights and M2 have no gap (592 and 596 of 672). For the two
+pairs with a gap (30 and 26 task-runs), the top class holds 0.30 and 0.31 of it (p = 0.12 and 0.096): "diffuse"
+[E7.10]. The unasked answer of Section 4.3 is rare here (18 to 26 failed runs for each arm) and does not differ by
+arm. So the pattern of the 27B model, one class that holds the gap, did not repeat.
+
+*A decision found after the fact.* The same read showed a decision that the totals hide. At the first call of a
+task, the reply that the client receives is often one sentence ("I'll start by exploring the available apps.") with
+no code block. The client answers "No code available to execute." and the run goes on. (This is what the client
+receives. What the model samples there is more than the sentence: see "What the client does not see", below.) In the record, the first reply
+has no code block in 227 of 672 runs for the official weights (33.8 %), in 254 of 670 for the public 2-bit file in its own
+build (37.9 %), and in 50 of 672 for M2 (7.4 %) [E7.10]. This was not a line written first. So we ran a confirm.
+
+*A pre-registered confirm on fresh tasks.* The first call has no model history: the request is the fixed agent prompt
+and the task. So a replay of the built request is the whole state of that turn. The requests that our driver builds
+equal the recorded first requests on 2,014 of 2,014 runs [E7.11]. The fresh set is the harder split (417 tasks), on
+which no file had been read for this decision. The plan, with three lines, was committed before any call. M2 and the
+public 2-bit file ran in one engine build and one setup on one 12 GB card, on the same 834 requests (seeds 102 and
+103), with an output cap of 1,024 tokens. A reply that the cap cut counts against the claim in L1 and L2.
+
+- **L1, the decision shows on fresh tasks:** the public 2-bit file's rate is 20 % or more. Result: 350 of 834
+  (42.0 %). Pass.
+- **L2, M2 is below it:** a sign test by task with p < 0.001, and a rate of half or less. Result: 95 of 834 (11.4 %)
+  against 42.0 %, ratio 0.27; by task 223 / 22 (p = 4.8e-43); by scenario 105 / 5 of 139. Pass.
+- **L3, the replay repeats the record:** M2 on the standard split, seed 102, inside the 95 % interval of the record's
+  rate ([6, 20] of 168). Result: 18 of 168. Pass. On our workstation the replay gives the record's reply text on 163
+  of 168 tasks.
+
+After the lines were scored, we added the official weights as a report row (an amendment written before its first
+call): the same engine commit, the same 834 requests, a 16-bit K/V cache, on a rented 48 GB card, because the file
+does not fit 12 GB [E7.11]. Table H3 gives the three rates for each seed.
+
+*Table H3. Inkling 2 Mini, the first call of an AppWorld task on the harder split: first replies with no code block,
+of 417 for each seed (a cut reply is scored by its content). The official weights ran as Unsloth's UD-Q8_K_XL
+file, an exact copy of the release; this model has no BF16 release [E4.10, E7.11].*
+
+| Arm | Seed 102 | Seed 103 | All seeds |
+|------------------------------|-----------:|-----------:|------------------:|
+| Official weights (run as UD-Q8_K_XL), 48 GB card | 261 (62.6 %) | 125 (30.0 %) | 386 of 834 (46.3 %) |
+| Public 2-bit file (UD-Q2_K_XL), our engine, 12 GB card | 192 (46.0 %) | 184 (44.1 %) | 376 of 834 (45.1 %) |
+| M2 (ours), 12 GB card | 64 (15.3 %) | 31 (7.4 %) | 95 of 834 (11.4 %) |
+
+The public 2-bit file is at the rate of the official weights (by task 108 / 112, p = 0.84): a standard quant keeps this decision
+of its parent. M2 departs from its parent at this decision (by task 246 / 13). Average KL does not show the
+departure, and it points the other way: M2 has the lower KL of the two 12 GB files (Table 7).
+
+![Inkling 2 Mini, the first call of an AppWorld task on the harder split: share of first replies with no code block,
+for each seed and for all seeds, for the official weights (run as UD-Q8_K_XL, an exact copy of the release), the public 2-bit file and M2. The
+calls of one seed share one random stream (Section 4.1) [E7.11].](figs/fig9-inkling-first-call.png){width=85%}
+
+*Two controls.* The official weights ran with a 16-bit K/V cache, and M2 with its release K/V setting. M2 with a 16-bit K/V
+cache gave 11 of 168 against 18 of 168 on the same requests (by task 6 / 13, p = 0.17). M2 with no reasoning budget
+gave 18 of 168, with the same outcome on every task. So the K/V precision and the reasoning budget do not explain the
+difference between the official weights and M2 [E7.11].
+
+*A decision probe that did not locate the decision (a negative result).* We pre-filled the reply with the common
+first sentence and read the next-token probabilities, with no sampling, for M2 and for the public 2-bit file (417
+tasks each; the form was written before the probe ran). The template drops an empty thinking block, so the probe read
+a state with no thinking, which a sampled reply at this effort never has. In that state both files go on to code: the
+most probable next token is a line break on 417 of 417 tasks in both. M2 gives the end-of-turn token *more*
+probability than the public file (median 0.120 against 0.046; higher on 417 of 417 tasks). That is the opposite of
+the sampled rates [E7.12]. So this decision is not made at the token after the sentence in a state with no thinking.
+It is not the choice of the sentence either, as the next probe shows.
+
+*A cross-over of the thinking: the step after the thinking decides.* Every sampled reply has a thinking block first.
+Does the thinking carry the difference between the two files, or the step after it? We took each file's own sampled
+thinking from the confirm (1,668 states: the 834 requests, for two files). Then each file's weights wrote the reply
+text once after each thinking, with the confirm's sampler. The plan and its lines were committed before any row
+[E7.18].
+
+*Table H3b. The cross-over: continuations with no code fence, of the scored states. A continuation that reached the
+limit of 200 tokens is left out (7, 13, 78 and 91 states) [E7.18].*
+
+| Weights that write the reply | After M2's thinking | After the public 2-bit file's thinking |
+|------------------------------|--------------------:|--------------------:|
+| M2 | 111 of 827 (13.4 %) | 77 of 821 (9.4 %) |
+| Public 2-bit file | 395 of 756 (52.2 %) | 331 of 743 (44.5 %) |
+
+The validity line holds: each file on its own thinking is inside the 95 % interval of its rate in the confirm (11.4 %
+and 45.1 %). With the thinking fixed, the public file's weights give more replies with no code: +38.8 points after
+M2's thinking (pairs 312 / 29) and +35.2 points after its own thinking (272 / 18). With the weights fixed, the
+public file's thinking gives fewer such replies, not more: -4.0 points under M2's weights (49 / 85; p = 0.0024) and
+-7.7 points under its own weights (104 / 165; p = 2.4e-4). By the lines written first, the step after the thinking
+decides, and the thinking does not carry the difference.
+
+*What the client does not see (found after the fact).* A token count in the cross-over showed that "one sentence and
+no code" is what the client receives. It is not all that the model samples. In most replies with no code, the model
+ends its text block after the sentence and then writes the action in a second block: bare code with no fence, or a
+tool-call form. In the cross-over, 690 of the 726 continuations with no fence under the public file's weights hold
+such code after the sentence, and 158 of the 188 under M2's weights. In the confirm, 373 of the public file's 376
+replies with no code, and 87 of M2's 95, have more sampled tokens than the returned thinking and text hold (a median
+of about 26 to 28 tokens) [E7.19]. The server's chat parser returns only the first text block, because the request
+declares no tools. So the decision is a choice of channel: fenced code in the text block, as the agent prompt shows
+it, against a second block that this server drops. Three limits apply. The reading is post hoc. The counts of
+"holds code" are counts of patterns in the text. And the exact type of the second block needs the token ids: a check
+is queued, and it is not in this version. The consequence is plain. A part of this habit may be removable on the
+serving side, by a return of the dropped block, with no change of the weights. That is a separate test, and it has
+not been run. It is the lesson of Section 4.8 again: a choice outside the weights can look like a property of the
+weights. The lines of the confirm stand as scored, because they count what the client receives.
+
+*Does the decision cost the task? Not in this client.* A habit read has two parts. Part 1: is the decision
+different? Part 2: does it cost the task? We tested part 2 on the recorded full runs of the standard split, with the
+reads and a rule written before the count (a post hoc check on existing runs; no line of the confirm depends on it)
+[E7.13].
+
+- *The raw split is a task effect.* Runs whose first reply has no code block pass less often than the other runs of
+  the same arm: 83.7 % against 90.3 % (official weights), 79.1 % against 87.3 % (public 2-bit file in its own build), 86.0 %
+  against 88.9 % (M2). But the tasks differ between the two groups: the decision shows more on harder tasks. This
+  split is not a cost.
+- *With the task held fixed, no cost is shown.* For each task that has both kinds of run on the seeds of one arm, we
+  compared the pass rates of the two kinds. Over 273 arm-task units the runs with no code first pass 1.5 points
+  *more* often (95 % bootstrap interval [-1.8, +4.7]; 33 units better, 18 worse, 222 equal; sign p = 0.049). The
+  rule written before the count gives this case the label "a small cost", because its pooled p is under 0.05. The
+  rule did not foresee the direction that came, so the label does not fit. The plain reading is: no task cost shown.
+  A cost under about 2 points is not excluded.
+- *The cost is about one call.* The run gives code at the next call in 89.0 %, 75.2 % and 96.0 % of the cases
+  (official weights, public 2-bit file, M2), and uses about one call more (mean +0.68, +1.61 and +1.62).
+- *The gap between the official weights and M2 is not at this decision.* M2 passes 4 runs more than the official
+  weights (596 against 592). All 4 are in the 426 task-runs where both files give code first. In the 246 task-runs where one file
+  or both give no code first, the two are level (205 and 205).
+
+So on Inkling 2 Mini this habit is a *decision marker*. The method detects it, replays it and confirms it across
+builds. It is not damage, and the lower rate of M2 is not a quality gain. What we state is this: M2 departs from its
+parent at this decision, a standard 2-bit quant stays at the parent's rate, and the departure has no measured task
+effect in this client. A client that ends the turn on a reply with no tool call would lose the turn; that case is
+not measured.
+
+The contrast with the 27B model is the point. There, the miss at the return turn *is* the scored failure of that
+turn, and the unasked answer *is* the failed test of the run. Here, part 2 is null. It turns the older point of this
+paper around: a change in behaviour can be large (46 % against 11 % of the first replies) and still be invisible in
+the task total.
+
+*Limits of the confirm.* (1) Two seeds are two clusters (Section 4.1). Seed 102 has about twice the events of seed
+103 for the official weights and for M2 (261 against 125; 64 against 31); for the public 2-bit file the two seeds are close
+(192 against 184). (2) M2's rate is higher on the harder split (11.4 %) than in the record of the standard split
+(7.4 %); on the one seed that both have, it is 15.3 % against 10.7 %. (3) The decision was found after the fact on
+old transcripts, and then confirmed on fresh tasks with the lines written first. (4) The official weights ran on
+another card class. Their replies are not token-identical to the record there (the same text on 21 of 168 tasks of the
+standard split; the rate holds: 74 against 80 of 168), while the replay on our workstation is (163 of 168). The
+parent's rate on the harder split is therefore from another card than the two 12 GB rows. (5) In the record the
+public 2-bit file ran in its own build; in the confirm it ran in our engine and setup, so the confirm compares
+weights in one setup. (6) The cap of 1,024 tokens cut 5, 26 and 9 replies (M2, public file, official weights); the lines
+count them against the claim.
+
+**What this section shows, and what it does not.** Table H4 puts the three habits side by side.
+
+*Table H4. Three decision-point habits. Rates for the full-precision weights (Section 2), a standard quant and our build
+[E6.4, E7.4, E7.11, E7.13].*
+
+| Habit | Model, turn | Full-precision weights | Standard quant | Our build | Does it cost the task? |
+|--------------|------------------------|----------------|--------------|--------------|------------------|
+| Unasked answer (Section 4.3) | 27B, the last call of an AppWorld action task, temperature 1.0 | BF16: 258 of 1,668 runs | not run | shipped: 112 of 1,668 | yes: it is the failed test of the run |
+| Returned tool not called | 27B, the BFCL return turn, temperature 0.001, one setup | BF16: 61 of 200 | not run | shipped: 36 of 200 | yes: it is the scored failure of the turn |
+| First reply with no code, as the client receives it | Inkling 2 Mini, the first call of an AppWorld task, temperature 1.0 | official weights: 386 of 834 | public 2-bit file: 376 of 834 | M2: 95 of 834 | none shown in this client; about one call |
+
+On two model families, a build of ours differs from its parent at one decision: it shows the parent's habit less
+often. **Neither build was made to do that.** The shipped 27B map is the published L0xRE-V2 allocation with our fits, and our own candidate
+maps are at BF16's rate at the return turn. M2 was chosen on KL. So these are observations of what our builds do, not
+results of a repair. The steps that this paper supports are: detect a habit that a total hides; freeze it and replay
+it for the cost of minutes; test levers and controls on the frozen turn; and, on the public entries only and with the limits
+above, point at the tensors that carry a difference between two files. **The missing step is a map built to remove a habit, and then
+confirmed on held-out turns.** We have not done it. The hunt for such a map on the 27B model ended at its own stop
+line (part 1 of the locate step). The result of part 2 is suggestive only: on the development half of a private set
+the gap between the two files is not shown, and one of its four leads shows again. A graft that we chose on that
+half was not confirmed on the sealed half.
 
 ## 5. Negative results (repairs measured and rejected)
 
@@ -1013,7 +1542,8 @@ byte split costs far more [E2.10].
   split the same files are level. At temperature 0 the lead over BF16 is +11 [-5, +28] of 417, and one greedy run
   cannot show whether it is smaller than the lead at 1.0 [E5.18, E6.1]. Three maps of Section 4.4 have one
   temperature-0 run each [E6.7]. The temperature-0 control is one run of 417 tasks for each arm. A second agent
-  benchmark (BFCL v3 multi-turn) is used in this paper only for the screen of the held candidate [E6.14].
+  benchmark (BFCL v3 multi-turn) is used for the screen of the held candidate [E6.14] and for the return-turn study
+  of Section 4.10.
 - **Few seeds.** Most comparisons on the harder split have two seeds. The seed-level p uses a design effect that is a
   mean over arm pairs with a wide range, so it is approximate; a strict test across two seeds has almost no power.
   Three effects sit in one seed and are marked in the text: the losses of the uniform and the HAWQ-style maps (seed
@@ -1067,16 +1597,79 @@ byte split costs far more [E2.10].
   launcher. The sharpness and token-class tests use golden-set text, not AppWorld traffic, and drafting exactness is
   from code reading [E5.7, E5.8, E5.16, E6.4, E6.9]. One benchmark and one prompt show the habit; on another
   prompt its rate can differ.
+- **Decision-point habits: what the word covers.** "Habit" means what these benchmarks punish or count. It is not
+  a general statement of quality. A habit read has two parts: is the decision different, and does it cost the task.
+  On the 27B model the miss is the scored failure of the turn. On Inkling 2 Mini the second part is null: the
+  first-call decision is a marker of a departure from the parent, not damage, and its lower rate in our build is not
+  a quality gain (Section 4.10) [E7.13].
+- **No build was made to remove a habit.** The shipped 27B map is the published allocation, and M2 was chosen on KL.
+  That our builds show a parent habit less often is an observation. The repair step of Section 4.10 is open: a first
+  graft, chosen after a look, was not confirmed on held-out turns.
+- **The return turn (27B).** The turn was found after the fact, as 1 of about 10 turn classes of one benchmark; the
+  replay is its confirmation [E7.1, E7.2]. Under the plan's miss rule the gap of the candidate map is on one of the
+  two histories and on both together, not on each ("mixed"). Rule 2 was added after the first results and is
+  exploratory. The counts of what the misses say are counts of fixed phrases; a second phrase list moves them by up
+  to 6 [E7.3]. The levers (wording, stripped thinking, effort, sampler) were measured at this turn only; none is a
+  product change, and what stripped thinking costs elsewhere is not measured.
+- **The parent check is narrow.** BF16 misses the returned tool more often than the shipped file on one history, on
+  one card, in one setup, at temperature 0.001 [E7.4]. The benchmark's own BF16 arm ran in another setup (engine
+  build, K/V type, card). The second history has no complete BF16 cell. The AppWorld lead over BF16 is at temperature
+  1.0; at temperature 0 it is not shown (Section 4.2). We make no statement about BF16 without the temperature and
+  the benchmark turn.
+- **The locate step is suggestive only, and a private set gives a mixed answer.** On the development half of a
+  fresh private set of our own, the control gap of the candidate map shows, and the gap between the two same-map
+  files does not: +12 misses of 230 units (p = 0.15; rule 2: p = 0.11). The set could show a gap of the public size
+  only at the edge, so this reads "not shown", not "absent". By the plan's rule the lines on the fit copies and on
+  the graft arms were then not read. As a report, one of the four public leads shows again (the copy of the
+  attention and linear-attention fits) and three do not; and one graft arm, chosen after the look, is below both
+  files. These two leads sit mostly under one of the set's two vague user lines [E7.15]. On the sealed half, in one
+  read, the control did not reach its line, so the graft's lines were not read. As a report, the graft misses less
+  often than its own base there and is not below the shipped file: no repair is confirmed [E7.16]. On the
+  public entries, the fit result of Section 4.10 holds under rule 1 and, over both histories,
+  under rule 2, but not under rule 2 on the plan's history, and its half splits do not hold under rule 2. Its labels
+  differ between the amendment's rule and the plan's rule. It was tested on the public entries that gave the lead,
+  with a reference gap of 47 entries up and 25 down, and with six primary and six secondary tests without a
+  correction [E7.9]. A habit is located in one model family only, and only on the public entries. On Inkling 2 Mini the decision is detected and
+  confirmed. A cross-over places it at the step after the thinking, and no group of weights is located [E7.12,
+  E7.18].
+- **What the first-call decision is.** The confirm counts what the client receives. A post hoc token check shows
+  that in most replies with no code the model writes the action in a second block, which this server drops because
+  the request declares no tools. So the decision is a choice of channel, and a part of it may be removable on the
+  serving side with no change of the weights. That test has not been run, and the type of the second block is not
+  read yet [E7.19].
+- **The Inkling confirm.** Two seeds are two clusters, and one seed has about twice the events of the other for the
+  official weights and for M2. M2's rate is higher on the harder split than in the record of the standard split. The
+  decision was found after the fact on old transcripts and then confirmed on fresh tasks with the lines written
+  first. The parent is the official weights (this model has no BF16 release); they ran on another card class, where their
+  replies are not token-identical to the record (21 of 168), while the replay on our workstation is (163 of 168)
+  [E7.11]. The task-cost check is post hoc and observational, on the standard split, in one client that asks again
+  after a reply with no code; a cost under about 2 points is not excluded, and a client that ends the turn is not
+  measured [E7.13].
+- **Context length.** Every habit replay of Section 4.10 is at short context. The return-turn units of the public
+  entries have 3,111 to 48,571 prompt tokens, with a median of 5,742; 3 of the 398 units are above 16,384 tokens. The
+  units of the private set's development half have 1,718 to 13,123 prompt tokens, with a median of 4,119. The first-call requests of
+  Inkling 2 Mini have 3,969 to 4,153 prompt tokens, with a median of about 4,000 [E7.17]. So the habit rates at long
+  context are not measured in this version. At tens to hundreds of thousands of tokens the tool block is far from
+  the turn, and the rates can differ. A depth test of the return turn is running, and it has no result here. The
+  long-context evidence of this paper (recall at 117k and 245k tokens [E4.3], and the long-copy gates) is about
+  retrieval and copying. It is not about these decisions.
 - **Another lineage.** The allocation rule of the 27B model did not carry to Inkling 2 Mini, a model of another
   lineage and architecture (Section 4.7). What carries within one lineage is knowledge of the base (Section 4.9),
   read from one base model here.
-- **Coding agents (a description, not a test).** On a public third-party board of 20 repository-repair tasks
-  [PatchEval] (one run, the Pi agent, a 12 GB card), the shipped file solved 13. We read each of its 7 misses against the hidden test
-  and the upstream fix: 6 are the model's own patches, 1 is a valid fix that an exact token snapshot rejects, and 0
-  come from the setup (no leaked tags, empty answers or loops in 1,112 tool calls). Against the official API run of
-  the base model on the same tasks, our file thinks about 30 % less per turn (1,404 against 1,982 characters) and
-  solves 3 tasks fewer (sign test p = 0.25, one run each) [E6.16]. We do not know whether effort xhigh closes this
-  gap on coding tasks.
+- **Coding agents (a description of one run each, not a test).** A public third-party board has 20 repository-repair
+  tasks [PatchEval]; each setup has one run with the Pi agent. On release v1.1.1 the shipped file solved 13 of 20. We
+  read each of the 7 misses of that run against the hidden test and the upstream fix: 6 were the model's own patches,
+  1 was a valid fix that an exact token snapshot rejected, and 0 came from the setup [E6.16]. On release v1.2, with
+  the same model file, the board's run solved 18 of 20, and 17 at the first try [E6.16b]. Between the two runs the
+  serving stack changed and the weights did not. One change is in release v1.1.6, and the board's note names it:
+  with thinking on, the server now keeps a token cap of 4,096 or more that the agent sends, and it ends the thinking
+  early enough to leave room for the answer (the reasoning budget is the cap minus 1,024). Before that release it
+  raised every cap to 24,576. The other releases between the two runs changed the stack too, and we did not measure
+  which change caused the rise. It is one more case where a task run shows an effect from outside the weights
+  (Section 4.8). The official API run of the base model
+  solved 16 of 20 on the same tasks. Paired by task, the v1.2 run solves 3 tasks that the API run does not, and the
+  API run solves 1 that the v1.2 run does not (exact sign test p = 0.63) [E6.16b]. This is not a test of the weights:
+  each setup has one run, and the two runs use different serving stacks.
 - **An error in our record.** Our record said for some hours that KL-table B had one cut against the shipped map. The
   model files show two (Section 4.4). We now read bit maps from the model files, not from map tables [E5.19].
 - **One fragile item.** Three recall-gate failures (KL-table A and the uniform and HAWQ-style baselines) are on that
@@ -1116,10 +1709,22 @@ byte split costs far more [E2.10].
 - **Every missed line.** Table 10 lists every pre-written line that a run missed and what we did.
 
 *Table 10. Every pre-written line that a run missed, and what we did. Lines that rejected a candidate map or repair
-are in Table 3 and Section 5. The first block is new in version 1.2, the second in version 1.1.*
+are in Table 3 and Section 5. The first block is new in version 1.3, the second in version 1.2, the third in
+version 1.1.*
 
 | Line (written before the run) | Measured | What we did | Ref. |
 |---|---|---|---|
+| Private set, development half: the gap between the two same-map files shows on fresh entries (above 4 misses, p < 0.05, under both miss rules) | +12 of 230 units (p 0.15); rule 2: +12 (p 0.11) | not shown at this size; by the plan the lines on the fit copies and on the graft arms were not read (their counts are a report); the control line of the set holds (+21, p 0.0076) | [E7.15] |
+| Private set, sealed half, one read: the control (KL-tools-3 above shipped, p < 0.05 under rule 1); if it holds, the graft is below its base (S-1, with 75 % of the base's misses or fewer) and below shipped (S-2), and the reverse copy is above shipped (S-3), each under both miss rules | control +16 of 230 units, p 0.065. Report: S-1 -24 (p 3.1e-4, ratio 0.70), rule 2 -16 (p 0.014, ratio 0.80); S-2 -7 (p 0.42), rule 2 -10 (p 0.23); S-3 +13 (p 0.087), rule 2 +6 (p 0.70) | the control fails, so the lines are not read; by the counts S-2 fails under both rules and S-1 fails its 75 % part under rule 2: the development lead did not hold; no repair is confirmed | [E7.16] |
+| Return-turn replay: the gap of the candidate map shows on each history (10 misses or more, p < 0.05) | +8 (p 0.17) on one history, +27 on the other; +35 on both together | valid by the line for both together; the reading is "mixed"; the locate step uses the one history | [E7.2] |
+| A replay of a file on its own history equals the live call on 90 % or more of the units (an expectation) | 95.0 % and 89.4 % (the replays ran on another machine) | reported | [E7.2] |
+| Return-turn hunt: the 40 common raises or the 33 common cuts of the candidate maps carry 60 % or more of the gap (p < 0.05) | raises 0.48 (partial); cuts 0.19 (clear) | stop line "diffuse at the side level"; the hunt at the level of the map stopped; no candidate map built | [E7.8] |
+| Wording (a): the gap between the two files holds (above 0 on each history, p < 0.05) | +4 and +4; p 0.092 | not shown; the misses almost go away for both files | [E7.6] |
+| Wording (c), "ceiling": no call in 5 % or less of the units for both files | 7.0 % and 24.4 % | not met | [E7.6] |
+| Wording (c) is the stronger probe for the two same-map files (gap above 26, p < 0.013) | +11; p 0.14 | not met; the later arms ran on the benchmark line | [E7.9] |
+| Fit transplants, by kind: a group arm of the attention half meets the half-gap rule (13 misses or more, p < 0.05) | 1 of 4, at the edge (+21, p 0.044); +8, -2 and +4 for the other three | three group arms did not carry; the result is suggestive only | [E7.9] |
+| Inkling turn split: one class holds half of the score gap or more (p < 0.05) | top class 0.30 and 0.31 of the gap (p 0.12, 0.096) | "diffuse"; no class located | [E7.10] |
+| Inkling task-cost check: the rule's label for a pooled p under 0.05 that is not a clear cost | "a small cost"; the sign is the other way (+1.5 points) | the label does not fit; the plain reading is given beside it | [E7.13] |
 | The KL-only winner and KL-table B at temperature 0 are each within 17 of the shipped file (their loss is slip damage) | 322 and 312 (shipped 330) | not met: KL-table B is one task below; reported per map | [E6.7] |
 | One targeted sentence at medium effort lowers the unasked-answer habit (exact McNemar p < 0.05) | 10 vs 13, p 0.65 | not shown | [E6.10] |
 | The sentence does not suppress asked answers (missing answers rise by 2 at most, passes drop by 3 at most) | missing answers 0 vs 0; passes 43 vs 47 | failed as written by one task; no asked answer was stopped | [E6.10] |
@@ -1174,19 +1779,62 @@ its harness gate caught an engine fault that the KL gate passed. The engine faul
 fix came from upstream work by others. The statistics of versions 1.0.x were too optimistic; version 1.1 corrected
 them (Appendix B).
 
+For the decision-point habits of Section 4.10 the scope is the same. We did not build a map to remove a habit. The
+hunt for the part of our candidate maps that brings the return-turn misses to BF16's rate ended at its stop line
+("diffuse at the side level"). The fit transplants point at the fits of the first half of the layers, and we call
+that suggestive only; on the development half of a fresh private set the gap between the two files was not shown,
+one of the four leads showed again, and a graft chosen there was not confirmed on the sealed half. On Inkling 2 Mini the turn split found no class that holds a score gap. A cross-over places the first-call
+decision at the step after the thinking, no group of weights is located, a part of the decision may sit in the
+serving stack, and the decision has no measured task cost. What we have is a way to detect a
+habit that a total hides, to replay it in minutes, and to test levers and controls on the frozen turn.
+
 ## 8. Future work
 
-The results point to instruments that this paper does not have. We name five directions and claim no result for
-any of them. (1) Probes of fidelity to the reference: count the places where a map changes the reference's own
-choice, in place of an average distance. (2) Near-tie fragility: judge an item by the reference's own gap between
-its two best tokens, so that a flip at a near tie is not read as damage. (3) Drowning tests: for each repair that
-adds bits to a group, test the mirror map that removes them, to find groups whose bits buy nothing. (4) Signals
-inside the model, validated by planted damage before any use. (5) Decision-aware probes: count the end-of-task
-decision of Section 4.3 on the model's own agent paths, for each map and each reasoning effort, before any agent run.
-A gradient map from the reference's decision margins was planned for this; its forward pass did not match the
-engine within the line (0.041 nats against 0.005), so it stopped before any gradient [E6.13]. For the agent benchmark
-itself: per-call seeds (Section 4.1), three or more seeds for each comparison, a temperature-0 arm, and a full arm at
-effort xhigh on fresh seeds.
+The step that this paper does not have is the repair of a habit (Section 4.10). It has three parts, and we claim
+no result for any of them. (a) A map that is built to remove a habit: for the return turn, a file built from the
+prediction of the locate step. (b) A confirmation on held-out turns. A private set now exists. On its
+development half one graft arm, chosen after the look, missed less often than both of its parent files. On the
+sealed half it was not confirmed: the control of the read did not reach its line, and the graft was not below the
+shipped file (Section 4.10). The next test needs a group that the locate step names before any look, and more
+entries. (c) A check that the map
+loses nothing else that we measure. Until these exist, the claim of the paper stops at detect, replay and locate.
+
+*Donors that a lab already has (a direction, not a result).* The tensor copies of Table H2 use a donor file with the
+same parent weights and the same bit map. A lab that quantizes or trains a model has more such files: its own other
+attempts from the same parent weights, with other calibration sets, seeds or Hessians, and its rejected candidates.
+A habit replay can say which of those files has less of a given habit in the located groups, also when that file lost
+on the total score. Then the rejected candidates are a pool of donors for a graft, and a habit profile for each file
+selects from the pool. Two conditions apply. The files must come from the same parent weights, so that the tensors
+line up. They must have the same bit layout in the grafted groups, so that the copy is exact. Two questions are open.
+First, do grafts for two habits compose? Our records show that habits can trade between files: KL-tools gives fewer
+unasked answers than the shipped file (39 against 58 runs) and more misses at the return turn (59 against 28
+entries), and on BFCL the candidate map KL-tools-3 has more turns with no call (93 against 73) and fewer failures
+with a wrong state (150 against 167) [E6.4, E7.1]. Second, does a graft hold on held-out turns? The one that we
+read was not confirmed (Section 4.10). We claim no result for any of this beyond the rows of Table H2. In those rows every copy
+moved the count toward the file with more misses. One graft in the other direction, chosen on the development half
+of the private set, was not confirmed on the sealed half; a graft that lowers a habit on held-out turns has not been
+built.
+
+Open steps of the studies of Section 4.10. For the 27B model: a depth test of the return turn at long context (it is
+running, and it has no result here; Section 6); the transplant arms that did not run (the
+output-projection fits of the linear-attention layers in layers 0-31 alone, and their complements; the split of the
+lower layer half; the split of the MLP kinds; the reverse copies into the second-fit file; the metadata keys alone),
+and a repeat of the group result on other histories and under sampling. For Inkling 2 Mini: the type of the second block that the
+server drops at the first call (a check is queued, and it is not in this version); a serving-side test that returns
+that block, to see how much of the first-call decision goes away with no change of the weights (not run); two more
+seeds for the confirm (they are running, and they are not in this version); and the same decision in a client that ends the turn on a reply with no tool
+call. For both: a *habit profile* of a map, one replay count for each known habit, set against the parent and the
+shipped map, as a screen before any full benchmark.
+
+The earlier results point to more instruments that this paper does not have. We name five directions and claim no
+result for any of them. (1) Probes of fidelity to the reference: count the places where a map changes the
+reference's own choice, in place of an average distance. (2) Near-tie fragility: judge an item by the reference's own
+gap between its two best tokens, so that a flip at a near tie is not read as damage. (3) Drowning tests: for each
+repair that adds bits to a group, test the mirror map that removes them, to find groups whose bits buy nothing.
+(4) Signals inside the model, validated by planted damage before any use. (5) A gradient map from the reference's
+decision margins; its forward pass did not match the engine within the line (0.041 nats against 0.005), so it
+stopped before any gradient [E6.13]. For the agent benchmark itself: per-call seeds (Section 4.1), three or more
+seeds for each comparison, a temperature-0 arm, and a full arm at effort xhigh on fresh seeds.
 
 ## 9. Related work
 
@@ -1219,7 +1867,9 @@ list with one-line differences: `evidence/RELATED.md`.
   it should check that card.
 - Inkling 2 Mini official weights: Apache-2.0. LookAtMyQuant: code MIT, Inkling files Apache-2.0. Unsloth's Inkling
   GGUFs (UD-Q2_K_XL, UD-Q8_K_XL) and Unsloth's llama.cpp build were used for evaluation only.
-- Benchmarks: AppWorld, HumanEval, WikiText-2 (test split), used for evaluation only.
+- Benchmarks: AppWorld, BFCL v3 (the Gorilla project, Apache-2.0), HumanEval, WikiText-2 (test split), used for
+  evaluation only. The evidence repository holds outcomes for each entry or task (ids and 0 / 1 flags), with no
+  prompt or reply text.
 
 ## AI use
 
@@ -1236,6 +1886,16 @@ The review did not ask for the seed-level statistics: the lab found the shared s
 transcripts of passing and failing runs (Section 4.1). A second LLM review, of version 1.1, gave the text changes of
 version 1.2 and two recomputed numbers, which we recomputed from the per-task files [E6.1, E6.2]. Neither review is an
 independent peer review.
+
+Version 1.3. LLM agents planned, ran and analysed the studies of Section 4.10 and drafted this text, under the
+author's direction. The author approved each study and decided what is claimed. A coordinating agent read some
+cells of the return-turn study after it had seen earlier results; the record marks those reads as not blind. To
+check them, a separate agent recounted every cell of both studies from the raw rows. Before its first commit it had
+read only the plans (for the rules) and the tools that wrote the rows (for the format), and not the entries, the
+reports or any result file [E7.14]. The agent that drafted this text counted the cells a third time with its own
+code, which is in the evidence repository. Every count of a complete cell agrees. The counts of the private set came after the blind recount; two agents
+counted them from the raw rows, and they agree. This is a check of the counting,
+not of the design, and it is not an independent peer review.
 
 ## Acknowledgements
 
@@ -1255,6 +1915,9 @@ port caused the harness failures of Section 4.8, and the lazy-grammar reasoning 
 and Peasant Smith and the Project Maya contributors (the per-token launch-overhead measurement on Inkling 2 Mini and
 the idea to fuse its glue launches); Killy (the voxel-pagoda prompt behind the bad-token check); DogukanUrker (the PatchEval board and its public traces); the authors of HumanEval and
 AppWorld.
+Testers and reporters of the releases: Lazm, Abdelrahman Waref, Mustafa YILDIRIM, loadnl and luluijn (AMD builds);
+Amel (donamelo), Doğukan Ürker, xgxx666, hyf03288 and XeonG (reports and fixes); Elhussein Ahmed (emourad; the Linux
+launcher of the Inkling release).
 No person or company named here endorses this work.
 
 ## References
@@ -1264,6 +1927,10 @@ Coding Agents. ACL 2024. arXiv:2407.18901.
 
 [AWQ] J. Lin et al. AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration. MLSys 2024.
 arXiv:2306.00978.
+
+[BFCL] S. G. Patil, H. Mao, C. C.-J. Ji, F. Yan, V. Suresh, I. Stoica, J. E. Gonzalez. The Berkeley Function Calling
+Leaderboard (BFCL): From Tool Use to Agentic Evaluation of Large Language Models. ICML 2025. Software and data (v3,
+multi-turn): <https://github.com/ShishirPatil/gorilla>.
 
 [Cawley & Talbot] G. C. Cawley, N. L. C. Talbot. On Over-fitting in Model Selection and Subsequent Selection Bias in
 Performance Evaluation. JMLR 11:2079-2107, 2010.
@@ -1393,8 +2060,45 @@ arXiv:2406.11235.
 | raises-only map, cuts-only map | R8c-h32, C13c-h32 (W6-R) | the KL-only winner with only the 8 raises, or only the 13 cuts, of KL-tools |
 | unasked answer; unasked answer only; pass + unasked only | history row A12; A12-only; pass + A12-only (L-S2) | the end-of-task class of Section 4.3 |
 | tests of version 1.2 | W6-R, W7-X, W7-A, W7-S, W8-S, W9-V, W10-T, L-S2 | test names in `evidence/LINES.md` |
+| KL-tools-3 | V5tf (W11-F) | KL-tools with 29 projections back at the shipped widths; passed the long-copy gates; not shipped |
+| second-fit file | V2body (a row of Table 5) | the shipped bit map with a second set of fits |
+| return turn; HS\*, HT\* | miss_func return turn; histories HS\*, HT\* | the turn in which a held-back function comes back; the histories made by the shipped file and by KL-tools-3 |
+| rule 1, rule 2 | fields `call`, `called_held` | no tool call; the returned function not called |
+| cells of Table H1 | s0-* (the 2 x 2 and two repeats), b-* (the 80 GB card), a6-* and s3-* (stripped thinking, effort xhigh), a3-* (wordings va, vb, vc), a2-* (sampling) | cell names in `data/habits/` |
+| arms of the locate step, part 1 | S+R, S+C; k-qkv, k-gate, k-sso, k-down, k-up (cells s1-*, s2-*) | the shipped file with the common raises, the common cuts, or one kind of them |
+| arms of Table H2, in table order | L1a, L1b, L1c, AS, FF, LO, HI, Kqkv, Kag, Ksso, Katt (cells l1-*, l2-*, l3-*) | tensor copies between the shipped file and the second-fit file |
+| the official weights of Inkling 2 Mini, in Section 4.10 | FULL (the record), FP (the confirm) | the official NVFP4 / MXFP8 release, run as Unsloth's UD-Q8_K_XL file (an exact copy of the release, E4.10) |
+| first-call arms | P1 (M2), P2 (UD-Q2_K_XL in our engine), FP, R1, C1, C2, FPR; PB1, PB2 (the probe); TW1, TW2 (the cross-over: M2 weights, the 2-bit file's weights) | the arms of the first-call confirm and of its two probes |
+| studies of version 1.3 | return-turn hunt (steps 0-3, amendments A1-A8; lines V-1, V-2, P-1, S-1, W-a, W-b, W-c); Inkling turn split; first-call confirm (lines L1-L3, amendments A1-A4); blind recount | study names in `evidence/LINES.md` |
 
 ## Appendix B. Version history
+
+**Version 1.3 (2026-11-27).** The central result is now decision-point habits (new Section 4.10), from studies made
+after version 1.2:
+
+- A procedure in four steps (detect, freeze and replay, locate, repair). This version does the first three and states
+  that the fourth is open: no build of ours was made to remove a habit.
+- The return turn of BFCL miss_func on the 27B model: found by a split by turn type while the totals were level
+  (E7.1); a replay of one frozen call, valid by its line, with two miss rules given everywhere (E7.2); the mechanism
+  (most misses say that the tool is absent) (E7.3); the parent check in one setup (E7.4); stripped thinking, effort
+  and three wordings (E7.5, E7.6); sampling on three seeds (E7.7).
+- The locate step: a stop line for the common changes of the candidate maps (E7.8), and tensor copies between two
+  files with one bit map, reported as suggestive only, with both sets of labels (E7.9). On the development half of a
+  fresh private set the control holds, the gap between the two files is not shown, one of the four leads shows again,
+  and one graft arm, chosen after the look, is below both files (E7.15). One read of that arm on the sealed half did
+  not confirm it: the control did not reach its line, and the graft was not below the shipped file (E7.16).
+- Inkling 2 Mini: a turn split that found no class that holds the score gap (E7.10); a pre-registered confirm of a
+  first-call decision on fresh tasks, with its three lines passed and the official weights as a report row (E7.11); a
+  decision probe that did not locate it (E7.12); a pre-registered cross-over of the thinking, which places the
+  decision at the step after the thinking (E7.18); a post hoc correction of what the decision is (the client
+  receives one sentence, and the model writes the action in a second block that the server drops; E7.19); and a
+  task-cost check that shows no cost in this client (E7.13).
+- A blind recount of both studies by a separate agent (E7.14), and per-unit outcome files with a script that repeats
+  the counts.
+- The coding-agent description in the limitations has the board's later run on release v1.2 (E6.16b).
+- The title is the one chosen for this version; the abstract leads with the mechanism. "Full precision" is defined
+  in Section 2. The AI-use statement is
+  updated. New names in Appendix A; new missed and stop lines in Table 10.
 
 **Version 1.2 (2026-11-26).** Text and evidence. No run was made for this text; the new results come from lab runs
 made after version 1.1, and the review items from a second LLM review of version 1.1:

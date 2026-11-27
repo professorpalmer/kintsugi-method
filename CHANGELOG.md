@@ -1,5 +1,60 @@
 # Changelog
 
+## v1.3 (2026-11-27)
+
+The central result is now decision-point habits (new Section 4.10). The results come from studies made after v1.2.
+
+### New results
+
+- **A procedure in four steps:** detect a habit by a split by turn type, freeze one history and replay the deciding
+  call, locate it by tensor copies, repair. This version does the first three. It states that the fourth is open: no
+  build of ours was made to remove a habit.
+- **The return turn of BFCL miss_func (Qwen3.8-27B).** A candidate map has level totals on two agent benchmarks and
+  misses the returned tool more often (48 of 198 against 28 of 199; found after the run). The replay of the one
+  deciding call repeats the gap; two miss rules are given everywhere (E7.1, E7.2).
+- **The mechanism:** in most misses the model says that the tool is absent, although the updated tool list is in its
+  prompt (keyword counts; E7.3). Not explained by prompt length.
+- **Levers on the frozen turn:** three wordings; stripping the thinking of earlier turns removes 62 % (rule 1) and
+  40 % (rule 2) of the shipped file's misses; effort xhigh; sampling on three seeds (E7.5-E7.7).
+- **The parent check:** on one 80 GB card in one setup at temperature 0.001, BF16 misses 61 of 200 return turns and
+  the shipped file 36 (p 1.1e-4; rule 2: 77 against 59). A narrow statement: one turn, one temperature, one history
+  (E7.4).
+- **Locate.** The common changes of the candidate maps: stop line "diffuse at the side level" (E7.8). Tensor copies
+  between two files with one bit map: the fits carry their gap under rule 1; reported as **suggestive only**, with
+  both rule-2 reads and both sets of labels (E7.9). **A fresh private set, development half:** the
+  control gap of the candidate map shows (+21 of 230 units, p 0.0076); the gap between the two files is not shown
+  (+12, p 0.15; rule 2 p 0.11), so the lines on the copies were not read; as a report, one of the four leads shows
+  again, and one graft arm, chosen after the look, is below both files (E7.15). **One read of that arm on the sealed
+  half did not confirm it:** the control did not reach its line (+16, p 0.065), so the lines were not read; as a
+  report, the graft misses less than its own base and is not below the shipped file. No repair is confirmed on
+  held-out turns (E7.16).
+- **Inkling 2 Mini.** A turn split found no class that holds the score gap (E7.10). A pre-registered confirm on
+  fresh tasks passed its three lines: the first reply of a task has no code in 46.3 % of the calls for the official
+  weights, 45.1 % for a public 2-bit file and 11.4 % for M2 (E7.11). A decision probe did not locate
+  the decision (E7.12). A pre-registered cross-over of the thinking places it at the step after the thinking
+  (E7.18). **A correction, post hoc:** "one sentence and no code" is what the client receives; in most such replies
+  the model writes the action in a second block that the server drops, so a part of the decision may be removable
+  on the serving side (not tested; E7.19). The decision shows **no task cost** in this client (E7.13): it is a marker of a departure
+  from the parent, not damage, and its lower rate is not a quality gain.
+- **A blind recount** of both studies by a separate agent: no count of a complete cell differs (E7.14).
+
+### Text
+
+- Title: "Kintsugi: Task-Gated Repair Reaches Full-Precision Agent Scores at 2.5 Bits". "Repair" is the loop (diagnose, locate, repair,
+  gate), not the 27B bit allocation, which is the published one. "Full precision" is defined in Section 2 of the
+  paper: the weights as their authors released them (BF16 for Qwen3.8-27B; for Inkling 2 Mini the official release,
+  which has no higher-precision form). The abstract leads with the mechanism.
+- Limitations, Future work, Table 10 (missed and stop lines), Appendix A (names) and the AI-use statement are updated.
+- The coding-agent description in the Limitations has the public board's later run on release v1.2: 18 of 20 with the
+  same model file (13 of 20 on release v1.1.1). The serving stack changed between the runs and the weights did not;
+  which change caused the rise was not measured. One run each: a description, not a test of the weights (E6.16b).
+
+### Repository
+
+- New data `data/habits/` (per-unit outcomes: ids and 0 / 1 flags; no prompt or reply text), new script
+  `scripts/v13_habits.py`, Figures 8 and 9.
+- `evidence/EVIDENCE.md` section W7 (E7.1-E7.19) and row E6.16b; `evidence/LINES.md` section 7.
+
 ## v1.2 (2026-11-26)
 
 Text and evidence. No run was made for this text; the new results come from lab runs made after v1.1. Review items

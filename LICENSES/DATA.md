@@ -8,6 +8,7 @@
 | `data/b1/excluded_names.txt` | file names left out of the B1 pool (the selection's recall corpora) | CC BY 4.0 |
 | `data/bench/pycode.raw` | the copy corpus of the recall gate (Python source files in order) | derived from the CPython standard library: PSF License 2.0 |
 | `data/appworld/openings/*.csv` | per task-run: the first word of the model's first reply and a 16-character hash of its first 8 words | our runs; the model's own words, one word per task-run; no AppWorld task text. CC BY 4.0 |
+| `data/habits/*.csv` | per-unit outcomes of the decision-point habit studies of paper v1.3: entry or task ids and 0 / 1 flags (and the prompt token count of a unit) | our runs of BFCL v3 multi-turn (the Gorilla project, Patil et al.; https://github.com/ShishirPatil/gorilla; Apache-2.0) and of AppWorld. Only ids and outcomes are given: no prompt, no reply, no tool definition, no test assertion. Our outcome files: CC BY 4.0 |
 | `data/w2c/out/`, `data/margins/w2d/` | teacher-forced margin records of the second batch | our measurements; CC BY 4.0 |
 | `data/freegen/` | free-generation records on a synthetic needle document (built by `scripts/free_needles.py`): the model's answer and its thinking text | our runs; the document is synthetic filler with planted codes; CC BY 4.0 |
 | `data/scores/` | result tables of our scorers | our measurements; CC BY 4.0. `w4l-overlap.txt` and `w4l-old-file-clean-set.txt` report measurements on a third party's public files and name public datasets; no third-party text is included |

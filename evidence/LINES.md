@@ -165,3 +165,54 @@ task level as the line was written, and at the seed level (section 6.1) where th
 | No map tuned to one item (rule, written when the item was found) | a later candidate must pass a fresh needle set; no map is tuned until the item passes | kept: the one-group maps are a diagnosis only (they move the event to other items) | E5.26 |
 | W4-L overlap check | a golden document is "in his text" at >= 50 % shared 50-character windows, "touched" at >= 5 %; with any document >= 5 % the clean set gives the verdict and the full set is reported next to it | **overlap found** (3 in, 2 touched); clean set 293 documents | E5.25 |
 | W4-L, new LookAtMyQuant file | "the gap to M2 closes in class c" only if the 95 % interval of (new - M2) includes 0 or is below 0, for code, tools, agentic, reasoning | not yet measured on our golden set (the rig port's check R0 did not pass) | E5.24 |
+
+## 7. Version 1.3: decision-point habits (2026-11-26 and 11-27; every line before the cells or calls it judges)
+
+"Rule 1" = the reply has no tool call (the rule of every line below). "Rule 2" (no call names the returned function)
+was added after the first results and judges no line. Verdicts marked * were read by the paper agent from the
+written line and the counts; the study record gives the counts.
+
+### 7.1 The return-turn replay (Qwen3.8-27B; BFCL v3 multi_turn_miss_func)
+
+| Test | Line | Verdict | Rows |
+|---|---|---|---|
+| Validity V-1 (per history) | "the gap reproduces on history h" only if D(KL-tools-3 - shipped) >= +10 AND p < 0.05 AND D > 2 x F (F = the replay noise, at least 2) | HS\*: **not met** (+8, p 0.17). HT\*: **met** (+27, p 3.5e-6) | E7.2 |
+| Validity V-2 (both histories) | D > 0 on each history AND by-entry D >= +16 AND p < 0.01 AND D > 2 x F | **met** (+35, 40 / 10, p 2.4e-5). The replay is valid; the analysis set is HT\* (V-1 holds on one history); reading "mixed" | E7.2 |
+| Diagonal check (an expectation, across machines after an amendment) | a file on its own history repeats the live call on 90 % or more of the units | 95.0 % and 89.4 % | E7.2 |
+| Step 1, "carries" | an arm carries iff its share of the gap on the analysis set is >= 0.60 AND p < 0.05 AND D > 2 x F; clear iff share <= 0.30 AND p >= 0.05; else partial. Exactly one side must carry, or the hunt stops | raises partial (0.48), cuts clear (0.19): **stop line "diffuse at the side level"**; no step 2 line read; no candidate map built | E7.8 |
+| P-1, the parent | "on identical prompts the shipped map misses the returned tool less often than the parent" HELD iff D(BF16 - shipped) > 0 on every history with complete cells AND p < 0.05 AND D > 2 x F | **held\*** (one history complete: 61 against 36, 33 / 8, p 1.1e-4) | E7.4 |
+| S-1, sampling | "the gap holds when the model samples" HELD iff D per seed > 0 for each of 3 seed bases AND the by-entry sign test over the 3 seeds and both histories has p < 0.05 | **held** (+49, +49, +42; 91 / 22, p 3.7e-11) | E7.7 |
+| W-a, W-b, wordings | "the gap is not tied to the BFCL line" HELD (per wording) iff D > 0 on each history AND the by-entry p < 0.05 | (a) **not held\*** (+4, +4; p 0.092); (b) **held\*** at the edge (+2, +11; p 0.049) | E7.6 |
+| W-c, "ceiling" | HELD iff no call in 5 % or less of the units for both files | **not held\*** (7.0 % and 24.4 %) | E7.6 |
+| Fit copies, half-gap rule (amendment, before any of its cells) | an arm meets it iff its by-entry D against shipped is >= 13 (half of the reference gap of 26) AND p < 0.05; it "carries" iff it meets the rule and its complement does not | the 400 second fits **carry** (+26, p 0.0056; the 53 other tensors -3); attention + linear-attention kinds **carry** (+31; MLP kinds +18, p 0.063); layers 0-31 **carry** (+31; layers 32-63 +3); by kind: linear-attention output **meets** (+21, p 0.044), three others do not. 6 primary and 6 secondary tests, no correction. By the plan's step-1 rule (an extension by the blind recount) the 400-fit arm and the output arm are "partial". Reported as suggestive only | E7.9 |
+| Fit copies, wording (c) as "the stronger probe" | only if the by-entry gap of the second-fit file under (c) is above 26 AND p < 0.013 | **not met** (+11, p 0.14) | E7.9 |
+
+### 7.2 Inkling 2 Mini
+
+| Test | Line | Verdict | Rows |
+|---|---|---|---|
+| Turn split of the recorded runs | ONE CLASS iff the top class has half of the gap or more AND the sign test by task has p < 0.05; a gap under 10 task-runs = NO GAP TO SPLIT; else DIFFUSE | the official weights against M2: **no gap to split**; the two pairs with a gap: **diffuse** (shares 0.30, 0.31) | E7.10 |
+| First-call confirm, L1 | the public 2-bit file's no-code rate on fresh tasks is 20 % or more (a cut reply counts as code) | **pass** (350 / 834 = 42.0 %) | E7.11 |
+| First-call confirm, L2 | M2 is below it: exact sign test by task (seeds pooled per task), p < 0.001, AND M2's rate is half or less (cut replies counted against the claim) | **pass** (95 / 834 against 350 / 834, ratio 0.27; 223 / 22, p 4.8e-43) | E7.11 |
+| First-call confirm, L3 | M2's replay on the standard split, seed 102, is inside the exact 95 % interval of the record's 50 / 672 at n 168: [6, 20] | **pass** (18 / 168) | E7.11 |
+| Task-cost check (reading rule, before the count; post hoc data) | "the habit costs tasks" needs the pooled within-task sign test p < 0.05 AND a mean of -5 points or lower; "no task cost shown" if the pooled p >= 0.05; anything between = "a small cost" | label by the rule: "a small cost" (p 0.049). The rule did not foresee the sign: the runs with no code first pass MORE often (+1.5 points, [-1.8, +4.7]). **Plain reading: no task cost shown**; a cost under about 2 points is not excluded | E7.13 |
+| Cross-over of the thinking, line D (validity) | each file's weights on its own thinking give a no-code count inside the 95 % binomial interval of its count in the confirm | **pass** (111 in [77, 112]; 331 in [308, 362]) | E7.18 |
+| Cross-over, line T | "the thinking carries the habit" iff its share of the gap is 0.4 or more AND both thinking tests go the same way (the 2-bit file's thinking gives more no-code) with p < 0.001 | **no** (share -0.19; -4.0 and -7.7 points: the other way) | E7.18 |
+| Cross-over, line W | "the step after the thinking carries it" iff its share is 0.4 or more AND both weights tests go the same way with p < 0.001 | **yes** (share 1.19; +38.8 points, 312 / 29; +35.2 points, 272 / 18). Reading: the step after the thinking decides | E7.18 |
+
+### 7.3 A fresh private set of return turns (development half, then one read of the sealed half)
+
+The set is generated by us, has the structure of BFCL miss_func and no overlap with the public entries. Only counts
+leave the lab.
+
+| Test | Line | Verdict | Rows |
+|---|---|---|---|
+| C0, the control | the gap of the candidate map (KL-tools-3 minus shipped) on the primary set is above 4 AND p < 0.05 under rule 1 ("the fresh set shows the habit gap"); rule 2 reported | **holds** (+21 of 230 units, 27 / 10, p 0.0076; rule 2: +18, p 0.017) | E7.15 |
+| L-G, the gap of the two same-map files on fresh entries | "the gap reproduces on fresh entries" holds under a rule iff the by-entry difference (second-fit file minus shipped) on the primary set is above 4 AND p < 0.05; "the lead reproduces" iff it holds under BOTH rules | **not met** (rule 1: +12 of 230 units, 16 / 8, p 0.15; rule 2: +12, 17 / 8, p 0.11): not shown at this size; the locate result is not replicated | E7.15 |
+| The fit copies and the graft arms on that set | read only under a rule where L-G holds | **not read** (no gap on the development half); their counts are a report: one copy arm of four shows again (attention + linear-attention kinds: +22, p 0.0070; rule 2 +19, p 0.029), and one graft arm of five, chosen after the look, is below shipped (-11, p 0.043; rule 2 -12, p 0.015) | E7.15 |
+| Resolution, stated in the plan before the run | a gap of the public size is about +15 on this set, with p near 0.05 at best; a failed line reads "not shown", not "absent" | - | E7.15 |
+| Sealed half, C (the control; lines written after the development results and before the sealed half was read) | KL-tools-3 misses more than shipped, p < 0.05 under rule 1; if C fails, S-1 to S-3 read "not read" | **fails** (+16 of 230 units, 24 / 12, p 0.065; rule 2: +14, p 0.18): S-1 to S-3 not read | E7.16 |
+| Sealed half, S-1 | the graft arm (chosen after the look at the development half) misses less than its base, p < 0.05 under both rules, AND its misses are at most 0.75 x the base's under both rules | not read; report: -24, 7 / 29, p 3.1e-4, ratio 0.70; rule 2: -16, 9 / 24, p 0.014, ratio 0.80 (above 0.75) | E7.16 |
+| Sealed half, S-2 | the graft arm misses less than shipped, p < 0.05 under both rules | not read; report: -7, p 0.42; rule 2: -10, p 0.23 | E7.16 |
+| Sealed half, S-3 | the reverse copy misses more than shipped, p < 0.05 under both rules | not read; report: +13, p 0.087; rule 2: +6, p 0.70 | E7.16 |
+| Sealed half, the reading rule | S-1 and S-2 pass: "a graft below both parent files, confirmed on held-out turns"; only S-1: "the graft lowers its base's habit"; neither: "the development lead did not hold" | **the development lead did not hold**; no repair is confirmed on held-out turns | E7.16 |

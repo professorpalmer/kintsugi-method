@@ -1,0 +1,275 @@
+PART 1. The return turn (BFCL v3 multi_turn_miss_func), Qwen3.8-27B. Counts are misses.
+Cell names: s0 = the 2 x 2; KL-tools-3 is 'V5tf' in the records. HS* = 200 entries, HT* = 198 entries.
+
+(1a) Cells: units / rule 1 misses / rule 2 misses
+    a2-V5tf-s20261201-HS: 200 / 59 / 91
+    a2-V5tf-s20261201-HT: 198 / 60 / 87
+    a2-V5tf-s20261202-HS: 200 / 55 / 83
+    a2-V5tf-s20261202-HT: 198 / 62 / 91
+    a2-V5tf-s20261203-HS: 200 / 58 / 75
+    a2-V5tf-s20261203-HT: 198 / 56 / 84
+    a2-shipped-s20261201-HS: 200 / 37 / 57
+    a2-shipped-s20261201-HT: 198 / 33 / 63
+    a2-shipped-s20261202-HS: 200 / 34 / 59
+    a2-shipped-s20261202-HT: 198 / 34 / 64
+    a2-shipped-s20261203-HS: 200 / 39 / 65
+    a2-shipped-s20261203-HT: 198 / 33 / 62
+    a3-V5tf-va-HS: 200 / 8 / 32
+    a3-V5tf-va-HT: 198 / 5 / 34
+    a3-V5tf-vb-HS: 200 / 42 / 132
+    a3-V5tf-vb-HT: 198 / 49 / 136
+    a3-V5tf-vc-HS: 200 / 47 / 59
+    a3-V5tf-vc-HT: 198 / 50 / 68
+    a3-shipped-va-HS: 200 / 4 / 30
+    a3-shipped-va-HT: 198 / 1 / 30
+    a3-shipped-vb-HS: 200 / 40 / 125
+    a3-shipped-vb-HT: 198 / 38 / 130
+    a3-shipped-vc-HS: 200 / 14 / 31
+    a3-shipped-vc-HT: 198 / 14 / 32
+    a6-V2body-nothink-HT: 198 / 28 / 50
+    a6-shipped-nothink-HS: 200 / 14 / 31
+    a6-shipped-nothink-HT: 198 / 13 / 41
+    b-BF16-HS: 200 / 61 / 77
+    b-BF16-HT: 190 / 49 / 77
+    b-V5tf-HS: 200 / 53 / 81
+    b-shipped-HS: 200 / 36 / 59
+    l1-L1a-HS: 200 / 38 / 61
+    l1-L1a-HT: 198 / 30 / 59
+    l1-L1b-HS: 200 / 50 / 73
+    l1-L1b-HT: 198 / 47 / 71
+    l1-L1c-HS: 200 / 37 / 60
+    l1-L1c-HT: 198 / 27 / 55
+    l1-V2body-vc-HS: 200 / 18 / 35
+    l1-V2body-vc-HT: 198 / 21 / 38
+    l2-AS-HS: 200 / 53 / 69
+    l2-AS-HT: 198 / 49 / 71
+    l2-FF-HS: 200 / 49 / 77
+    l2-FF-HT: 198 / 40 / 64
+    l2-HI-HS: 200 / 42 / 66
+    l2-HI-HT: 198 / 32 / 59
+    l2-LO-HS: 200 / 48 / 69
+    l2-LO-HT: 198 / 54 / 74
+    l3-Kag-HS: 200 / 37 / 58
+    l3-Kag-HT: 198 / 32 / 52
+    l3-Katt-HS: 200 / 48 / 71
+    l3-Katt-HT: 198 / 27 / 55
+    l3-Kqkv-HS: 200 / 39 / 62
+    l3-Kqkv-HT: 198 / 40 / 63
+    l3-Ksso-HS: 200 / 49 / 74
+    l3-Ksso-HT: 198 / 43 / 71
+    s0-V5tf-HS: 200 / 48 / 80
+    s0-V5tf-HT: 198 / 58 / 84
+    s0-shipped-HS: 200 / 40 / 61
+    s0-shipped-HS-R1: 200 / 40 / 61
+    s0-shipped-HS-R2: 200 / 40 / 61
+    s0-shipped-HT: 198 / 31 / 59
+    s1-SC-HS: 200 / 37 / 58
+    s1-SC-HT: 198 / 36 / 64
+    s1-SR-HS: 200 / 45 / 66
+    s1-SR-HT: 198 / 44 / 70
+    s1-V2body-HS: 200 / 51 / 73
+    s1-V2body-HT: 198 / 46 / 70
+    s2-k-down-HS: 200 / 34 / 59
+    s2-k-down-HT: 198 / 35 / 61
+    s2-k-gate-HS: 200 / 40 / 63
+    s2-k-gate-HT: 198 / 41 / 64
+    s2-k-qkv-HS: 200 / 44 / 67
+    s2-k-qkv-HT: 198 / 39 / 62
+    s2-k-sso-HS: 200 / 33 / 56
+    s2-k-sso-HT: 198 / 28 / 56
+    s2-k-up-HS: 200 / 39 / 64
+    s2-k-up-HT: 198 / 33 / 62
+    s3-V5tf-nothink-HS: 200 / 20 / 38
+    s3-V5tf-nothink-HT: 198 / 19 / 40
+    s3-V5tf-xhigh-HS: 200 / 32 / 52
+    s3-V5tf-xhigh-HT: 198 / 35 / 65
+
+(1b) Replay noise: the shipped cell on HS* run again (R1 same seeds, R2 other seeds)
+    rule 1 no call: R1 40 vs 40 of 200, D +0, 0 / 0, p 1; R2 40 vs 40 of 200, D +0, 0 / 0, p 1
+    rule 2 function not called: R1 61 vs 61 of 200, D +0, 0 / 0, p 1; R2 61 vs 61 of 200, D +0, 0 / 0, p 1
+
+(1c) The live runs that made the histories (first reply of the return turn; the rig's repeat of the benchmark turn)
+    shipped 32 of 200; KL-tools-3 57 of 198; paired on 198 entries: KL-tools-3 only 35, shipped only 10, both 22, p 2.5e-04
+    replay equal to the live call, shipped on HS*: 190 of 200 (95.0 %)
+    replay equal to the live call, KL-tools-3 on HT*: 177 of 198 (89.4 %)
+
+(1d) Main comparisons, both rules
+[2x2] KL-tools-3 vs shipped (RTX 4070 cells)
+    rule 1 no call: HS* 48 vs 40 of 200, D +8, 17 / 9, p 0.17; HT* 58 vs 31 of 198, D +27, 31 / 4, p 3.5e-06; pooled by entry D +35, 40 / 10, p 2.4e-05 (200 entries)
+    rule 2 function not called: HS* 80 vs 61 of 200, D +19, 31 / 12, p 0.0054; HT* 84 vs 59 of 198, D +25, 32 / 7, p 7.0e-05; pooled by entry D +44, 51 / 14, p 4.5e-06 (200 entries)
+[parent] BF16 vs shipped, one A100, one engine and setup
+    rule 1 no call: HS* 61 vs 36 of 200, D +25, 33 / 8, p 1.1e-04
+    rule 2 function not called: HS* 77 vs 59 of 200, D +18, 33 / 15, p 0.013
+[parent-v5tf] KL-tools-3 vs shipped on the A100
+    rule 1 no call: HS* 53 vs 36 of 200, D +17, 24 / 7, p 0.0033
+    rule 2 function not called: HS* 81 vs 59 of 200, D +22, 33 / 11, p 0.0013
+[parent-bf16-v5tf] BF16 vs KL-tools-3 on the A100
+    rule 1 no call: HS* 61 vs 53 of 200, D +8, 23 / 15, p 0.26
+    rule 2 function not called: HS* 77 vs 81 of 200, D -4, 22 / 26, p 0.67
+[setup] shipped on the A100 vs shipped on the RTX 4070 box, HS* (same requests)
+    rule 1 no call: 36 vs 40 of 200, D -4, 3 / 7, p 0.34; entries that differ 10
+    rule 2 function not called: 59 vs 61 of 200, D -2, 6 / 8, p 0.79; entries that differ 14
+[strip-shipped] shipped with earlier thinking stripped vs shipped
+    rule 1 no call: HS* 14 vs 40 of 200, D -26, 6 / 32, p 2.4e-05; HT* 13 vs 31 of 198, D -18, 6 / 24, p 0.0014; pooled by entry D -44, 7 / 45, p 7.0e-08 (200 entries)
+    rule 2 function not called: HS* 31 vs 61 of 200, D -30, 5 / 35, p 1.4e-06; HT* 41 vs 59 of 198, D -18, 7 / 25, p 0.0021; pooled by entry D -48, 9 / 48, p 1.5e-07 (200 entries)
+[strip-v5tf] KL-tools-3 with earlier thinking stripped vs KL-tools-3
+    rule 1 no call: HS* 20 vs 48 of 200, D -28, 9 / 37, p 4.1e-05; HT* 19 vs 58 of 198, D -39, 6 / 45, p 1.8e-08; pooled by entry D -67, 13 / 60, p 2.3e-08 (200 entries)
+    rule 2 function not called: HS* 38 vs 80 of 200, D -42, 6 / 48, p 3.3e-09; HT* 40 vs 84 of 198, D -44, 6 / 50, p 1.0e-09; pooled by entry D -86, 10 / 73, p 5.8e-13 (200 entries)
+[strip-gap] KL-tools-3 stripped vs shipped stripped
+    rule 1 no call: HS* 20 vs 14 of 200, D +6, 8 / 2, p 0.11; HT* 19 vs 13 of 198, D +6, 9 / 3, p 0.15; pooled by entry D +12, 16 / 4, p 0.012 (200 entries)
+    rule 2 function not called: HS* 38 vs 31 of 200, D +7, 9 / 2, p 0.065; HT* 40 vs 41 of 198, D -1, 4 / 5, p 1; pooled by entry D +6, 12 / 5, p 0.14 (200 entries)
+[strip-v2body] refit stripped vs shipped stripped
+    rule 1 no call: HT* 28 vs 13 of 198, D +15, 15 / 0, p 6.1e-05
+    rule 2 function not called: HT* 50 vs 41 of 198, D +9, 11 / 2, p 0.022
+[strip-v2body-self] refit stripped vs refit
+    rule 1 no call: HT* 28 vs 46 of 198, D -18, 9 / 27, p 0.0039
+    rule 2 function not called: HT* 50 vs 70 of 198, D -20, 9 / 29, p 0.0017
+[xhigh] KL-tools-3 at effort xhigh vs KL-tools-3
+    rule 1 no call: HS* 32 vs 48 of 200, D -16, 13 / 29, p 0.02; HT* 35 vs 58 of 198, D -23, 9 / 32, p 4.3e-04; pooled by entry D -39, 17 / 45, p 5.0e-04 (200 entries)
+    rule 2 function not called: HS* 52 vs 80 of 200, D -28, 13 / 41, p 1.8e-04; HT* 65 vs 84 of 198, D -19, 14 / 33, p 0.0079; pooled by entry D -47, 21 / 52, p 3.7e-04 (200 entries)
+[xhigh-shipped] KL-tools-3 at effort xhigh vs shipped
+    rule 1 no call: HS* 32 vs 40 of 200, D -8, 15 / 23, p 0.26; HT* 35 vs 31 of 198, D +4, 16 / 12, p 0.57; pooled by entry D -4, 24 / 27, p 0.78 (200 entries)
+    rule 2 function not called: HS* 52 vs 61 of 200, D -9, 20 / 29, p 0.25; HT* 65 vs 59 of 198, D +6, 21 / 15, p 0.41; pooled by entry D -3, 34 / 35, p 1 (200 entries)
+[word-va] wording (a) paraphrase: KL-tools-3 vs shipped
+    rule 1 no call: HS* 8 vs 4 of 200, D +4, 6 / 2, p 0.29; HT* 5 vs 1 of 198, D +4, 5 / 1, p 0.22; pooled by entry D +8, 10 / 3, p 0.092 (200 entries)
+    rule 2 function not called: HS* 32 vs 30 of 200, D +2, 9 / 7, p 0.8; HT* 34 vs 30 of 198, D +4, 6 / 2, p 0.29; pooled by entry D +6, 13 / 7, p 0.26 (200 entries)
+    shipped under this wording vs shipped under the benchmark line (other requests by design): rule 1 no call: HS* 4 vs 40, HT* 1 vs 31; rule 2 function not called: HS* 30 vs 61, HT* 30 vs 59
+[word-vb] wording (b) the withheld request again, no announcement: KL-tools-3 vs shipped
+    rule 1 no call: HS* 42 vs 40 of 200, D +2, 13 / 11, p 0.84; HT* 49 vs 38 of 198, D +11, 17 / 6, p 0.035; pooled by entry D +13, 29 / 15, p 0.049 (200 entries)
+    rule 2 function not called: HS* 132 vs 125 of 200, D +7, 19 / 12, p 0.28; HT* 136 vs 130 of 198, D +6, 19 / 13, p 0.38; pooled by entry D +13, 34 / 21, p 0.1 (200 entries)
+    shipped under this wording vs shipped under the benchmark line (other requests by design): rule 1 no call: HS* 40 vs 40, HT* 38 vs 31; rule 2 function not called: HS* 125 vs 61, HT* 130 vs 59
+[word-vc] wording (c) the function is named: KL-tools-3 vs shipped
+    rule 1 no call: HS* 47 vs 14 of 200, D +33, 34 / 1, p 2.1e-09; HT* 50 vs 14 of 198, D +36, 40 / 4, p 1.7e-08; pooled by entry D +69, 58 / 5, p 1.7e-12 (200 entries)
+    rule 2 function not called: HS* 59 vs 31 of 200, D +28, 32 / 4, p 1.9e-06; HT* 68 vs 32 of 198, D +36, 40 / 4, p 1.7e-08; pooled by entry D +64, 56 / 8, p 5.6e-10 (200 entries)
+    shipped under this wording vs shipped under the benchmark line (other requests by design): rule 1 no call: HS* 14 vs 40, HT* 14 vs 31; rule 2 function not called: HS* 31 vs 61, HT* 32 vs 59
+[word-vc-refit] wording (c): refit vs shipped
+    rule 1 no call: HS* 18 vs 14 of 200, D +4, 13 / 9, p 0.52; HT* 21 vs 14 of 198, D +7, 12 / 5, p 0.14; pooled by entry D +11, 19 / 10, p 0.14 (200 entries)
+    rule 2 function not called: HS* 35 vs 31 of 200, D +4, 13 / 9, p 0.52; HT* 38 vs 32 of 198, D +6, 12 / 6, p 0.24; pooled by entry D +10, 20 / 12, p 0.22 (200 entries)
+
+(1e) Sampling at the launcher default (temperature 1.0, top-k 20, top-p 0.95, min-p 0.05), three seed bases
+    rule 1 no call, seed base 20261201: HS* 59 vs 37 of 200, D +22, 35 / 13, p 0.0021; HT* 60 vs 33 of 198, D +27, 44 / 17, p 7.3e-04; pooled D +49, 58 / 20, p 2.0e-05 (200 entries)
+    rule 1 no call, seed base 20261202: HS* 55 vs 34 of 200, D +21, 34 / 13, p 0.0031; HT* 62 vs 34 of 198, D +28, 39 / 11, p 9.0e-05; pooled D +49, 58 / 17, p 2.2e-06 (200 entries)
+    rule 1 no call, seed base 20261203: HS* 58 vs 39 of 200, D +19, 40 / 21, p 0.02; HT* 56 vs 33 of 198, D +23, 40 / 17, p 0.0032; pooled D +42, 53 / 20, p 1.4e-04 (200 entries)
+    rule 1 no call, three seeds: KL-tools-3 350 vs shipped 210 of 1194 replies; by entry D +140, 91 / 22, p 3.7e-11 (200 entries); D per seed [49, 49, 42], mean +46.7, 95 % t interval (2 df) [+36.6, +56.7]
+    rule 2 function not called, seed base 20261201: HS* 91 vs 57 of 200, D +34, 49 / 15, p 2.4e-05; HT* 87 vs 63 of 198, D +24, 46 / 22, p 0.0049; pooled D +58, 69 / 24, p 3.3e-06 (200 entries)
+    rule 2 function not called, seed base 20261202: HS* 83 vs 59 of 200, D +24, 41 / 17, p 0.0022; HT* 91 vs 64 of 198, D +27, 41 / 14, p 3.6e-04; pooled D +51, 62 / 21, p 7.5e-06 (200 entries)
+    rule 2 function not called, seed base 20261203: HS* 75 vs 65 of 200, D +10, 38 / 28, p 0.27; HT* 84 vs 62 of 198, D +22, 42 / 20, p 0.0071; pooled D +32, 55 / 30, p 0.0088 (200 entries)
+    rule 2 function not called, three seeds: KL-tools-3 511 vs shipped 370 of 1194 replies; by entry D +141, 102 / 28, p 4.4e-11 (200 entries); D per seed [58, 51, 32], mean +47.0, 95 % t interval (2 df) [+13.6, +80.4]
+
+(1f) Prompt length: rule 1 misses in the shorter and the longer half of the prompts (split at the median)
+    s0-V5tf-HT: shorter 31 of 99; longer 27 of 99
+    s0-shipped-HT: shorter 10 of 99; longer 21 of 99
+    b-BF16-HS: shorter 29 of 100; longer 32 of 100
+
+(1g) The locate step. G1 = the gap of KL-tools-3 on HT* under rule 1 (the plan's analysis set); G2 = the pooled gap of
+     the refit (same bit map as shipped, other fits) under rule 1. 'plan label' = the rule of the study's plan applied
+     on HT* against G1: carries iff share >= 0.60 and p < 0.05 and D > 4; clear iff share <= 0.30 and p >= 0.05; else
+     partial. 'half-gap' = the rule of the later amendment: pooled D >= G2 / 2 and pooled p < 0.05.
+    G1 = +27; G2 = D +26, 47 / 25, p 0.013 (200 entries); half of G2 = 13
+    s1-V2body = refit (all 400 fits and 53 other tensors differ)
+        rule 1: HS* 51 vs 40 of 200, D +11, 26 / 15, p 0.12; HT* 46 vs 31 of 198, D +15, 29 / 14, p 0.032; pooled D +26, 47 / 25, p 0.013 (200 entries)
+        rule 2: HS* 73 vs 61 of 200, D +12, 30 / 18, p 0.11; HT* 70 vs 59 of 198, D +11, 30 / 19, p 0.15; pooled D +23, 51 / 29, p 0.018 (200 entries)
+        plan label on HT* (share 0.56): partial; half-gap rule: met
+    s1-SR = shipped + the 40 common raises of the candidate maps
+        rule 1: HS* 45 vs 40 of 200, D +5, 12 / 7, p 0.36; HT* 44 vs 31 of 198, D +13, 22 / 9, p 0.029; pooled D +18, 26 / 11, p 0.02 (200 entries)
+        rule 2: HS* 66 vs 61 of 200, D +5, 17 / 12, p 0.46; HT* 70 vs 59 of 198, D +11, 21 / 10, p 0.071; pooled D +16, 31 / 17, p 0.059 (200 entries)
+        plan label on HT* (share 0.48): partial; half-gap rule: met
+    s1-SC = shipped + the 33 common cuts
+        rule 1: HS* 37 vs 40 of 200, D -3, 9 / 12, p 0.66; HT* 36 vs 31 of 198, D +5, 12 / 7, p 0.36; pooled D +2, 16 / 14, p 0.86 (200 entries)
+        rule 2: HS* 58 vs 61 of 200, D -3, 12 / 15, p 0.7; HT* 64 vs 59 of 198, D +5, 15 / 10, p 0.42; pooled D +2, 21 / 17, p 0.63 (200 entries)
+        plan label on HT* (share 0.19): clear; half-gap rule: not met
+    s2-k-qkv = shipped + raises: attn_qkv (17)
+        rule 1: HS* 44 vs 40 of 200, D +4, 11 / 7, p 0.48; HT* 39 vs 31 of 198, D +8, 17 / 9, p 0.17; pooled D +12, 21 / 12, p 0.16 (200 entries)
+        rule 2: HS* 67 vs 61 of 200, D +6, 17 / 11, p 0.34; HT* 62 vs 59 of 198, D +3, 17 / 14, p 0.72; pooled D +9, 26 / 19, p 0.37 (200 entries)
+        plan label on HT* (share 0.30): clear; half-gap rule: not met
+    s2-k-gate = shipped + raises: ffn_gate (8)
+        rule 1: HS* 40 vs 40 of 200, D +0, 10 / 10, p 1; HT* 41 vs 31 of 198, D +10, 18 / 8, p 0.076; pooled D +10, 22 / 16, p 0.42 (200 entries)
+        rule 2: HS* 63 vs 61 of 200, D +2, 14 / 12, p 0.85; HT* 64 vs 59 of 198, D +5, 18 / 13, p 0.47; pooled D +7, 28 / 23, p 0.58 (200 entries)
+        plan label on HT* (share 0.37): partial; half-gap rule: not met
+    s2-k-sso = shipped + raises: ssm_out (15)
+        rule 1: HS* 33 vs 40 of 200, D -7, 5 / 12, p 0.14; HT* 28 vs 31 of 198, D -3, 8 / 11, p 0.65; pooled D -10, 10 / 19, p 0.14 (200 entries)
+        rule 2: HS* 56 vs 61 of 200, D -5, 8 / 13, p 0.38; HT* 56 vs 59 of 198, D -3, 9 / 12, p 0.66; pooled D -8, 15 / 22, p 0.32 (200 entries)
+        plan label on HT* (share -0.11): clear; half-gap rule: not met
+    s2-k-down = shipped + cuts: ffn_down (28)
+        rule 1: HS* 34 vs 40 of 200, D -6, 8 / 14, p 0.29; HT* 35 vs 31 of 198, D +4, 13 / 9, p 0.52; pooled D -2, 18 / 19, p 1 (200 entries)
+        rule 2: HS* 59 vs 61 of 200, D -2, 14 / 16, p 0.86; HT* 61 vs 59 of 198, D +2, 15 / 13, p 0.85; pooled D +0, 24 / 23, p 1 (200 entries)
+        plan label on HT* (share 0.15): clear; half-gap rule: not met
+    s2-k-up = shipped + cuts: ffn_up (5)
+        rule 1: HS* 39 vs 40 of 200, D -1, 5 / 6, p 1; HT* 33 vs 31 of 198, D +2, 7 / 5, p 0.77; pooled D +1, 10 / 10, p 1 (200 entries)
+        rule 2: HS* 64 vs 61 of 200, D +3, 8 / 5, p 0.58; HT* 62 vs 59 of 198, D +3, 9 / 6, p 0.61; pooled D +6, 16 / 11, p 0.44 (200 entries)
+        plan label on HT* (share 0.07): clear; half-gap rule: not met
+    l1-L1a = shipped + the refit's 53 non-fit tensors
+        rule 1: HS* 38 vs 40 of 200, D -2, 7 / 9, p 0.8; HT* 30 vs 31 of 198, D -1, 10 / 11, p 1; pooled D -3, 15 / 17, p 0.86 (200 entries)
+        rule 2: HS* 61 vs 61 of 200, D +0, 10 / 10, p 1; HT* 59 vs 59 of 198, D +0, 11 / 11, p 1; pooled D +0, 20 / 19, p 1 (200 entries)
+        plan label on HT* (share -0.04): clear; half-gap rule: not met
+    l1-L1b = refit + shipped's 53 non-fit tensors (the refit's 400 fits)
+        rule 1: HS* 50 vs 40 of 200, D +10, 25 / 15, p 0.15; HT* 47 vs 31 of 198, D +16, 30 / 14, p 0.023; pooled D +26, 47 / 23, p 0.0056 (200 entries)
+        rule 2: HS* 73 vs 61 of 200, D +12, 29 / 17, p 0.1; HT* 71 vs 59 of 198, D +12, 31 / 19, p 0.12; pooled D +24, 51 / 27, p 0.0088 (200 entries)
+        plan label on HT* (share 0.59): partial; half-gap rule: met
+    l1-L1c = shipped + the refit's output head
+        rule 1: HS* 37 vs 40 of 200, D -3, 1 / 4, p 0.38; HT* 27 vs 31 of 198, D -4, 0 / 4, p 0.12; pooled D -7, 1 / 6, p 0.12 (200 entries)
+        rule 2: HS* 60 vs 61 of 200, D -1, 1 / 2, p 1; HT* 55 vs 59 of 198, D -4, 0 / 4, p 0.12; pooled D -5, 1 / 5, p 0.22 (200 entries)
+        plan label on HT* (share -0.15): clear; half-gap rule: not met
+    l2-AS = shipped + the refit's fits: attention and ssm kinds (208)
+        rule 1: HS* 53 vs 40 of 200, D +13, 26 / 13, p 0.053; HT* 49 vs 31 of 198, D +18, 28 / 10, p 0.0051; pooled D +31, 44 / 19, p 0.0022 (200 entries)
+        rule 2: HS* 69 vs 61 of 200, D +8, 26 / 18, p 0.29; HT* 71 vs 59 of 198, D +12, 26 / 14, p 0.081; pooled D +20, 40 / 26, p 0.11 (200 entries)
+        plan label on HT* (share 0.67): carries; half-gap rule: met
+    l2-FF = shipped + the refit's fits: ffn kinds (192)
+        rule 1: HS* 49 vs 40 of 200, D +9, 21 / 12, p 0.16; HT* 40 vs 31 of 198, D +9, 23 / 14, p 0.19; pooled D +18, 36 / 21, p 0.063 (200 entries)
+        rule 2: HS* 77 vs 61 of 200, D +16, 26 / 10, p 0.011; HT* 64 vs 59 of 198, D +5, 24 / 19, p 0.54; pooled D +21, 41 / 25, p 0.064 (200 entries)
+        plan label on HT* (share 0.33): partial; half-gap rule: not met
+    l2-LO = shipped + the refit's fits: layers 0-31 (200)
+        rule 1: HS* 48 vs 40 of 200, D +8, 18 / 10, p 0.18; HT* 54 vs 31 of 198, D +23, 39 / 16, p 0.0027; pooled D +31, 43 / 21, p 0.0081 (200 entries)
+        rule 2: HS* 69 vs 61 of 200, D +8, 21 / 13, p 0.23; HT* 74 vs 59 of 198, D +15, 36 / 21, p 0.063; pooled D +23, 43 / 28, p 0.096 (200 entries)
+        plan label on HT* (share 0.85): carries; half-gap rule: met
+    l2-HI = shipped + the refit's fits: layers 32-63 (200)
+        rule 1: HS* 42 vs 40 of 200, D +2, 21 / 19, p 0.87; HT* 32 vs 31 of 198, D +1, 15 / 14, p 1; pooled D +3, 28 / 25, p 0.78 (200 entries)
+        rule 2: HS* 66 vs 61 of 200, D +5, 24 / 19, p 0.54; HT* 59 vs 59 of 198, D +0, 17 / 17, p 1; pooled D +5, 30 / 28, p 0.9 (200 entries)
+        plan label on HT* (share 0.04): clear; half-gap rule: not met
+    l3-Kqkv = shipped + the refit's fits: attn_qkv (48)
+        rule 1: HS* 39 vs 40 of 200, D -1, 13 / 14, p 1; HT* 40 vs 31 of 198, D +9, 19 / 10, p 0.14; pooled D +8, 23 / 15, p 0.26 (200 entries)
+        rule 2: HS* 62 vs 61 of 200, D +1, 17 / 16, p 1; HT* 63 vs 59 of 198, D +4, 18 / 14, p 0.6; pooled D +5, 28 / 20, p 0.31 (200 entries)
+        plan label on HT* (share 0.33): partial; half-gap rule: not met
+    l3-Kag = shipped + the refit's fits: attn_gate (48)
+        rule 1: HS* 37 vs 40 of 200, D -3, 10 / 13, p 0.68; HT* 32 vs 31 of 198, D +1, 14 / 13, p 1; pooled D -2, 21 / 23, p 0.88 (200 entries)
+        rule 2: HS* 58 vs 61 of 200, D -3, 13 / 16, p 0.71; HT* 52 vs 59 of 198, D -7, 10 / 17, p 0.25; pooled D -10, 21 / 30, p 0.26 (200 entries)
+        plan label on HT* (share 0.04): clear; half-gap rule: not met
+    l3-Ksso = shipped + the refit's fits: ssm_out (48)
+        rule 1: HS* 49 vs 40 of 200, D +9, 22 / 13, p 0.18; HT* 43 vs 31 of 198, D +12, 22 / 10, p 0.05; pooled D +21, 32 / 17, p 0.044 (200 entries)
+        rule 2: HS* 74 vs 61 of 200, D +13, 27 / 14, p 0.06; HT* 71 vs 59 of 198, D +12, 24 / 12, p 0.065; pooled D +25, 40 / 20, p 0.013 (200 entries)
+        plan label on HT* (share 0.44): partial; half-gap rule: met
+    l3-Katt = shipped + the refit's fits: attn_q, k, v, output (64)
+        rule 1: HS* 48 vs 40 of 200, D +8, 15 / 7, p 0.13; HT* 27 vs 31 of 198, D -4, 9 / 13, p 0.52; pooled D +4, 18 / 15, p 0.73 (200 entries)
+        rule 2: HS* 71 vs 61 of 200, D +10, 22 / 12, p 0.12; HT* 55 vs 59 of 198, D -4, 11 / 15, p 0.56; pooled D +6, 28 / 21, p 0.39 (200 entries)
+        plan label on HT* (share -0.15): clear; half-gap rule: not met
+    direct, rule 1, pooled: refit - L1b: D +0, 18 / 17, p 1 (200 entries)
+    direct, rule 1, pooled: refit - L1a: D +29, 44 / 20, p 0.0037 (200 entries)
+    direct, rule 1, pooled: LO - HI: D +28, 40 / 18, p 0.0054 (200 entries)
+    direct, rule 1, pooled: AS - FF: D +13, 40 / 30, p 0.28 (200 entries)
+    direct, rule 1, pooled: AS - Ksso: D +10, 42 / 32, p 0.3 (200 entries)
+    direct, rule 1, pooled: Ksso - Kag: D +23, 31 / 16, p 0.04 (200 entries)
+
+PART 2. The first call of an AppWorld task, Inkling 2 Mini. Counts are first replies with no code block.
+
+(2a) test_challenge, 417 tasks per seed: no code / cut at the cap, per seed (cut replies scored by their content)
+    FP = official weights (run as UD-Q8_K_XL), f16 K/V, 48 GB card: seed 102: 261 of 417 (62.6 %), cut 6; seed 103: 125 of 417 (30.0 %), cut 3; all: 386 of 834 (46.3 %), cut 9
+    P2 = public 2-bit file (UD-Q2_K_XL), our engine, 12 GB card: seed 102: 192 of 417 (46.0 %), cut 14; seed 103: 184 of 417 (44.1 %), cut 12; all: 376 of 834 (45.1 %), cut 26
+    P1 = our map (M2), 12 GB card: seed 102: 64 of 417 (15.3 %), cut 5; seed 103: 31 of 417 (7.4 %), cut 0; all: 95 of 834 (11.4 %), cut 5
+
+(2b) The lines written before the run (seeds [102, 103])
+    L1 (the public 2-bit file's rate is 20 % or more; a cut reply counts as code): 350 of 834 = 42.0 % -> PASS
+    L2 (our map is below it: sign test by task p < 0.001 and rate ratio <= 0.5; cut replies counted against): our map 95 of 834 = 11.4 %, ratio 0.271; tasks 2-bit file higher / our map higher 223 / 22, p 4.8e-43; scenarios 105 / 5 of 139, p 2.0e-25 -> PASS
+    per seed (2-bit file minus our map, plain rule): 102: +128, 103: +153
+    plain rule by task: 237 / 18, p 6.6e-50
+    tasks with the event on one seed or more, P1: 86 of 417
+    tasks with the event on one seed or more, P2: 284 of 417
+
+(2c) The official weights against the two 12 GB files (report only; plain rule; seeds [102, 103])
+    P1 vs FP: by task official weights higher / our map higher 246 / 13, p 6.4e-57; by scenario 118 / 6 of 139, p 4.4e-28; per seed (FP - P1) 102: +197, 103: +94
+    FP vs P2: by task 2-bit file higher / official weights higher 108 / 112, p 0.84; by scenario 52 / 51 of 139, p 1; per seed (P2 - FP) 102: -69, 103: +59
+
+(2d) test_normal, seed 102, 168 tasks (the replay of the record, and two controls on our map)
+    L3 (our map's replay is inside the exact 95 % interval of the record's 50 of 672 at n 168 = [6, 20]): 18 of 168 (10.7 %), cut 1 -> PASS
+    C1 (control: f16 K/V): 11 of 168 (6.5 %), cut 0; against our map's replay by task: only this arm 6, only our map 13, p 0.17
+    C2 (control: no reasoning budget): 18 of 168 (10.7 %), cut 1; against our map's replay by task: only this arm 0, only our map 0, p 1
+    FPR (official weights (48 GB card)): 74 of 168 (44.0 %), cut 0; against our map's replay by task: only this arm 59, only our map 3, p 1.7e-14

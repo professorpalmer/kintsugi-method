@@ -1,5 +1,5 @@
 """Figures of the Kintsugi-method paper, from data already in the record only (no new runs). Deterministic.
-    python -X utf8 scripts/make_figs.py      -> paper/figs/fig{1..7}-<name>.{png,pdf} (numbered in order of appearance)
+    python -X utf8 scripts/make_figs.py      -> paper/figs/fig{1..9}-<name>.{png,pdf} (numbered in order of appearance)
 
 Sources by output file (the paper numbers figures by the file prefix; every number is also in evidence/EVIDENCE.md):
 - fig1-workflow: the workflow (no data).
@@ -15,6 +15,10 @@ Sources by output file (the paper numbers figures by the file prefix; every numb
   cluster-robust intervals (E5.28).
 - fig7-inkling-appworld: Inkling AppWorld test_normal per seed: seeds 102-105 (E4.8, E4.12, E3.12, E3.13) and seeds 108-111 with
   the setup equal (E5.22).
+- fig8-return-turn: the return turn of BFCL miss_func, misses under both rules for pairs of cells on the same requests, from
+  the per-unit outcome file return-turn-units.csv (E7.2, E7.4-E7.6).
+- fig9-inkling-first-call: Inkling 2 Mini, first replies with no code block per seed and arm, from the per-unit outcome file
+  inkling-firstcall-units.csv (E7.11).
 Style: light theme, Okabe-Ito colours (colour-blind safe) plus distinct markers / hatches (readable in grayscale). Legends
 are outside the plot area.
 """
@@ -68,6 +72,15 @@ def seed_level(label):
             if c["label"] == label:
                 return c
     raise KeyError(label)
+
+
+HAB = os.path.join(ROOT, "data", "habits")
+
+
+def hab(name):
+    import csv
+    with open(os.path.join(HAB, name), encoding="utf-8") as f:
+        return list(csv.DictReader(f))
 
 
 def pfmt(p):
@@ -363,6 +376,81 @@ def fig_bf16():
     save(fig, "fig2-bf16-per-seed")
 
 
+# ------------------------------------------------------------------ the return turn under both rules (paper v1.3)
+def fig_return_turn():
+    cells = {}
+    for r in hab("return-turn-units.csv"):
+        c = cells.setdefault(r["cell"], [0, 0, 0])
+        c[0] += 1; c[1] += int(r["no_call"]); c[2] += int(r["held_not_called"])
+
+    def tot(names, k):
+        return sum(cells[n][k] for n in names), sum(cells[n][0] for n in names)
+
+    ship = (OK["black"], "", "shipped 2.47-bit file")
+    kt3 = (OK["orange"], "xx", "KL-tools-3 (candidate map)")
+    bf = (OK["blue"], "//", "BF16")
+    strip = (OK["green"], "..", "shipped, earlier thinking stripped")
+    pairs = [("HS*\n12 GB\ncards", ["s0-shipped-HS"], ship, ["s0-V5tf-HS"], kt3),
+             ("HT*\n12 GB\ncards", ["s0-shipped-HT"], ship, ["s0-V5tf-HT"], kt3),
+             ("HS*\none 80 GB\ncard", ["b-shipped-HS"], ship, ["b-BF16-HS"], bf),
+             ("HS* + HT*\nthinking\nstripped", ["s0-shipped-HS", "s0-shipped-HT"], ship,
+              ["a6-shipped-nothink-HS", "a6-shipped-nothink-HT"], strip),
+             ("HS* + HT*\nwording\n(c)", ["a3-shipped-vc-HS", "a3-shipped-vc-HT"], ship,
+              ["a3-V5tf-vc-HS", "a3-V5tf-vc-HT"], kt3)]
+    fig, ax = plt.subplots(1, 2, figsize=(7.4, 3.5), sharey=True)
+    w = 0.38
+    for k, a in ((1, ax[0]), (2, ax[1])):
+        seen = set()
+        for i, (_, xa, sa, xb, sb) in enumerate(pairs):
+            for j, (names, (c, hatch, lab)) in enumerate(((xa, sa), (xb, sb))):
+                m, n = tot(names, k)
+                a.bar(i + (j - 0.5) * w, 100 * m / n, w, color=c if not hatch else "white", edgecolor=c, hatch=hatch, lw=1.2,
+                      label=lab if lab not in seen else None)
+                seen.add(lab)
+                a.annotate(str(m), (i + (j - 0.5) * w, 100 * m / n), xytext=(0, 2), textcoords="offset points", ha="center",
+                           fontsize=6.5)
+        a.set_xticks(range(len(pairs))); a.set_xticklabels([p[0] for p in pairs], fontsize=6.8)
+        a.set_ylim(0, 50)
+        a.set_title("(a) Rule 1: the reply has no tool call" if k == 1 else "(b) Rule 2: the returned function is not called")
+    ax[0].set_ylabel("misses at the return turn (% of units)\nnumbers on the bars: misses")
+    h, l = ax[0].get_legend_handles_labels()
+    fig.legend(h, l, frameon=False, fontsize=7, loc="lower center", ncol=4, bbox_to_anchor=(0.5, -0.06), columnspacing=1.0,
+               handletextpad=0.4)
+    fig.tight_layout(w_pad=1.2)
+    save(fig, "fig8-return-turn")
+
+
+# ------------------------------------------------------------------ Inkling 2 Mini, the first call of a task (paper v1.3)
+def fig_first_call():
+    acc = {}
+    for r in hab("inkling-firstcall-units.csv"):
+        if r["dataset"] != "test_challenge":
+            continue
+        c = acc.setdefault((r["arm"], int(r["seed"])), [0, 0])
+        c[0] += 1; c[1] += int(r["no_code"])
+    arms = [("FP", OK["blue"], "//", "official weights (run as UD-Q8_K_XL), 48 GB card"),
+            ("P2", OK["grey"], "xx", "public 2-bit file (UD-Q2_K_XL), our engine, 12 GB card"),
+            ("P1", OK["black"], "", "M2 (ours), 12 GB card")]
+    seeds = sorted({s for (a, s) in acc if all((x[0], s) in acc for x in arms)})
+    fig, ax = plt.subplots(figsize=(5.6, 3.2))
+    w = 0.26
+    for j, (arm, c, hatch, lab) in enumerate(arms):
+        vals = [acc[(arm, s)] for s in seeds]
+        vals.append([sum(v[0] for v in vals), sum(v[1] for v in vals)])
+        for i, (n, m) in enumerate(vals):
+            ax.bar(i + (j - 1) * w, 100 * m / n, w, color=c if not hatch else "white", edgecolor=c, hatch=hatch, lw=1.2,
+                   label=lab if i == 0 else None)
+            ax.annotate(str(m), (i + (j - 1) * w, 100 * m / n), xytext=(0, 2), textcoords="offset points", ha="center", fontsize=6.5)
+    ax.set_xticks(range(len(seeds) + 1))
+    ax.set_xticklabels([f"seed {s}\n(417 tasks)" for s in seeds] + [f"all seeds\n({417 * len(seeds):,} calls)"], fontsize=7.5)
+    ax.set_ylim(0, 72)
+    ax.set_ylabel("first replies with no code block (%)\nnumbers on the bars: replies")
+    ax.set_title("Inkling 2 Mini: the first call of an AppWorld task (harder split)")
+    ax.legend(frameon=False, fontsize=7, loc="upper center", ncol=1, bbox_to_anchor=(0.5, -0.2))
+    fig.tight_layout()
+    save(fig, "fig9-inkling-first-call")
+
+
 if __name__ == "__main__":
-    fig5(); fig_bf16(); fig1(); fig6(); fig3(); fig2(); fig4()
+    fig5(); fig_bf16(); fig1(); fig6(); fig3(); fig2(); fig4(); fig_return_turn(); fig_first_call()
     print("figures written to", os.path.abspath(OUT))

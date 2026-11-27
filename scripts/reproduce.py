@@ -20,6 +20,7 @@ STEPS = [
      ["scripts/gg_seed.py"]),
     ("Seed-level tests of the test_normal comparisons (E5.28)", ["scripts/gg_seed_tn.py"]),
     ("Temperature 1.0 minus temperature 0 lead; greedy split of the T 1.0 runs (E6.1, E6.2)", ["scripts/v12_t0.py"]),
+    ("Decision-point habits: the return turn under both miss rules, the first call (E7.2, E7.4-E7.9, E7.11)", ["scripts/v13_habits.py"]),
     ("AppWorld counts and task-level statistics of v1.0.x (E1.31, E1.32, E1.36, E3.x, E4.8, E4.12)", ["scripts/gg_stats.py"]),
     ("W2-C flip maps on the held-out recall population (E5.15)", ["scripts/w2c_score.py", "--dir", "data/w2c/out"]),
     ("W2-D graded recall of the Inkling baselines (E5.21)", ["scripts/w2d_margin.py"]),

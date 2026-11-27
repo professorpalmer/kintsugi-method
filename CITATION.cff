@@ -1,15 +1,15 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
 type: article
-title: "Kintsugi: Gate Low-Bit Quantization on Tasks, Not on Average Error Alone"
-version: "1.2.0"
-date-released: "2026-11-26"
+title: "Kintsugi: Task-Gated Repair Reaches Full-Precision Agent Scores at 2.5 Bits"
+version: "1.3.0"
+date-released: "2026-11-27"
 license: CC-BY-4.0
 repository-code: "https://github.com/professorpalmer/kintsugi-method"
 authors:
   - family-names: Palmer
     given-names: Cary
-abstract: "Low-bit quantization of language models is usually tuned on an average error, such as the KL divergence to the full-precision model. The Kintsugi method gates every change on task probes next to KL, with each pass line written before its run, and confirms on data that no choice used. On two models that fit one 12 GB GPU: (1) On Qwen3.8-27B at temperature 1.0, a 2.47-bit build scores above BF16 on AppWorld test_challenge on four of four seeds (+117 of 1,668 task-runs; seed-level p = 5.1e-4), also in BF16's setup. Almost all of the gap is one end-of-task habit of the base model: on an action task, the run passes an unasked answer and fails. BF16 does this in 258 runs, the build in 112; with these runs counted as passes (a post hoc class), the two are level. At temperature 0 the lead is +11 [-5, +28]. Reasoning effort xhigh lowers the habit (3 against 13 runs on a targeted set); one targeted sentence does not. (2) Average KL does not rank bit maps: six maps of one size score 586 to 680 of 834. A class-level KL table found a repair worth 70 task-runs, and 8 raised projections carry it. (3) Lines written before the runs held two lower-KL maps out of the release. (4) On Inkling 2 Mini, another lineage, our build scores above a public 2-bit file with the setup equal (598 against 579 of 672; p = 0.019); the 27B allocation rule did not carry over. We did not invent the quantizer, the trellis codec or the 27B bit allocation."
+abstract: "Low-bit quantization of language models is usually tuned on an average error such as KL divergence. The Kintsugi method gates every change and every repair on task probes next to KL, with pass lines written before each run. On two model families, the 12 GB builds that came out of this loop, at about 2.5 bits per coded weight, reach the AppWorld scores of the full-precision weights: on Qwen3.8-27B the shipped build (the published bit allocation with our fits, head and runtime) and the map that the loop repaired; on Inkling 2 Mini our map (596 against 592 of 672). On the 27B model, average KL would have picked lower-scoring maps. Such results sit at single decisions that a benchmark total hides: decision-point habits. We detect one by a turn-type split, replay the deciding call on a frozen history, and locate it by tensor copies between files. (1) Qwen3.8-27B, BFCL: when a held-back tool returns, the model often says the tool is absent although the new tool list is in its prompt. At temperature 0.001 in one setup, BF16 misses 61 of 200 such turns and the 2.47-bit build 36 (p = 1.1e-4). Stripping earlier thinking removes 40-62 % of the build's misses. Tensor copies pointed at the fits of two same-map files on the public entries; on the development half of a fresh private set that gap was not shown, and a graft chosen there was not confirmed on the sealed half. (2) Inkling 2 Mini, a pre-registered confirm on fresh tasks: the first reply that the client receives has no code in 46 % of calls for the official weights, 45 % for a public 2-bit file and 11 % for our map; no task cost is shown. No build was made to change a habit. A map built to remove one, confirmed on held-out turns, is the open step. We did not invent the quantizer, the trellis codec or the 27B bit allocation."
 keywords:
   - "quantization"
   - "large language models"
@@ -21,4 +21,6 @@ keywords:
   - "preregistration"
   - "winner's curse"
   - "mixture of experts"
+  - "tool calling"
+  - "decision-point habits"
 doi: 10.5281/zenodo.24455575

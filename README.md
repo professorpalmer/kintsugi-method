@@ -2,8 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24455575.svg)](https://doi.org/10.5281/zenodo.24455575)
 
-**Gate low-bit quantization on tasks, not on average error alone.**
-Paper and evidence by Cary Palmer, version 1.2 (2026-11-26).
+**Task-gated repair reaches full-precision agent scores at 2.5 bits.**
+Paper and evidence by Cary Palmer, version 1.3 (2026-11-27).
 
 - Paper: [`paper/kintsugi-method.pdf`](paper/kintsugi-method.pdf) (source: [`paper/kintsugi-method.md`](paper/kintsugi-method.md))
 - Every number in the paper cites a row of [`evidence/EVIDENCE.md`](evidence/EVIDENCE.md) as [E#.#].
@@ -12,7 +12,12 @@ Paper and evidence by Cary Palmer, version 1.2 (2026-11-26).
   [`evidence/ALGORITHM.md`](evidence/ALGORITHM.md).
 - A patch proposal for per-call seeds in AppWorld runs: [`evidence/SEED-FIX.md`](evidence/SEED-FIX.md).
 
-**Version 1.2 adds the mechanism of the agent result** (one end-of-task habit of the base model; Section 4.3 of the
+**Version 1.3 makes decision-point habits the central result** (Section 4.10 of the paper): a procedure to detect a
+habit that a benchmark total hides, to freeze it and replay it, and to locate it by tensor copies, on two model
+families, with a blind recount of every cell count. The paper says plainly which step is open: no build was made to remove
+a habit; on a fresh private set the gap between the two same-map files of the locate step is not shown on the development half, and a graft chosen there was not confirmed on the sealed half. The per-unit outcomes are in `data/habits/`, and `scripts/v13_habits.py` repeats the counts.
+
+**Version 1.2 added the mechanism of the agent result** (one end-of-task habit of the base model; Section 4.3 of the
 paper), the repair split, a held candidate map and the review changes. Version 1.1 corrected the statistics of
 versions 1.0.x: the task-runs of one AppWorld seed share one random stream, so every AppWorld claim is at the seed
 level. Appendix B of the paper and [`CHANGELOG.md`](CHANGELOG.md) list what each version changed.
@@ -43,13 +48,36 @@ byte-identical to the one in this repository (Python 3.12 and the pinned package
 | Flip maps of KL-table B on the held-out recall population (W2-C) | `scripts/w2c_score.py --dir data/w2c/out` | `data/w2c/`, `data/b1/`, `data/b1c/` | `results/w2c-result.txt` | Section 4.3; E5.15 |
 | Graded recall of the Inkling baselines (W2-D) | `scripts/w2d_margin.py` | `data/margins/w2d/`, `data/margins/gc2/` | `results/w2d-margin-result.txt` | Section 4.6, Table 7; E5.21 |
 | Temperature 1.0 minus temperature 0 lead (scenario bootstrap and design effect); each arm's T 1.0 runs split by its greedy result | `scripts/v12_t0.py` | `data/appworld/` (`t3-pv3ac*`, `w2-pv3ac*`, `w2-pbf16*`) | `results/v12-t0.txt`, `.json` | Section 4.2, Table 1b; E6.1, E6.2 |
+| **Decision-point habits (version 1.3):** the return turn of BFCL miss_func under both miss rules (the 2 x 2, the parent check, stripped thinking, effort, wordings, sampling, the tensor-copy arms with both sets of labels) and the first call of an AppWorld task on Inkling 2 Mini (lines L1-L3, controls, the reference row) | `scripts/v13_habits.py` | `data/habits/` | `results/v13-habits.txt`, `.json` | Section 4.10; Tables H1-H3; Figures 8, 9; E7.2, E7.4-E7.9, E7.11 |
 | Free-generation check: thinking length per item | `scripts/freegen_summary.py` | `data/freegen/` | `results/freegen.txt` | Section 6; E5.26, E5.30 |
 | Graded K/V margins on Inkling 2 Mini | `scripts/gc2_score.py` | `data/margins/gc2/` | `results/gc2-result.txt` | Section 4.4; E2.23 |
 | Graded margins of the two baselines | `scripts/gb2_score.py` | `data/margins/gb2/` | `results/gb2-result.txt` | Section 4.3; E1.33 |
 | B1 held-out recall population test | `scripts/b1/b1_score.py --dir data/b1/out` | `data/b1/` | `results/b1-result.txt` | Section 4.3, Figure 4; E1.34 |
 | B1c same-box confirmation | `scripts/b1/b1c_score.py --dir data/b1c/out` | `data/b1c/` | `results/b1c-result.txt` | E1.35 |
 | KL comparisons of the first batch | `scripts/kl/kl_docs.py <p1/p2> <base> <map>...` | `data/kl/` | `results/kl.txt` | Table 3; E1.1-E1.3, E1.8, E1.9, E1.28-E1.30 |
-| Figures 1-7 | `scripts/make_figs.py` | the above | `paper/figs/` | Figures 1-7 |
+| Figures 1-9 | `scripts/make_figs.py` | the above | `paper/figs/` | Figures 1-9 |
+
+### Numbers of version 1.3
+
+`data/habits/` holds one line per unit: the entry or task id and 0 / 1 outcome flags. It holds no prompt and no reply
+text (`data/README.md` gives the columns and the cell names; Appendix A of the paper maps the names).
+
+| Number in the paper | Where to read it after `reproduce.py` |
+|---|---|
+| Live return turns 32 / 200 against 57 / 198 (35 / 10, p 2.5e-4); replay noise 0 of 200; replay equal to the live call 95.0 % and 89.4 % | `results/v13-habits.txt`, parts (1b), (1c) |
+| Table H1: every pair under rule 1 and rule 2 (the 2 x 2, BF16 against the shipped file on one 80 GB card 61 / 36 and 77 / 59, the setup effect 36 against 40, stripped thinking, effort xhigh, wordings (a)-(c)) | part (1d) |
+| Sampling on three seeds: +49, +49, +42; by entry +140 (91 / 22) | part (1e) |
+| Prompt-length halves | part (1f) |
+| Locate, part 1 (the common raises and cuts; single kinds) and Table H2 (tensor copies, both rules, the half-gap label and the plan label) | part (1g) |
+| Table H3 and lines L1-L3: 350 / 834; 95 / 834, ratio 0.27, by task 223 / 22; 18 / 168 in [6, 20]; controls 11 / 168 and 18 / 168; the official weights 386 / 834 | part 2 |
+
+`data/scores/v13-habits-lab.txt` is the lab output of the same script, for comparison with your `results/`.
+
+Not recomputed here (the sources are transcripts and reply texts, which hold benchmark content): the BFCL and AppWorld
+totals of the candidate map and the first find of the return turn (E7.1); the counts of what the misses say (E7.3);
+the Inkling turn split (E7.10); the token-identity checks of the replays (E7.11); the decision probe (E7.12); the
+task-cost check (E7.13); the cross-over of the thinking and the token check behind the correction (E7.18, E7.19); the counts on the private set, whose entries are not published (E7.15, E7.16). Their counts are in the paper and in `evidence/EVIDENCE.md`. The blind recount (E7.14) read
+the raw rows; `scripts/v13_habits.py` on `data/habits/` gives the same counts.
 
 ### Numbers of version 1.2
 
@@ -120,5 +148,5 @@ AppWorld scores come from the AppWorld harness (not included); `data/appworld/` 
 
 ## Cite
 
-Palmer, C. (2026). *Kintsugi: Gate Low-Bit Quantization on Tasks, Not on Average Error Alone*. Zenodo.
+Palmer, C. (2026). *Kintsugi: Task-Gated Repair Reaches Full-Precision Agent Scores at 2.5 Bits*. Zenodo.
 https://doi.org/10.5281/zenodo.24455575 (machine-readable: `CITATION.cff`; Zenodo gives each version its own DOI).
